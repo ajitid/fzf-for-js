@@ -688,3 +688,104 @@ function calculateScore(
   }
   return [score, pos];
 }
+
+const FuzzyMatchV1: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  text,
+  pattern,
+  withPos,
+  slab
+) => {
+  if (pattern.length === 0) {
+    return [{ start: 0, end: 0, score: 0 }, null];
+  }
+
+  if (asciiFuzzyIndex(text, pattern, caseSensitive) < 0) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  let pidx = 0,
+    sidx = -1,
+    eidx = -1;
+
+  const lenRunes = text.length;
+  const lenPattern = pattern.length;
+
+  for (let index = 0; index < lenRunes; index++) {
+    let rune = text[indexAt(index, lenRunes, forward)].codePointAt(0)!;
+
+    if (!caseSensitive) {
+      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+        rune += 32;
+      } else if (rune > MAX_ASCII) {
+        rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+      }
+    }
+
+    if (normalize) {
+      rune = normalizeRune(rune);
+    }
+
+    const pchar = pattern[indexAt(pidx, lenPattern, forward)];
+
+    if (rune === pchar) {
+      if (sidx < 0) {
+        sidx = index;
+      }
+
+      pidx++;
+      if (pidx === lenPattern) {
+        eidx = index + 1;
+        break;
+      }
+    }
+  }
+
+  if (sidx >= 0 && eidx >= 0) {
+    pidx--;
+
+    for (let index = eidx - 1; index >= sidx; index--) {
+      const tidx = indexAt(index, lenRunes, forward);
+      let rune = text[tidx].codePointAt(0)!;
+
+      if (!caseSensitive) {
+        if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+          rune += 32;
+        } else if (rune > MAX_ASCII) {
+          rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+        }
+      }
+
+      const pidx_ = indexAt(pidx, lenPattern, forward);
+      const pchar = pattern[pidx_];
+
+      if (rune === pchar) {
+        pidx--;
+        if (pidx < 0) {
+          sidx = index;
+          break;
+        }
+      }
+    }
+
+    if (!forward) {
+      sidx = lenRunes - eidx;
+      eidx = lenRunes - sidx;
+    }
+
+    const [score, pos] = calculateScore(
+      caseSensitive,
+      normalize,
+      text,
+      pattern,
+      sidx,
+      eidx,
+      withPos
+    );
+    return [{ start: sidx, end: eidx, score }, pos];
+  }
+
+  return [{ start: -1, end: -1, score: 0 }, null];
+};
