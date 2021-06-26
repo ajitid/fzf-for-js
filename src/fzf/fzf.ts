@@ -5,6 +5,10 @@
 import { normalized } from "./normalize";
 import { Slab } from "./utils/slab";
 
+type Int16 = Int16Array[0];
+type Int32 = Int32Array[0];
+type Rune = Int32;
+
 function indexAt(index: number, max: number, forward: boolean) {
   if (forward) {
     return index;
@@ -74,7 +78,8 @@ function alloc32(
 }
 
 // rune is type int32 in Golang https://blog.golang.org/strings#TOC_5.
-// and represents a character
+// and represents a character. In JavaScript, rune will be
+// int32 [Go] == 'a'.codePointAt(0) [JS] == 97 [number]
 //
 // TODO We are considering passed argument `rune` as string here and use
 // rune[0] to denote char (which, I know, is a string)
@@ -84,10 +89,9 @@ function alloc32(
 // this might led to creation of too many strings in string pool resulting in
 // huge garbage collection. JS can't parse it in terms of bytes so I might need to use
 // char array instead (which will technically be string array)
-function charClassOfAscii(rune: string): Char {
-  if (rune.length === 0) return Char.NonWord;
+function charClassOfAscii(rune: Rune): Char {
+  const char = String.fromCodePoint(rune);
 
-  const char = rune[0];
   if (char >= "a" && char <= "z") {
     return Char.Lower;
   } else if (char >= "A" && char <= "Z") {
@@ -99,10 +103,9 @@ function charClassOfAscii(rune: string): Char {
   }
 }
 
-function charClassOfNonAscii(rune: string): Char {
-  if (rune.length === 0) return Char.NonWord;
+function charClassOfNonAscii(rune: Rune): Char {
+  const char = String.fromCodePoint(rune);
 
-  const char = rune[0];
   // checking whether it is a lowercase letter by checking whether converting
   // it into uppercase has any effect on it
   if (char !== char.toUpperCase()) {
@@ -120,21 +123,17 @@ function charClassOfNonAscii(rune: string): Char {
   return Char.NonWord;
 }
 
-const MAX_ASCII = "\u007F";
+const MAX_ASCII = "\u007F".codePointAt(0)!;
 
-function charClassOf(rune: string): Char {
-  if (rune.length === 0) return charClassOfAscii(rune);
-
-  const char = rune[0];
-
-  if (char <= MAX_ASCII) {
-    return charClassOfAscii(char);
+function charClassOf(rune: Rune): Char {
+  if (rune <= MAX_ASCII) {
+    return charClassOfAscii(rune);
   }
 
-  return charClassOfNonAscii(char);
+  return charClassOfNonAscii(rune);
 }
 
-function bonusFor(prevClass: Char, currClass: Char): Int16Array[0] {
+function bonusFor(prevClass: Char, currClass: Char): Int16 {
   if (prevClass === Char.NonWord && currClass !== Char.NonWord) {
     // word boundary
     return BONUS_BOUNDARY;
@@ -151,30 +150,30 @@ function bonusFor(prevClass: Char, currClass: Char): Int16Array[0] {
   return 0;
 }
 
-function bonusAt(input: string, idx: number): Int16Array[0] {
+function bonusAt(input: string, idx: number): Int16 {
   if (idx === 0) {
     return BONUS_BOUNDARY;
   }
 
-  return bonusFor(charClassOf(input[idx - 1]), charClassOf(input[idx]));
+  return bonusFor(
+    charClassOf(input[idx - 1].codePointAt(0)!),
+    charClassOf(input[idx].codePointAt(0)!)
+  );
 }
 
-function normalizeRune(r: string) {
-  const char = r[0];
-
-  if (
-    char < String.fromCharCode(0x00c0) ||
-    char > String.fromCharCode(0x2184)
-  ) {
-    return r;
+function normalizeRune(rune: Rune): Rune {
+  if (rune < 0x00c0 || rune > 0x2184) {
+    return rune;
   }
 
   // while a char can be converted to hex using str.charCodeAt().toString(16), it is not needed
-  // because in `normalized` map those hex in keys will be converted to decimals
-  const normalizedChar = normalized[char.charCodeAt(0)];
-  if (normalizedChar !== undefined) return normalizedChar;
+  // because in `normalized` map those hex in keys will be converted to decimals.
+  // Also we are passing a number instead of a converting a char so the above line doesn't apply (and that
+  // we are using codePointAt instead of charCodeAt)
+  const normalizedChar = normalized[rune];
+  if (normalizedChar !== undefined) return normalizedChar.codePointAt(0)!;
 
-  return char;
+  return rune;
 }
 
 type AlgoFn = (
@@ -182,7 +181,7 @@ type AlgoFn = (
   normalize: boolean,
   forward: boolean,
   input: string,
-  pattern: string[],
+  pattern: Rune[],
   withPos: boolean,
   slab: Slab | null
 ) => [Result, number[] | null];
@@ -193,7 +192,7 @@ function trySkip(
   char: string,
   from: number
 ): number {
-  let rest = input.substr(from);
+  let rest = input.substring(from);
   let idx = rest.indexOf(char);
   if (idx === 0) {
     return from;
@@ -208,7 +207,7 @@ function trySkip(
     // convert ascii lower to upper by subtracting 32 (a -> A)
     // and then checking if it is present in str
     // dunno, this logic looks odd
-    const uidx = rest.indexOf(String.fromCharCode(char.charCodeAt(0) - 32));
+    const uidx = rest.indexOf(String.fromCodePoint(char.codePointAt(0)! - 32));
     if (uidx >= 0) {
       idx = uidx;
     }
@@ -221,10 +220,9 @@ function trySkip(
   return from + idx;
 }
 
-function isAscii(runes: string[]) {
+function isAscii(runes: Rune[]) {
   for (const rune of runes) {
-    const char = rune[0];
-    if (char.charCodeAt(0) >= 128) {
+    if (rune >= 128) {
       return false;
     }
   }
@@ -234,7 +232,7 @@ function isAscii(runes: string[]) {
 
 function asciiFuzzyIndex(
   input: string,
-  pattern: string[],
+  pattern: Rune[],
   caseSensitive: boolean
 ): number {
   // TODO there is a condition that returns 0 which I didn't used (not present in telescope-fzf-native either)
@@ -248,7 +246,12 @@ function asciiFuzzyIndex(
     idx = 0;
 
   for (let pidx = 0; pidx < pattern.length; pidx++) {
-    idx = trySkip(input, caseSensitive, pattern[pidx], idx);
+    idx = trySkip(
+      input,
+      caseSensitive,
+      String.fromCodePoint(pattern[pidx]),
+      idx
+    );
     if (idx < 0) {
       return -1;
     }
@@ -294,6 +297,7 @@ export const fuzzyMatchV2: AlgoFn = (
     );
   }
 
+  // Phase 1. Optimized search for ASCII string
   const idx = asciiFuzzyIndex(input, pattern, caseSensitive);
   if (idx < 0) {
     return [{ start: -1, end: -1, score: 0 }, null];
@@ -301,15 +305,19 @@ export const fuzzyMatchV2: AlgoFn = (
 
   let offset16 = 0,
     offset32 = 0,
-    H0: Int16Array = null,
-    C0: Int16Array = null,
-    B: Int16Array = null,
-    F: Int32Array = null;
+    H0: Int16Array | null = null,
+    C0: Int16Array | null = null,
+    B: Int16Array | null = null,
+    F: Int32Array | null = null;
   [offset16, H0] = alloc16(offset16, slab, N);
   [offset16, C0] = alloc16(offset16, slab, N);
   [offset16, B] = alloc16(offset16, slab, N);
   [offset32, F] = alloc32(offset32, slab, M);
   const [, T] = alloc32(offset32, slab, N);
-  //  so rune is int32, uh-oh
-  // input.
+
+  for (let i = 0; i < T.length; i++) {
+    T[i] = input.codePointAt(i)!;
+  }
+
+  // Phase 2. Calculate bonus for each point
 };
