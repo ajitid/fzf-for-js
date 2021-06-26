@@ -76,8 +76,14 @@ function alloc32(
 // rune is type int32 in Golang https://blog.golang.org/strings#TOC_5.
 // and represents a character
 //
-// TODO we are considering passed argument `rune` as string here and use
+// TODO We are considering passed argument `rune` as string here and use
 // rune[0] to denote char (which, I know, is a string)
+// need to eliminate this unnecessary indexing.
+//
+// Also I'm considering `input` arg as a string not an array of chars,
+// this might led to creation of too many strings in string pool resulting in
+// huge garbage collection. JS can't parse it in terms of bytes so I might need to use
+// char array instead (which will technically be string array)
 function charClassOfAscii(rune: string): Char {
   if (rune.length === 0) return Char.NonWord;
 
@@ -176,10 +182,10 @@ type AlgoFn = (
   normalize: boolean,
   forward: boolean,
   input: string,
-  pattern: string,
+  pattern: string[],
   withPos: boolean,
-  slab: Slab
-) => [Result, number[]];
+  slab: Slab | null
+) => [Result, number[] | null];
 
 function trySkip(
   input: string,
@@ -225,3 +231,85 @@ function isAscii(runes: string[]) {
 
   return true;
 }
+
+function asciiFuzzyIndex(
+  input: string,
+  pattern: string[],
+  caseSensitive: boolean
+): number {
+  // TODO there is a condition that returns 0 which I didn't used (not present in telescope-fzf-native either)
+  // check if it is needed
+
+  if (!isAscii(pattern)) {
+    return -1;
+  }
+
+  let firstIdx = 0,
+    idx = 0;
+
+  for (let pidx = 0; pidx < pattern.length; pidx++) {
+    idx = trySkip(input, caseSensitive, pattern[pidx], idx);
+    if (idx < 0) {
+      return -1;
+    }
+    if (pidx === 0 && idx > 0) {
+      firstIdx = idx - 1;
+    }
+    idx++;
+  }
+
+  return firstIdx;
+}
+
+function debugV2() {
+  // TODO
+  console.error(" complete this!!!! ");
+}
+
+export const fuzzyMatchV2: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  input,
+  pattern,
+  withPos,
+  slab
+) => {
+  const M = pattern.length;
+  if (M === 0) {
+    return [{ start: 0, end: 0, score: 0 }, posArray(withPos, M)];
+  }
+
+  const N = input.length;
+
+  if (slab !== null && N * M > slab.i16.length) {
+    return fuzzyMatchV1(
+      caseSensitive,
+      normalize,
+      forward,
+      input,
+      pattern,
+      withPos,
+      slab
+    );
+  }
+
+  const idx = asciiFuzzyIndex(input, pattern, caseSensitive);
+  if (idx < 0) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  let offset16 = 0,
+    offset32 = 0,
+    H0: Int16Array = null,
+    C0: Int16Array = null,
+    B: Int16Array = null,
+    F: Int32Array = null;
+  [offset16, H0] = alloc16(offset16, slab, N);
+  [offset16, C0] = alloc16(offset16, slab, N);
+  [offset16, B] = alloc16(offset16, slab, N);
+  [offset32, F] = alloc32(offset32, slab, M);
+  const [, T] = alloc32(offset32, slab, N);
+  //  so rune is int32, uh-oh
+  // input.
+};
