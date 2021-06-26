@@ -789,3 +789,105 @@ const FuzzyMatchV1: AlgoFn = (
 
   return [{ start: -1, end: -1, score: 0 }, null];
 };
+
+const exactMatchNaive: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  text,
+  pattern,
+  withPos,
+  slab
+) => {
+  if (pattern.length === 0) {
+    return [{ start: 0, end: 0, score: 0 }, null];
+  }
+
+  const lenRunes = text.length;
+  const lenPattern = pattern.length;
+
+  if (lenRunes < lenPattern) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  if (asciiFuzzyIndex(text, pattern, caseSensitive) < 0) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  let pidx = 0;
+  let bestPos = -1,
+    bonus = toShort(0),
+    bestBonus = toShort(-1);
+
+  for (let index = 0; index < lenRunes; index++) {
+    const index_ = indexAt(index, lenRunes, forward);
+    let rune = text[index_].codePointAt(0)!;
+
+    if (!caseSensitive) {
+      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+        rune += 32;
+      } else if (rune > MAX_ASCII) {
+        rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+      }
+    }
+
+    if (normalize) {
+      rune = normalizeRune(rune);
+    }
+
+    const pidx_ = indexAt(pidx, lenPattern, forward);
+    const pchar = pattern[pidx_];
+
+    if (pchar === rune) {
+      if (pidx_ === 0) {
+        bonus = bonusAt(text, index_);
+      }
+
+      pidx++;
+      if (pidx === lenPattern) {
+        if (bonus > bestBonus) {
+          bestPos = index;
+          bestBonus = bonus;
+        }
+
+        if (bonus === BONUS_BOUNDARY) {
+          break;
+        }
+
+        index -= pidx - 1;
+        pidx = 0;
+        bonus = 0;
+      }
+    } else {
+      index -= pidx;
+      pidx = 0;
+      bonus = 0;
+    }
+  }
+
+  if (bestPos >= 0) {
+    let sidx = 0,
+      eidx = 0;
+
+    if (forward) {
+      sidx = bestPos - lenPattern + 1;
+      eidx = bestPos + 1;
+    } else {
+      sidx = lenRunes - (bestPos + 1);
+      sidx = lenRunes - (bestPos - lenPattern + 1);
+    }
+
+    const [score] = calculateScore(
+      caseSensitive,
+      normalize,
+      text,
+      pattern,
+      sidx,
+      eidx,
+      false
+    );
+    return [{ start: sidx, end: eidx, score }, null];
+  }
+
+  return [{ start: -1, end: -1, score: 0 }, null];
+};
