@@ -605,3 +605,86 @@ export const fuzzyMatchV2: AlgoFn = (
   // maxScore needs to be typecasted in other lang to `int`
   return [{ start: j, end: maxScorePos + 1, score: maxScore }, pos];
 };
+
+function calculateScore(
+  caseSensitive: boolean,
+  normalize: boolean,
+  text: string,
+  pattern: Rune[],
+  sidx: number,
+  eidx: number,
+  withPos: boolean
+): [number, number[] | null] {
+  let pidx = 0,
+    score = 0,
+    inGap = false,
+    consecutive = 0,
+    firstBonus = toShort(0);
+
+  const pos = posArray(withPos, pattern.length);
+  let prevCharClass = Char.NonWord;
+
+  if (sidx > 0) {
+    prevCharClass = charClassOf(text[sidx - 1].codePointAt(0)!);
+  }
+
+  for (let idx = sidx; idx < eidx; idx++) {
+    let rune = text[idx].codePointAt(0)!;
+    const charClass = charClassOf(rune);
+
+    if (!caseSensitive) {
+      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+        rune += 32;
+      } else if (rune > MAX_ASCII) {
+        rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+      }
+    }
+
+    if (normalize) {
+      rune = normalizeRune(rune);
+    }
+
+    if (rune === pattern[pidx]) {
+      if (withPos) {
+        // TODO needs typeguard
+        pos?.push(idx);
+      }
+
+      score += SCORE_MATCH;
+      let bonus = bonusFor(prevCharClass, charClass);
+
+      if (consecutive === 0) {
+        firstBonus = bonus;
+      } else {
+        if (bonus === BONUS_BOUNDARY) {
+          firstBonus = bonus;
+        }
+        bonus = maxInt16(maxInt16(bonus, firstBonus), BONUS_CONSECUTIVE);
+      }
+
+      if (pidx === 0) {
+        // whole RHS needs to be casted to int in other lang
+        score += bonus * BONUS_FIRST_CHAR_MULTIPLIER;
+      } else {
+        // whole RHS needs to be casted to int in other lang
+        score += bonus;
+      }
+
+      inGap = false;
+      consecutive++;
+      pidx++;
+    } else {
+      if (inGap) {
+        score += SCORE_GAP_EXTENTION;
+      } else {
+        score += SCORE_GAP_START;
+      }
+
+      inGap = true;
+      consecutive = 0;
+      firstBonus = 0;
+    }
+    prevCharClass = charClass;
+  }
+  return [score, pos];
+}
