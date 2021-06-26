@@ -5,6 +5,8 @@
 import { normalized } from "./normalize";
 import { Slab } from "./utils/slab";
 
+const DEBUG = false;
+
 type Int16 = Int16Array[0];
 type Int32 = Int32Array[0];
 type Rune = Int32;
@@ -70,7 +72,26 @@ enum Char {
 
 function posArray(withPos: boolean, len: number) {
   if (withPos) {
-    const pos = new Array(len).fill(0);
+    // TLDR; there is no easy way to do
+    // ```
+    // pos := make([]int, 0, len)
+    // return &pos
+    // ```
+    // in JS.
+    //
+    // Golang has len and capacity:
+    // see https://tour.golang.org/moretypes/13
+    // and https://stackoverflow.com/a/41668362/7683365
+    //
+    // JS has a way to define capacity (`new Array(capacity)`) but
+    // then all elements in the capacity will be `undefined` and a push
+    // will result in the push at the end of the capacity rather than
+    // from the start of it (which happens in go using `append`).
+    // So while we'll accept len as arg, we won't do anything with it.
+    //
+    // {{ this is useless here, ignore: const pos = new Array(len).fill(0) }}
+
+    const pos = new Array();
     return pos;
   }
 
@@ -290,7 +311,14 @@ function asciiFuzzyIndex(
   return firstIdx;
 }
 
-function debugV2() {
+function debugV2(
+  T: Rune[],
+  pattern: Rune[],
+  F: Int32[],
+  lastIdx: number,
+  H: Int16[],
+  C: Int16[]
+) {
   // TODO
   console.error(" complete this!!!! ");
 }
@@ -402,7 +430,8 @@ export const fuzzyMatchV2: AlgoFn = (
       ) {
         maxScore = score;
         maxScorePos = idx + off;
-        if (forward && bonus == BONUS_BOUNDARY) {
+        // bonus is int16 but BONUS_BOUNDARY is int. It might have needed casting in other lang
+        if (forward && bonus === BONUS_BOUNDARY) {
           break;
         }
       }
@@ -427,6 +456,7 @@ export const fuzzyMatchV2: AlgoFn = (
     const result: Result = {
       start: maxScorePos,
       end: maxScorePos + 1,
+      // maxScore needs to be typecasted from int16 to int in other langs
       score: maxScore,
     };
     if (!withPos) {
@@ -437,4 +467,141 @@ export const fuzzyMatchV2: AlgoFn = (
   }
 
   // Phase 3. Fill in score matrix (H)
+
+  // F[0] needs to be typecasted from int32 to int in other langs
+  const f0 = F[0];
+  const width = lastIdx - f0 + 1;
+  let H: Int16Array | null = null;
+  [offset16, H] = alloc16(offset16, slab, width * M);
+  {
+    const toCopy = H0.slice(f0, lastIdx + 1);
+    for (const [i, v] of toCopy.entries()) {
+      H[i] = v;
+    }
+  }
+
+  let [, C] = alloc16(offset16, slab, width * M);
+  {
+    const toCopy = C0.slice(f0, lastIdx + 1);
+    for (const [i, v] of toCopy.entries()) {
+      C[i] = v;
+    }
+  }
+
+  const Fsub = F.slice(1);
+  const Psub = pattern.slice(1).slice(0, Fsub.length);
+
+  for (const [off, f] of Fsub.entries()) {
+    // int32 -> int conversion needed in other lang for `f` to use
+
+    let inGap = false;
+    const pchar = Psub[off],
+      pidx = off + 1,
+      row = pidx * width,
+      Tsub = T.slice(f, lastIdx + 1),
+      Bsub = B.slice(f).slice(0, Tsub.length),
+      Csub = C.slice(row + f - f0).slice(0, Tsub.length),
+      Cdiag = C.slice(row + f - f0 - 1 - width).slice(0, Tsub.length),
+      Hsub = H.slice(row + f - f0).slice(0, Tsub.length),
+      Hdiag = H.slice(row + f - f0 - 1 - width).slice(0, Tsub.length),
+      Hleft = H.slice(row + f - f0 - 1).slice(0, Tsub.length);
+    Hleft[0] = 0;
+
+    for (const [off, char] of Tsub.entries()) {
+      const col = off + f;
+      let s1: Int16 = 0,
+        s2: Int16 = 0,
+        consecutive: Int16 = 0;
+
+      if (inGap) {
+        s2 = Hleft[off] + SCORE_GAP_EXTENTION;
+      } else {
+        s2 = Hleft[off] + SCORE_GAP_START;
+      }
+
+      if (pchar === char) {
+        s1 = Hdiag[off] + SCORE_MATCH;
+        let b = Bsub[off];
+        consecutive = Cdiag[off] + 1;
+
+        if (b === BONUS_BOUNDARY) {
+          consecutive = 1;
+        } else if (consecutive > 1) {
+          // `consecutive` needs to be casted to int in other lang
+          b = maxInt16(
+            b,
+            maxInt16(BONUS_CONSECUTIVE, B[col - consecutive + 1])
+          );
+        }
+
+        if (s1 + b < s2) {
+          s1 += Bsub[off];
+          consecutive = 0;
+        } else {
+          s1 += b;
+        }
+      }
+      Csub[off] = consecutive;
+
+      inGap = s1 < s2;
+      const score = maxInt16(maxInt16(s1, s2), 0);
+      if (
+        pidx === M - 1 &&
+        ((forward && score > maxScore) || (!forward && score >= maxScore))
+      ) {
+        maxScore = score;
+        maxScorePos = col;
+      }
+      Hsub[off] = score;
+    }
+  }
+
+  if (DEBUG) {
+    // TODO debugV2()
+  }
+
+  // Phase 4. (Optional) Backtrace to find character positions
+  const pos = posArray(withPos, M);
+  let j = f0;
+  if (withPos) {
+    let i = M - 1;
+    j = maxScorePos;
+    let preferMatch = true;
+
+    while (true) {
+      const I = i * width,
+        j0 = j - f0,
+        s = H[I + j0];
+
+      let s1: Int16 = 0,
+        s2: Int16 = 0;
+
+      // F[i] needs to be casted to int in other lang
+      if (i > 0 && j >= F[i]) {
+        s1 = H[I - width + j0 - 1];
+      }
+
+      // F[i] needs to be casted to int in other lang
+      if (j > F[i]) {
+        s2 = H[I + j0 - 1];
+      }
+
+      if (s > s1 && (s > s2 || (s === s2 && preferMatch))) {
+        // TODO `pos` needs a typeguard or something using `withPos`
+        pos!.push(j);
+        if (i === 0) {
+          break;
+        }
+        i--;
+      }
+
+      preferMatch =
+        C[I + j0] > 1 ||
+        (I + width + j0 + 1 < C.length && C[I + width + j0 + 1] > 0);
+      j--;
+    }
+  }
+
+  // maxScore needs to be typecasted in other lang to `int`
+  return [{ start: j, end: maxScorePos + 1, score: maxScore }, pos];
 };
