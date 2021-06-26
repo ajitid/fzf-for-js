@@ -37,6 +37,11 @@ function maxInt16(num1: number, num2: number) {
 
 // ------ numeric operations end
 
+const strToRunes = (str: string) => str.split("").map((s) => s.codePointAt(0)!);
+const runesToStr = (runes: Rune[]) =>
+  runes.map((r) => String.fromCodePoint(r)).join("");
+// -------------
+
 function indexAt(index: number, max: number, forward: boolean) {
   if (forward) {
     return index;
@@ -689,7 +694,7 @@ function calculateScore(
   return [score, pos];
 }
 
-const FuzzyMatchV1: AlgoFn = (
+const fuzzyMatchV1: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
@@ -887,6 +892,190 @@ const exactMatchNaive: AlgoFn = (
       false
     );
     return [{ start: sidx, end: eidx, score }, null];
+  }
+
+  return [{ start: -1, end: -1, score: 0 }, null];
+};
+
+const prefixMatch: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  text,
+  pattern,
+  withPos,
+  slab
+) => {
+  if (pattern.length === 0) {
+    return [{ start: 0, end: 0, score: 0 }, null];
+  }
+
+  let trimmedLen = 0;
+  // check if pattern[0] is not a whitespace
+  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+    trimmedLen = text.length - text.trimStart().length;
+  }
+
+  if (text.length - trimmedLen < pattern.length) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  for (const [index, r] of pattern.entries()) {
+    let rune = text[trimmedLen + index].codePointAt(0)!;
+
+    if (!caseSensitive) {
+      rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+    }
+
+    if (normalize) {
+      rune = normalizeRune(rune);
+    }
+
+    if (rune !== r) {
+      return [{ start: -1, end: -1, score: 0 }, null];
+    }
+  }
+
+  const lenPattern = pattern.length;
+  const [score] = calculateScore(
+    caseSensitive,
+    normalize,
+    text,
+    pattern,
+    trimmedLen,
+    trimmedLen + lenPattern,
+    false
+  );
+  return [{ start: trimmedLen, end: trimmedLen + lenPattern, score }, null];
+};
+
+const suffixMatch: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  text,
+  pattern,
+  withPos,
+  slab
+) => {
+  const lenRunes = text.length;
+  let trimmedLen = lenRunes;
+
+  if (
+    pattern.length === 0 ||
+    String.fromCodePoint(pattern[pattern.length - 1]).match(/\s/) ===
+      null /* last el in pattern is not a space */
+  ) {
+    trimmedLen -= text.length - text.trimEnd().length;
+  }
+
+  if (pattern.length === 0) {
+    // TODO what?? start and end are same... is this right?
+    return [{ start: trimmedLen, end: trimmedLen, score: 0 }, null];
+  }
+
+  const diff = trimmedLen - pattern.length;
+  if (diff < 0) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  for (const [index, r] of pattern.entries()) {
+    let rune = text[index + diff].codePointAt(0)!;
+
+    if (!caseSensitive) {
+      rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+    }
+
+    if (normalize) {
+      rune = normalizeRune(rune);
+    }
+
+    if (rune !== r) {
+      return [{ start: -1, end: -1, score: 0 }, null];
+    }
+  }
+
+  const lenPattern = pattern.length;
+  const sidx = trimmedLen - lenPattern;
+  const eidx = trimmedLen;
+  const [score] = calculateScore(
+    caseSensitive,
+    normalize,
+    text,
+    pattern,
+    sidx,
+    eidx,
+    false
+  );
+  return [{ start: sidx, end: eidx, score }, null];
+};
+
+const equalMatch: AlgoFn = (
+  caseSensitive,
+  normalize,
+  forward,
+  text,
+  pattern,
+  withPos,
+  slab
+) => {
+  const lenPattern = pattern.length;
+  if (lenPattern === 0) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  let trimmedLen = 0;
+  // check if first el in pattern is not a whitespace
+  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+    trimmedLen = text.length - text.trimStart().length;
+  }
+
+  let trimmedEndLen = 0;
+  if (String.fromCodePoint(pattern[lenPattern - 1]).match(/\s/) === null) {
+    trimmedEndLen = text.length - text.trimEnd().length;
+  }
+
+  if (text.length - trimmedLen - trimmedEndLen != lenPattern) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  let match = true;
+  if (normalize) {
+    const runes = strToRunes(text);
+
+    for (const [idx, pchar] of pattern.entries()) {
+      let rune = runes[trimmedLen + idx];
+
+      if (!caseSensitive) {
+        rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
+      }
+
+      if (normalizeRune(pchar) !== normalizeRune(rune)) {
+        match = false;
+        break;
+      }
+    }
+  } else {
+    let runesStr = text.substring(trimmedLen, text.length - trimmedEndLen);
+
+    if (!caseSensitive) {
+      runesStr = runesStr.toLowerCase();
+    }
+
+    match = runesStr === runesToStr(pattern);
+  }
+
+  if (match) {
+    return [
+      {
+        start: trimmedLen,
+        end: trimmedLen + lenPattern,
+        score:
+          (SCORE_MATCH + BONUS_BOUNDARY) * lenPattern +
+          (BONUS_FIRST_CHAR_MULTIPLIER - 1) * BONUS_BOUNDARY,
+      },
+      null,
+    ];
   }
 
   return [{ start: -1, end: -1, score: 0 }, null];
