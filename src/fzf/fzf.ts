@@ -9,6 +9,32 @@ type Int16 = Int16Array[0];
 type Int32 = Int32Array[0];
 type Rune = Int32;
 
+// TODO extract these numeric operations out
+// short, int, long https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
+
+function toShort(number: number): Int16 {
+  // with this implementation, I don't think it does anything
+  // as it is returning a number only, not int16
+  const int16 = new Int16Array(1);
+  int16[0] = number;
+  return int16[0];
+}
+
+function toInt(number: number): Int32 {
+  // with this implementation, I don't think it does anything
+  // as it is returning a number only, not int32
+  const int32 = new Int32Array(1);
+  int32[0] = number;
+  return int32[0];
+}
+
+function maxInt16(num1: number, num2: number) {
+  const arr = Int16Array.from([num1, num2]);
+  return arr[0] > arr[1] ? arr[0] : arr[1];
+}
+
+// ------ numeric operations end
+
 function indexAt(index: number, max: number, forward: boolean) {
   if (forward) {
     return index;
@@ -320,4 +346,95 @@ export const fuzzyMatchV2: AlgoFn = (
   }
 
   // Phase 2. Calculate bonus for each point
+  let maxScore = toShort(0),
+    maxScorePos = 0;
+  let pidx = 0,
+    lastIdx = 0;
+  const pchar0 = pattern[0];
+  let pchar = pattern[0],
+    prevH0 = toShort(0),
+    prevCharClass = Char.NonWord,
+    inGap = false;
+  let Tsub = T.slice(idx);
+  let H0sub = H0.slice(idx).slice(0, Tsub.length),
+    C0sub = C0.slice(idx).slice(0, Tsub.length),
+    Bsub = B.slice(idx).slice(0, Tsub.length);
+
+  for (let [off, char] of Tsub.entries()) {
+    let charClass: Char | null = null;
+
+    if (char <= MAX_ASCII) {
+      charClass = charClassOfAscii(char);
+      if (!caseSensitive && charClass === Char.Upper) {
+        char += 32;
+      }
+    } else {
+      charClass = charClassOfNonAscii(char);
+      if (!caseSensitive && charClass === Char.Upper) {
+        char = String.fromCodePoint(char).toLowerCase().codePointAt(0)!;
+      }
+      if (normalize) {
+        char = normalizeRune(char);
+      }
+    }
+
+    Tsub[off] = char;
+    const bonus = bonusFor(prevCharClass, charClass);
+    Bsub[off] = bonus;
+    prevCharClass = charClass;
+
+    if (char === pchar) {
+      if (pidx < M) {
+        F[pidx] = toInt(idx + off);
+        pidx++;
+        pchar = pattern[Math.min(pidx, M - 1)];
+      }
+      lastIdx = idx + off;
+    }
+
+    if (char === pchar0) {
+      const score = SCORE_MATCH + bonus * BONUS_FIRST_CHAR_MULTIPLIER;
+      H0sub[off] = score;
+      C0sub[off] = 1;
+      if (
+        M === 1 &&
+        ((forward && score > maxScore) || (!forward && score >= maxScore))
+      ) {
+        maxScore = score;
+        maxScorePos = idx + off;
+        if (forward && bonus == BONUS_BOUNDARY) {
+          break;
+        }
+      }
+      inGap = false;
+    } else {
+      if (inGap) {
+        H0sub[off] = maxInt16(prevH0 + SCORE_GAP_EXTENTION, 0);
+      } else {
+        H0sub[off] = maxInt16(prevH0 + SCORE_GAP_START, 0);
+      }
+      C0sub[off] = 0;
+      inGap = true;
+    }
+    prevH0 = H0sub[off];
+  }
+
+  if (pidx !== M) {
+    return [{ start: -1, end: -1, score: 0 }, null];
+  }
+
+  if (M === 1) {
+    const result: Result = {
+      start: maxScorePos,
+      end: maxScorePos + 1,
+      score: maxScore,
+    };
+    if (!withPos) {
+      return [result, null];
+    }
+    const pos = [maxScorePos];
+    return [result, pos];
+  }
+
+  // Phase 3. Fill in score matrix (H)
 };
