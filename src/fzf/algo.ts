@@ -228,7 +228,7 @@ function normalizeRune(rune: Rune): Rune {
   return rune;
 }
 
-type AlgoFn = (
+export type AlgoFn = (
   caseSensitive: boolean,
   normalize: boolean,
   forward: boolean,
@@ -694,7 +694,7 @@ function calculateScore(
   return [score, pos];
 }
 
-const fuzzyMatchV1: AlgoFn = (
+export const fuzzyMatchV1: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
@@ -795,7 +795,7 @@ const fuzzyMatchV1: AlgoFn = (
   return [{ start: -1, end: -1, score: 0 }, null];
 };
 
-const exactMatchNaive: AlgoFn = (
+export const exactMatchNaive: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
@@ -897,7 +897,7 @@ const exactMatchNaive: AlgoFn = (
   return [{ start: -1, end: -1, score: 0 }, null];
 };
 
-const prefixMatch: AlgoFn = (
+export const prefixMatch: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
@@ -949,7 +949,7 @@ const prefixMatch: AlgoFn = (
   return [{ start: trimmedLen, end: trimmedLen + lenPattern, score }, null];
 };
 
-const suffixMatch: AlgoFn = (
+export const suffixMatch: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
@@ -1010,7 +1010,7 @@ const suffixMatch: AlgoFn = (
   return [{ start: sidx, end: eidx, score }, null];
 };
 
-const equalMatch: AlgoFn = (
+export const equalMatch: AlgoFn = (
   caseSensitive,
   normalize,
   forward,
