@@ -1,46 +1,38 @@
 import React, { useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
-
-// import "./fzf/algo.test";
-// import "./fzf/meh";
+import { fzf } from "./lib/main";
+import list from "./files.json";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [input, setInput] = useState("");
+
+  const [result, setResult] = useState<ReturnType<typeof fzf>>([]);
+
+  const handleInputChange = (input: string) => {
+    setInput(input);
+    let result = fzf(list, input);
+    result = result.filter((v) => v.result.score !== 0);
+    result.sort((a, b) => b.result.score - a.result.score);
+    setResult(result);
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {" | "}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div>
+      <div>
+        <input
+          value={input}
+          onChange={(e) => handleInputChange(e.target.value)}
+        />
+      </div>
+      <div>
+        <ul>
+          {result.map((item) => (
+            <li key={item.item}>
+              {item.item} -- {item.result.score}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
