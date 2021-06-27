@@ -24,7 +24,7 @@ interface Result {
   score: number;
 }
 
-const SCORE_MATCH = 16,
+export const SCORE_MATCH = 16,
   SCORE_GAP_START = -3,
   // FIXME: sure it shouldn't be renamed as "extension"??
   SCORE_GAP_EXTENTION = -1,
