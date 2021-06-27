@@ -3,7 +3,7 @@
 // for extra reference
 
 import { normalized } from "./normalize";
-import { Slab } from "./utils/slab";
+import { Slab } from "./slab";
 import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
 import { Rune, strToRunes, runesToStr } from "./runes";
 
