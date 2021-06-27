@@ -4,43 +4,10 @@
 
 import { normalized } from "./normalize";
 import { Slab } from "./utils/slab";
+import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
+import { Rune, strToRunes, runesToStr } from "./runes";
 
 const DEBUG = false;
-
-type Int16 = Int16Array[0];
-type Int32 = Int32Array[0];
-type Rune = Int32;
-
-// TODO extract these numeric operations out
-// short, int, long https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
-
-function toShort(number: number): Int16 {
-  // with this implementation, I don't think it does anything
-  // as it is returning a number only, not int16
-  const int16 = new Int16Array(1);
-  int16[0] = number;
-  return int16[0];
-}
-
-function toInt(number: number): Int32 {
-  // with this implementation, I don't think it does anything
-  // as it is returning a number only, not int32
-  const int32 = new Int32Array(1);
-  int32[0] = number;
-  return int32[0];
-}
-
-function maxInt16(num1: number, num2: number) {
-  const arr = Int16Array.from([num1, num2]);
-  return arr[0] > arr[1] ? arr[0] : arr[1];
-}
-
-// ------ numeric operations end
-
-const strToRunes = (str: string) => str.split("").map((s) => s.codePointAt(0)!);
-const runesToStr = (runes: Rune[]) =>
-  runes.map((r) => String.fromCodePoint(r)).join("");
-// -------------
 
 function indexAt(index: number, max: number, forward: boolean) {
   if (forward) {
@@ -133,11 +100,7 @@ function alloc32(
 // and represents a character. In JavaScript, rune will be
 // int32 [Go] == 'a'.codePointAt(0) [JS] == 97 [number]
 //
-// TODO We are considering passed argument `rune` as string here and use
-// rune[0] to denote char (which, I know, is a string)
-// need to eliminate this unnecessary indexing.
-//
-// Also I'm considering `input` arg as a string not an array of chars,
+// I'm considering `input` arg as a string not an array of chars,
 // this might led to creation of too many strings in string pool resulting in
 // huge garbage collection. JS can't parse it in terms of bytes so I might need to use
 // char array instead (which will technically be string array)
@@ -258,7 +221,7 @@ function trySkip(
     // TODO I hope that I'm doing it right
     // convert ascii lower to upper by subtracting 32 (a -> A)
     // and then checking if it is present in str
-    // dunno, this logic looks odd
+    // dunno, this logic looks odd for chars which aren't alphabets
     const uidx = rest.indexOf(String.fromCodePoint(char.codePointAt(0)! - 32));
     if (uidx >= 0) {
       idx = uidx;
