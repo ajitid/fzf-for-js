@@ -11,8 +11,6 @@ export function Basic() {
   const handleInputChange = (input: string) => {
     setInput(input);
     let result = fzf(list, input);
-    result = result.filter((v) => v.result.score !== 0);
-    result.sort((a, b) => b.result.score - a.result.score);
     // it is better to not to slice the list
     result = result.slice(0, 12);
     setResult(result);

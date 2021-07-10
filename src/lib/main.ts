@@ -10,8 +10,21 @@ import type { Result } from "./algo";
 export const fzf = (list: string[], query: string) => {
   const pattern = strToRunes(query);
 
-  return list.map((item) => {
-    const match = fuzzyMatchV2(false, false, false, item, pattern, true, null);
-    return { item, result: match[0], pos: match[1] };
-  });
+  const result = list
+    .map((item) => {
+      const match = fuzzyMatchV2(
+        false,
+        false,
+        false,
+        item,
+        pattern,
+        true,
+        null
+      );
+      return { item, result: match[0], pos: match[1] };
+    })
+    .filter((v) => v.result.score !== 0);
+  result.sort((a, b) => b.result.score - a.result.score);
+
+  return result;
 };
