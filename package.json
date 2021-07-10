@@ -2,6 +2,12 @@
   "name": "fzf",
   "version": "0.0.12",
   "license": "SEE LICENSE IN license.txt",
+  "description": "FZF for JavaScript",
+  "keywords": [
+    "fzf",
+    "fuzzy-string-match",
+    "fuzzy-search"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "npm run build:modules && npm run build:types",
