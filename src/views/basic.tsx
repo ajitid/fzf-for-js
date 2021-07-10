@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import "./App.css";
-import { fzf } from "./lib/main";
-import list from "./files.json";
 
-function App() {
+import { fzf } from "../lib/main";
+import list from "../files.json";
+
+export function Basic() {
   const [input, setInput] = useState("");
 
   const [result, setResult] = useState<ReturnType<typeof fzf>>([]);
@@ -75,5 +75,3 @@ const HighlightChars = (props: HighlightCharsProps) => {
 
   return <>{nodes}</>;
 };
-
-export default App;
