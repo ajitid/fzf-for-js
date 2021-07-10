@@ -8,7 +8,7 @@ import { strToRunes } from "./runes";
 import type { Result } from "./algo";
 
 export const fzf = (list: string[], query: string) => {
-  const pattern = strToRunes(query);
+  const pattern = strToRunes(query.toLowerCase());
 
   const result = list
     .map((item) => {
