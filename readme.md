@@ -1,5 +1,7 @@
 # fzf for JavaScript
 
+<img src="assets/landing.gif" />
+
 ## Why?
 
 Most of the apps now have a command palette now. It allows you to quickly
