@@ -17,7 +17,7 @@ function indexAt(index: number, max: number, forward: boolean) {
   return max - index - 1;
 }
 
-interface Result {
+export interface Result {
   // TODO from junegunn/fzf - int32 should suffice
   start: number;
   end: number;
