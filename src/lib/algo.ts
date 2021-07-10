@@ -250,8 +250,15 @@ function asciiFuzzyIndex(
   pattern: Rune[],
   caseSensitive: boolean
 ): number {
-  // TODO there is a condition that returns 0 which I didn't used (not present in telescope-fzf-native either)
-  // check if it is needed
+  /*
+   * this https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/algo/algo.go#L280-L283
+   * is basically checking if input has only ASCII chars, see
+   * https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/util/chars.go#L38-L43
+   * and https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/util/chars.go#L48
+   */
+  if (!isAscii(strToRunes(input))) {
+    return 0;
+  }
 
   if (!isAscii(pattern)) {
     return -1;

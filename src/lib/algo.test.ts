@@ -542,9 +542,7 @@ function testNormalize() {
     score: number,
     ...fns: AlgoFn[]
   ) => {
-    console.log(input, pattern, "================");
     for (const fn of fns) {
-      console.log(fn, "------------");
       assertMatch2(
         fn,
         caseSensitive,
@@ -604,6 +602,7 @@ function testLongString() {
   );
 }
 
+console.log("");
 console.log("----------------running------------------");
 testFuzzyMatch();
 testFuzzyMatchBackward();
@@ -612,8 +611,5 @@ testExactMatchNaiveBackward();
 testPrefixMatch();
 testSuffixMatch();
 testEmptyPattern();
-
-// FIXME normalize doesn't work
-// testNormalize();
-
+testNormalize();
 testLongString();

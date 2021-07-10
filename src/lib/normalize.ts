@@ -401,10 +401,71 @@ export const normalized: Record<number, string> = {
   0x028f: "Y", // , LATIN LETTER SMALL CAPITAL
   0x1d22: "Z", // , LATIN LETTER SMALL CAPITAL
 
-  // TODO apart from hex codes there are char mapping as well
-  // https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/algo/normalize.go#L409
-  // I don't know why these exists and whether not adding them will have any effect either
-  //
-  // doing this alone won't work, check algo code too
-  // ["Ắ".codePointAt(0)!]: "A",
+  ["Ắ".codePointAt(0)!]: "A",
+  ["Ấ".codePointAt(0)!]: "A",
+  ["Ằ".codePointAt(0)!]: "A",
+  ["Ầ".codePointAt(0)!]: "A",
+  ["Ẳ".codePointAt(0)!]: "A",
+  ["Ẩ".codePointAt(0)!]: "A",
+  ["Ẵ".codePointAt(0)!]: "A",
+  ["Ẫ".codePointAt(0)!]: "A",
+  ["Ặ".codePointAt(0)!]: "A",
+  ["Ậ".codePointAt(0)!]: "A",
+
+  ["ắ".codePointAt(0)!]: "a",
+  ["ấ".codePointAt(0)!]: "a",
+  ["ằ".codePointAt(0)!]: "a",
+  ["ầ".codePointAt(0)!]: "a",
+  ["ẳ".codePointAt(0)!]: "a",
+  ["ẩ".codePointAt(0)!]: "a",
+  ["ẵ".codePointAt(0)!]: "a",
+  ["ẫ".codePointAt(0)!]: "a",
+  ["ặ".codePointAt(0)!]: "a",
+  ["ậ".codePointAt(0)!]: "a",
+
+  ["Ế".codePointAt(0)!]: "E",
+  ["Ề".codePointAt(0)!]: "E",
+  ["Ể".codePointAt(0)!]: "E",
+  ["Ễ".codePointAt(0)!]: "E",
+  ["Ệ".codePointAt(0)!]: "E",
+
+  ["ế".codePointAt(0)!]: "e",
+  ["ề".codePointAt(0)!]: "e",
+  ["ể".codePointAt(0)!]: "e",
+  ["ễ".codePointAt(0)!]: "e",
+  ["ệ".codePointAt(0)!]: "e",
+
+  ["Ố".codePointAt(0)!]: "O",
+  ["Ớ".codePointAt(0)!]: "O",
+  ["Ồ".codePointAt(0)!]: "O",
+  ["Ờ".codePointAt(0)!]: "O",
+  ["Ổ".codePointAt(0)!]: "O",
+  ["Ở".codePointAt(0)!]: "O",
+  ["Ỗ".codePointAt(0)!]: "O",
+  ["Ỡ".codePointAt(0)!]: "O",
+  ["Ộ".codePointAt(0)!]: "O",
+  ["Ợ".codePointAt(0)!]: "O",
+
+  ["ố".codePointAt(0)!]: "o",
+  ["ớ".codePointAt(0)!]: "o",
+  ["ồ".codePointAt(0)!]: "o",
+  ["ờ".codePointAt(0)!]: "o",
+  ["ổ".codePointAt(0)!]: "o",
+  ["ở".codePointAt(0)!]: "o",
+  ["ỗ".codePointAt(0)!]: "o",
+  ["ỡ".codePointAt(0)!]: "o",
+  ["ộ".codePointAt(0)!]: "o",
+  ["ợ".codePointAt(0)!]: "o",
+
+  ["Ứ".codePointAt(0)!]: "U",
+  ["Ừ".codePointAt(0)!]: "U",
+  ["Ử".codePointAt(0)!]: "U",
+  ["Ữ".codePointAt(0)!]: "U",
+  ["Ự".codePointAt(0)!]: "U",
+
+  ["ứ".codePointAt(0)!]: "u",
+  ["ừ".codePointAt(0)!]: "u",
+  ["ử".codePointAt(0)!]: "u",
+  ["ữ".codePointAt(0)!]: "u",
+  ["ự".codePointAt(0)!]: "u",
 };
