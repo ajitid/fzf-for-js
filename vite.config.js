@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src/lib/main.ts"),
-      name: "LibScopeName",
+      name: "fzf",
     },
     rollupOptions: {
       external: ["react", "react-router", "react-router-dom", "rmwc"],
