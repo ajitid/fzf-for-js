@@ -28,7 +28,6 @@
   },
   "types": "./dist/main.d.ts",
   "devDependencies": {
-    "@alex_neo/jest-expect-message": "^1.0.5",
     "@types/jest": "^26.0.24",
     "@types/jest-expect-message": "^1.0.3",
     "@types/react": "^17.0.0",
@@ -37,6 +36,8 @@
     "autoprefixer": "^10.2.6",
     "history": "^5.0.0",
     "jest": "^27.0.6",
+    "jest-expect-message": "^1.0.2",
+    "patch-package": "^6.4.7",
     "postcss": "^8.3.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",

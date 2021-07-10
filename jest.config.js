@@ -3,5 +3,5 @@ module.exports = {
   transform: {
     "^.+\\.ts$": "ts-jest",
   },
-  setupFilesAfterEnv: ["@alex_neo/jest-expect-message"],
+  setupFilesAfterEnv: ["jest-expect-message"],
 };
