@@ -17,6 +17,8 @@ import {
 } from "./algo";
 import { strToRunes } from "./runes";
 
+import "jest-expect-message";
+
 function assertMatch(
   algo: AlgoFn,
   caseSensitive: boolean,
@@ -76,24 +78,13 @@ function assertMatch2(
     end = pos[pos.length - 1] + 1;
   }
 
-  if (start !== sidx) {
-    console.error(
-      `Invalid start index: ${start} (expected: ${sidx}, ${input} / ${pattern})`
-    );
-  }
-  if (end !== eidx) {
-    console.error(
-      `Invalid end index: ${end} (expected: ${eidx}, ${input} / ${pattern})`
-    );
-  }
-  if (res.score !== score) {
-    console.error(
-      `Invalid score: ${res.score} (expected: ${score}, ${input} / ${pattern})`
-    );
-  }
+  const msg = `INPUT ${input} :: PATTERN ${pattern} :: FORWARD ${forward}`;
+  expect(start, msg).toBe(sidx);
+  expect(end, msg).toBe(eidx);
+  expect(res.score, msg).toBe(score);
 }
 
-function testFuzzyMatch() {
+it("testFuzzyMatch", () => {
   for (const algo of [fuzzyMatchV1, fuzzyMatchV2]) {
     for (const forward of [true, false]) {
       assertMatch(
@@ -339,9 +330,9 @@ function testFuzzyMatch() {
       assertMatch(algo, true, forward, "fooBarbaz", "fooBarbazz", -1, -1, 0);
     }
   }
-}
+});
 
-function testFuzzyMatchBackward() {
+it("testFuzzyMatchBackward", () => {
   assertMatch(
     fuzzyMatchV1,
     false,
@@ -367,9 +358,9 @@ function testFuzzyMatchBackward() {
       BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
       BONUS_BOUNDARY
   );
-}
+});
 
-function testExactMatchNaive() {
+it("testExactMatchNaive", () => {
   for (const dir of [true, false]) {
     assertMatch(exactMatchNaive, true, dir, "fooBarbaz", "oBA", -1, -1, 0);
     assertMatch(
@@ -424,9 +415,9 @@ function testExactMatchNaive() {
       SCORE_MATCH * 5 + BONUS_BOUNDARY * (BONUS_FIRST_CHAR_MULTIPLIER + 4)
     );
   }
-}
+});
 
-function testExactMatchNaiveBackward() {
+it("testExactMatchNaiveBackward", () => {
   assertMatch(
     exactMatchNaive,
     false,
@@ -447,9 +438,9 @@ function testExactMatchNaiveBackward() {
     10,
     SCORE_MATCH * 2 + BONUS_CONSECUTIVE
   );
-}
+});
 
-function testPrefixMatch() {
+it("testPrefixMatch", () => {
   const score =
     (SCORE_MATCH + BONUS_BOUNDARY) * 3 +
     BONUS_BOUNDARY * (BONUS_FIRST_CHAR_MULTIPLIER - 1);
@@ -465,9 +456,9 @@ function testPrefixMatch() {
     assertMatch(prefixMatch, false, dir, " fooBar", " fo", 0, 3, score);
     assertMatch(prefixMatch, false, dir, "     fo", "foo", -1, -1, 0);
   }
-}
+});
 
-function testSuffixMatch() {
+it("testSuffixMatch", () => {
   for (const dir of [true, false]) {
     assertMatch(suffixMatch, true, dir, "fooBarbaz", "Baz", -1, -1, 0);
     assertMatch(suffixMatch, false, dir, "fooBarbaz", "Foo", -1, -1, 0);
@@ -517,9 +508,9 @@ function testSuffixMatch() {
       SCORE_MATCH * 4 + BONUS_CONSECUTIVE * 2 + BONUS_NON_WORD
     );
   }
-}
+});
 
-function testEmptyPattern() {
+it("testEmptyPattern", () => {
   for (const dir of [true, false]) {
     assertMatch(fuzzyMatchV1, true, dir, "foobar", "", 0, 0, 0);
     assertMatch(fuzzyMatchV2, true, dir, "foobar", "", 0, 0, 0);
@@ -527,9 +518,9 @@ function testEmptyPattern() {
     assertMatch(prefixMatch, true, dir, "foobar", "", 0, 0, 0);
     assertMatch(suffixMatch, true, dir, "foobar", "", 6, 6, 0);
   }
-}
+});
 
-function testNormalize() {
+it("testNormalize", () => {
   const caseSensitive = false;
   const normalize = true;
   const forward = true;
@@ -582,10 +573,10 @@ function testNormalize() {
     exactMatchNaive,
     equalMatch
   );
-}
+});
 
 const MAX_UINT_16 = 65535;
-function testLongString() {
+it("testLongString", () => {
   const strArr = new Array(MAX_UINT_16 * 2).fill("x");
   strArr[MAX_UINT_16] = "z";
   const str = strArr.join("");
@@ -600,16 +591,4 @@ function testLongString() {
     MAX_UINT_16 + 2,
     SCORE_MATCH * 2 + BONUS_CONSECUTIVE
   );
-}
-
-console.log("");
-console.log("----------------running------------------");
-testFuzzyMatch();
-testFuzzyMatchBackward();
-testExactMatchNaive();
-testExactMatchNaiveBackward();
-testPrefixMatch();
-testSuffixMatch();
-testEmptyPattern();
-testNormalize();
-testLongString();
+});
