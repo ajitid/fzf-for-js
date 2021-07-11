@@ -1,4 +1,5 @@
 {
+  "===== INFO =====": "",
   "name": "fzf",
   "version": "0.0.13",
   "license": "SEE LICENSE IN license.txt",
@@ -8,6 +9,12 @@
     "fuzzy-string-match",
     "fuzzy-search"
   ],
+  "homepage": "https://fzf.now.sh",
+  "bugs": {
+    "url": "https://github.com/ajitid/fzf-for-js/issues"
+  },
+  "sideEffects": false,
+  "===== SCRIPTS =====": "",
   "scripts": {
     "dev": "vite",
     "build": "npm run build:modules && npm run build:types",
@@ -15,6 +22,7 @@
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
     "test": "jest src"
   },
+  "===== BUILD =====": "",
   "files": [
     "dist"
   ],
@@ -27,6 +35,7 @@
     }
   },
   "types": "./dist/main.d.ts",
+  "===== DEPS =====": "",
   "devDependencies": {
     "@types/jest": "^26.0.24",
     "@types/jest-expect-message": "^1.0.3",
