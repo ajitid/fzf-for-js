@@ -2,16 +2,19 @@
   "===== INFO =====": "",
   "name": "fzf",
   "version": "0.0.13",
-  "license": "SEE LICENSE IN license.txt",
   "description": "Do fuzzy matching using fzf algorithm in JavaScript",
+  "license": "SEE LICENSE IN license.txt",
   "keywords": [
     "fzf",
     "fuzzy-string-match",
     "fuzzy-search"
   ],
-  "homepage": "https://fzf.now.sh",
-  "bugs": {
-    "url": "https://github.com/ajitid/fzf-for-js/issues"
+  "homepage": "https://fzf.vercel.app",
+  "repository": "zlksnk/fzf-for-js",
+  "author": {
+    "name": "Ajit Singh",
+    "email": "zlksnkwork+pkgnfo@gmail.com",
+    "url": "https://zlksnk.in"
   },
   "sideEffects": false,
   "===== SCRIPTS =====": "",
