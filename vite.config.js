@@ -10,13 +10,15 @@ export default defineConfig({
       entry: path.resolve(__dirname, "src/lib/main.ts"),
       name: "fzf",
     },
+    /* intentionally commented for future reference
     rollupOptions: {
-      // external: ["react", "react-router", "react-router-dom", "rmwc"],
-      // output: {
-      //   globals: {
-      //     react: "React",
-      //   },
-      // },
+      external: ["react", "react-router", "react-router-dom", "rmwc"],
+      output: {
+        globals: {
+          react: "React",
+        },
+      },
     },
+    */
   },
 });
