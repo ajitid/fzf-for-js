@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 
-import { fzf } from "../lib/main";
+import { Fzf, FzfResultItem } from "../lib/main";
 import list from "../files.json";
+
+const fzf = new Fzf(list);
 
 export function Basic() {
   const [input, setInput] = useState("");
 
-  const [result, setResult] = useState<ReturnType<typeof fzf>>([]);
+  const [result, setResult] = useState<FzfResultItem[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
@@ -15,7 +17,7 @@ export function Basic() {
       return;
     }
 
-    let result = fzf(list, input);
+    let result = fzf.find(input);
     // limiting size of the result to avoid jank while rendering it
     result = result.slice(0, 32);
     setResult(result);
@@ -36,9 +38,9 @@ export function Basic() {
         {input !== "" ? (
           <ul>
             {result.map((item) => (
-              <li key={item.item} className="py-1">
+              <li key={item.str} className="py-1">
                 <HighlightChars
-                  str={item.item}
+                  str={item.str}
                   highlightIndices={item.pos ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">

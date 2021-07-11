@@ -2,15 +2,15 @@ import * as Comlink from "comlink";
 
 import React, { useState } from "react";
 
-import type { fzf } from "../lib/main";
+import type { FzfResultItem } from "../lib/main";
 import FzfWorker from "../utils/fzf-worker?worker";
 
-const fzfAsync = Comlink.wrap(new FzfWorker());
+const fzfFindAsync = Comlink.wrap(new FzfWorker());
 
 export function WithWorker() {
   const [input, setInput] = useState("");
 
-  const [result, setResult] = useState<ReturnType<typeof fzf>>([]);
+  const [result, setResult] = useState<FzfResultItem[]>([]);
 
   const handleInputChange = async (input: string) => {
     setInput(input);
@@ -20,7 +20,7 @@ export function WithWorker() {
     }
 
     // @ts-ignore
-    const result = await fzfAsync(input);
+    const result = await fzfFindAsync(input);
     setResult(result);
   };
 
@@ -39,9 +39,9 @@ export function WithWorker() {
         {input !== "" ? (
           <ul>
             {result.map((item) => (
-              <li key={item.item} className="py-1">
+              <li key={item.str} className="py-1">
                 <HighlightChars
-                  str={item.item}
+                  str={item.str}
                   highlightIndices={item.pos ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">

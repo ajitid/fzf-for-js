@@ -7,24 +7,67 @@ import { strToRunes } from "./runes";
 */
 import type { Result } from "./algo";
 
-export const fzf = (list: string[], query: string) => {
-  const pattern = strToRunes(query.toLowerCase());
+interface Options {
+  cache: boolean;
+  maxResultItems: number;
+}
 
-  const result = list
-    .map((item) => {
-      const match = fuzzyMatchV2(
-        false,
-        false,
-        false,
-        item,
-        pattern,
-        true,
-        null
-      );
-      return { item, result: match[0], pos: match[1] };
-    })
-    .filter((v) => v.result.score !== 0);
-  result.sort((a, b) => b.result.score - a.result.score);
-
-  return result;
+const defaultOpts: Options = {
+  cache: true,
+  maxResultItems: Infinity,
 };
+
+export interface FzfResultItem {
+  str: string;
+  result: Result;
+  pos: number[] | null;
+}
+
+type query = string;
+
+export class Fzf {
+  private list: string[] = [];
+  readonly opts: Options = { ...defaultOpts };
+  private cache: Record<query, FzfResultItem[]> = {};
+
+  constructor(list: string[], options: Partial<Options> = defaultOpts) {
+    this.opts = { ...defaultOpts, ...options };
+    this.list = list;
+  }
+
+  find = (query: string): FzfResultItem[] => {
+    const pattern = query.toLowerCase();
+
+    if (this.opts.cache) {
+      const cachedResult = this.cache[pattern];
+      if (cachedResult !== undefined) {
+        return cachedResult;
+      }
+    }
+
+    const patternRunes = strToRunes(pattern);
+    let result = this.list
+      .map((str) => {
+        const match = fuzzyMatchV2(
+          false,
+          false,
+          false,
+          str,
+          patternRunes,
+          true,
+          null
+        );
+        return { str, result: match[0], pos: match[1] };
+      })
+      .filter((v) => v.result.score !== 0);
+    result.sort((a, b) => b.result.score - a.result.score);
+
+    if (Number.isFinite(this.opts.maxResultItems)) {
+      result = result.slice(0, this.opts.maxResultItems);
+    }
+
+    if (this.opts.cache) this.cache[pattern] = result;
+
+    return result;
+  };
+}
