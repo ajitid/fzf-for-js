@@ -6,7 +6,7 @@ import type { fzf } from "../lib/main";
 import FzfWorker from "../utils/fzf-worker?worker";
 import list from "../date-fns.json";
 
-const fzfLib = Comlink.wrap(new FzfWorker());
+const fzfAsync = Comlink.wrap(new FzfWorker());
 
 export function WithWorker() {
   const [input, setInput] = useState("");
@@ -16,7 +16,7 @@ export function WithWorker() {
   const handleInputChange = async (input: string) => {
     setInput(input);
     // @ts-ignore
-    let result = await fzfLib.fzf(list, input);
+    let result = await fzfAsync(list, input);
     setResult(result.slice(0, 32));
   };
 
