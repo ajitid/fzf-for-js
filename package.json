@@ -10,11 +10,11 @@
     "fuzzy-search"
   ],
   "homepage": "https://fzf.vercel.app",
-  "repository": "zlksnk/fzf-for-js",
+  "repository": "ajitid/fzf-for-js",
   "author": {
     "name": "Ajit Singh",
     "email": "zlksnkwork+pkgnfo@gmail.com",
-    "url": "https://zlksnk.in"
+    "url": "https://ajitid.in"
   },
   "===== SCRIPTS =====": "",
   "scripts": {
