@@ -1,7 +1,7 @@
 {
   "===== INFO =====": "",
   "name": "fzf",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Do fuzzy matching using fzf algorithm in JavaScript",
   "license": "SEE LICENSE IN license.txt",
   "keywords": [
@@ -16,7 +16,6 @@
     "email": "zlksnkwork+pkgnfo@gmail.com",
     "url": "https://zlksnk.in"
   },
-  "sideEffects": false,
   "===== SCRIPTS =====": "",
   "scripts": {
     "dev": "vite",
@@ -39,6 +38,8 @@
     }
   },
   "types": "./dist/main.d.ts",
+  "===== HINTING =====": "",
+  "sideEffects": false,
   "===== DEPS =====": "",
   "devDependencies": {
     "@types/jest": "^26.0.24",

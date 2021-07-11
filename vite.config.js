@@ -11,12 +11,12 @@ export default defineConfig({
       name: "fzf",
     },
     rollupOptions: {
-      external: ["react", "react-router", "react-router-dom", "rmwc"],
-      output: {
-        globals: {
-          react: "React",
-        },
-      },
+      // external: ["react", "react-router", "react-router-dom", "rmwc"],
+      // output: {
+      //   globals: {
+      //     react: "React",
+      //   },
+      // },
     },
   },
 });
