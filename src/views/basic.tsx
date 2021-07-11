@@ -10,9 +10,14 @@ export function Basic() {
 
   const handleInputChange = (input: string) => {
     setInput(input);
+    if (input === "") {
+      setResult([]);
+      return;
+    }
+
     let result = fzf(list, input);
-    // it is better to not to slice the list
-    result = result.slice(0, 12);
+    // limiting size of the result to avoid jank while rendering it
+    result = result.slice(0, 32);
     setResult(result);
   };
 

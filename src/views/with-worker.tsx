@@ -4,7 +4,6 @@ import React, { useState } from "react";
 
 import type { fzf } from "../lib/main";
 import FzfWorker from "../utils/fzf-worker?worker";
-import list from "../date-fns.json";
 
 const fzfAsync = Comlink.wrap(new FzfWorker());
 
@@ -15,9 +14,14 @@ export function WithWorker() {
 
   const handleInputChange = async (input: string) => {
     setInput(input);
+    if (input === "") {
+      setResult([]);
+      return;
+    }
+
     // @ts-ignore
-    let result = await fzfAsync(list, input);
-    setResult(result.slice(0, 32));
+    const result = await fzfAsync(input);
+    setResult(result);
   };
 
   return (
