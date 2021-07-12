@@ -78,3 +78,26 @@ export class Fzf {
     return result;
   };
 }
+
+export const fzfQuick = (query: string) => {
+  let caseSensitive = false;
+  // smartcase
+  if (query.toLowerCase() !== query) {
+    caseSensitive = true;
+  }
+
+  const runes = strToRunes(query);
+
+  return (str: string) => {
+    const match = fuzzyMatchV2(
+      caseSensitive,
+      false,
+      false,
+      str,
+      runes,
+      true,
+      null
+    );
+    return { str, result: match[0], pos: match[1] };
+  };
+};

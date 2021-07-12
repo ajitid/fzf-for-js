@@ -48,7 +48,7 @@ const resultOrAbort = <T>(promises: Promise<T>) => {
     new Promise((_, rej) => {
       const checkSignal = () => {
         if (signal) {
-          rej();
+          rej("didn't waited for all chunks to give result");
           return;
         }
         requestAnimationFrame(checkSignal);
@@ -72,7 +72,7 @@ let abortPrevJob = () => {};
 let lastJobId = "";
 
 const fzfFindAsync = async (query: string) => {
-  const jobId = `${query}-${Date.now().toString()}`;
+  const jobId = `fzf::${query}::${Date.now()}`;
   lastJobId = jobId;
   // TODO cancel previous query
   pool.jobs = [];
@@ -84,14 +84,25 @@ const fzfFindAsync = async (query: string) => {
   }
 
   try {
+    let abortor = {
+      signal: false,
+    };
+
     const partialResultsPromise = Promise.all<FzfResultItem[]>(
       slices.map((slice) => {
-        return pool.callFn("find")(slice, query) as Promise<FzfResultItem[]>;
+        return pool.callFn("find")(
+          slice,
+          query,
+          Comlink.proxy(() => abortor.signal)
+        ) as Promise<FzfResultItem[]>;
       })
     );
 
     const { promise, abort } = resultOrAbort(partialResultsPromise);
-    abortPrevJob = abort;
+    abortPrevJob = () => {
+      abortor.signal = true;
+      abort();
+    };
     const partialResults = await promise;
 
     if (jobId !== lastJobId) return null;

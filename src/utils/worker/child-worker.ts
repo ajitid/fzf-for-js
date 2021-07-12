@@ -1,10 +1,22 @@
 import * as Comlink from "comlink";
 
-import { Fzf } from "../../lib/main";
+import { fzfQuick } from "../../lib/main";
 
 Comlink.expose({
-  find: (list: string[], query: string) => {
-    const fzf = new Fzf(list, { cache: false, sort: false });
-    return fzf.find(query);
+  find: async (
+    list: string[],
+    query: string,
+    cancel: () => Promise<boolean>
+  ) => {
+    const fzf = fzfQuick(query);
+    const result = [];
+    for (const item of list) {
+      const cancelled = await cancel();
+      if (cancelled) {
+        return Promise.reject("stopped an fzf chunk");
+      }
+      result.push(fzf(item));
+    }
+    return result.filter((v) => v.result.score !== 0);
   },
 });
