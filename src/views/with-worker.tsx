@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import type { FzfResultItem } from "../lib/main";
 import FzfWorker from "../utils/fzf-worker?worker";
 
+// It's a good idea to check for worker support using ```if (window.Worker)```
+
 const fzfFindAsync = Comlink.wrap(new FzfWorker());
 
 export function WithWorker() {
