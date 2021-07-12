@@ -38,24 +38,28 @@ export class Fzf {
   }
 
   find = (query: string): FzfResultItem[] => {
-    const pattern = query.toLowerCase();
+    let caseSensitive = false;
+    // smartcase
+    if (query.toLowerCase() !== query) {
+      caseSensitive = true;
+    }
 
     if (this.opts.cache) {
-      const cachedResult = this.cache[pattern];
+      const cachedResult = this.cache[query];
       if (cachedResult !== undefined) {
         return cachedResult;
       }
     }
 
-    const patternRunes = strToRunes(pattern);
+    const runes = strToRunes(query);
     let result = this.list
       .map((str) => {
         const match = fuzzyMatchV2(
-          false,
+          caseSensitive,
           false,
           false,
           str,
-          patternRunes,
+          runes,
           true,
           null
         );
@@ -69,7 +73,7 @@ export class Fzf {
       result = result.slice(0, this.opts.maxResultItems);
     }
 
-    if (this.opts.cache) this.cache[pattern] = result;
+    if (this.opts.cache) this.cache[query] = result;
 
     return result;
   };
