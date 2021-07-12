@@ -41,8 +41,8 @@ export function WithWorker() {
       <div className="pt-2">
         {input !== "" ? (
           <ul>
-            {result.map((item) => (
-              <li key={item.str} className="py-1">
+            {result.map((item, index) => (
+              <li key={index} className="py-1">
                 <HighlightChars
                   str={item.str}
                   highlightIndices={item.pos ?? []}

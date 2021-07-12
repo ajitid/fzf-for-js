@@ -42,15 +42,27 @@ export class WorkerPool {
     });
   }
 
+  private getWorker() {
+    const worker = this.pool.pop();
+    if (worker) return worker;
+
+    if (this.used < this.poolSize) {
+      this.used++;
+      const worker = Comlink.wrap(this.workerFactory());
+      return worker;
+    }
+
+    return null;
+  }
+
   private nextJob() {
     const job = this.jobs.shift();
     if (!job) return;
 
-    let worker = this.pool.pop();
+    let worker = this.getWorker();
     if (!worker) {
-      if (this.used >= this.poolSize) return;
-      this.used++;
-      worker = Comlink.wrap(this.workerFactory());
+      this.jobs.unshift(job);
+      return;
     }
 
     // @ts-expect-error any type

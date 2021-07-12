@@ -64,11 +64,16 @@ const resultOrAbort = <T>(promises: Promise<T>) => {
   };
 };
 
-let prevAbort = () => {};
+let abortPrevJob = () => {};
+
+let lastJobId = "";
 
 const fzfFindAsync = async (query: string) => {
+  const jobId = `${query}-${Date.now().toString()}`;
+  lastJobId = jobId;
   // TODO cancel previous query
-  prevAbort();
+  abortPrevJob();
+  pool.jobs = [];
 
   try {
     const partialResultsPromise = Promise.all<FzfResultItem[]>(
@@ -78,15 +83,21 @@ const fzfFindAsync = async (query: string) => {
     );
 
     const { promise, abort } = resultOrAbort(partialResultsPromise);
-    prevAbort = abort;
+    abortPrevJob = abort;
     const partialResults = await promise;
+
+    if (jobId !== lastJobId) return null;
 
     const result = partialResults.flat();
     result.sort((a, b) => b.result.score - a.result.score);
+
+    if (jobId !== lastJobId) return null;
+
     return result.slice(0, 32);
-  } catch {
+  } catch (error) {
     // TODO null ain't the best return, maybe throw reject w/ error?
-    console.log("err");
+    // same for early returns in try blcok?
+    console.log("scratched results for", query, { error });
     return null;
   }
 };
