@@ -8,12 +8,15 @@ import list from "../../date-fns.json";
 // TODO revert to date-fns list
 // const list = new Array(999999).fill("abcde");
 
-// taken for https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/matcher.go#L42
-const NUM_PARTITIONS_MULTIPLIER = 8;
+// Idea of these constansts is taken from
+// https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/matcher.go#L42
+//
+// Value of these constants have been modified:
+// const __NOT__USED__NUM_PARTITIONS_MULTIPLIER = 8;
 const MAX_PARTITIONS = 32;
-const PARTITIONS = Math.min(
-  NUM_PARTITIONS_MULTIPLIER * (navigator.hardwareConcurrency ?? 4),
-  MAX_PARTITIONS
+const PARTITIONS = Math.max(
+  Math.min(navigator.hardwareConcurrency ?? 4, MAX_PARTITIONS) - 1,
+  1
 );
 
 const sliceList = () => {
@@ -34,7 +37,7 @@ const sliceList = () => {
 
 const slices = sliceList();
 
-const workerFactory = () => Comlink.wrap(new Worker());
+const workerFactory = () => new Worker();
 const pool = new WorkerPool(workerFactory, PARTITIONS);
 
 // TODO replace `any`
@@ -74,10 +77,7 @@ const fzfFindAsync = async (query: string) => {
   try {
     const partialResultsPromise = Promise.all<FzfResultItem[]>(
       slices.map((slice) => {
-        // @ts-ignore
-        return workerFactory().find(slice, query);
-        // FIXME use pool, see WorkerPool for the issue
-        // pool.find(slice, query);
+        return pool.callFn("find")(slice, query) as Promise<FzfResultItem[]>;
       })
     );
 
@@ -91,7 +91,7 @@ const fzfFindAsync = async (query: string) => {
   } catch {
     // TODO
     console.log("err");
-    return [];
+    return null;
   }
 };
 

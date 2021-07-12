@@ -23,6 +23,7 @@ export function WithWorker() {
 
     // @ts-ignore
     const result = await fzfFindAsync(input);
+    if (result === null) return;
     setResult(result);
   };
 

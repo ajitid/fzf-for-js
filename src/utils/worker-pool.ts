@@ -14,53 +14,41 @@ import * as Comlink from "comlink";
 */
 
 export class WorkerPool {
-  workerFactory: () => Comlink.Remote<unknown>;
+  workerFactory: () => Worker;
   poolSize: number;
   used: number;
   pool: Comlink.Remote<unknown>[];
   jobs: any[];
 
   constructor(
-    workerFactory: () => Comlink.Remote<unknown>,
+    workerFactory: () => Worker,
     size = navigator.hardwareConcurrency ?? 4
     // hardwareConcurrency is basically what runtime.NumCPU() is in Golang
   ) {
     let worker = (this.workerFactory = workerFactory)();
-    // FIXME check why it isn't working
-    // @ts-ignore
-    // this["find"] = this._method["find"];
     this.poolSize = size;
     this.used = 1;
-    this.pool = [worker];
+    this.pool = [Comlink.wrap(worker)];
     this.jobs = [];
-    for (let i in worker)
-      if (
-        worker.hasOwnProperty(i) &&
-        // @ts-expect-error any type
-        typeof worker[i] === "function"
-      ) {
-        // @ts-expect-error any type
-        this[i] = this._method(i); // proxy all methods available on the worker
-      }
   }
 
-  _method(name: string) {
-    return (...args: any[]) => this._queueJob(name, args);
+  callFn(name: string) {
+    return (...args: any[]) => this.queueJob(name, args);
   }
 
-  _queueJob(method: string, args: any[]) {
+  private queueJob(method: string, args: any[]) {
     return new Promise((y, n) => {
       this.jobs.push({ method, args, y, n });
-      this._nextJob();
+      this.nextJob();
     });
   }
 
-  _nextJob() {
+  private nextJob() {
     let worker = this.pool.pop();
     if (!worker) {
       if (this.used >= this.poolSize) return;
       this.used++;
-      worker = this.workerFactory();
+      worker = Comlink.wrap(this.workerFactory());
     }
     const job = this.jobs.shift();
     if (!job) return;
@@ -70,7 +58,7 @@ export class WorkerPool {
       .catch(job.n)
       .finally(() => {
         this.pool.push(worker!);
-        this._nextJob();
+        this.nextJob();
       });
   }
 }
