@@ -18,6 +18,8 @@ export function toInt(number: number): Int32 {
   return int32[0];
 }
 export function maxInt16(num1: number, num2: number) {
+  // with this implementation, I don't think it does anything
+  // as it is returning a number only, not int16
   const arr = Int16Array.from([num1, num2]);
   return arr[0] > arr[1] ? arr[0] : arr[1];
 }
