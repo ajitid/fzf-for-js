@@ -64,6 +64,9 @@ const resultOrAbort = <T>(promises: Promise<T>) => {
   };
 };
 
+type query = string;
+const cache: Record<query, FzfResultItem[]> = {};
+
 let abortPrevJob = () => {};
 
 let lastJobId = "";
@@ -72,8 +75,13 @@ const fzfFindAsync = async (query: string) => {
   const jobId = `${query}-${Date.now().toString()}`;
   lastJobId = jobId;
   // TODO cancel previous query
-  abortPrevJob();
   pool.jobs = [];
+  abortPrevJob();
+
+  const cachedResult = cache[query];
+  if (cachedResult !== undefined) {
+    return cachedResult;
+  }
 
   try {
     const partialResultsPromise = Promise.all<FzfResultItem[]>(
@@ -88,12 +96,15 @@ const fzfFindAsync = async (query: string) => {
 
     if (jobId !== lastJobId) return null;
 
-    const result = partialResults.flat();
+    let result = partialResults.flat();
     result.sort((a, b) => b.result.score - a.result.score);
 
     if (jobId !== lastJobId) return null;
 
-    return result.slice(0, 32);
+    result = result.slice(0, 32);
+
+    cache[query] = result;
+    return result;
   } catch (error) {
     // TODO null ain't the best return, maybe throw reject w/ error?
     // same for early returns in try blcok?
