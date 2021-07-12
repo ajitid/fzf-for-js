@@ -26,8 +26,8 @@ export interface FzfResultItem {
 type query = string;
 
 export class Fzf {
-  private list: string[] = [];
-  readonly opts: Options = { ...defaultOpts };
+  private list;
+  readonly opts: Options;
   private cache: Record<query, FzfResultItem[]> = {};
 
   constructor(list: string[], options: Partial<Options> = defaultOpts) {
