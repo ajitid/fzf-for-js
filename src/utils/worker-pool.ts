@@ -23,7 +23,6 @@ export class WorkerPool {
   constructor(
     workerFactory: () => Worker,
     size = navigator.hardwareConcurrency ?? 4
-    // hardwareConcurrency is basically what runtime.NumCPU() is in Golang
   ) {
     let worker = (this.workerFactory = workerFactory)();
     this.poolSize = size;

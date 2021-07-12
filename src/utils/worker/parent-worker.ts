@@ -5,16 +5,12 @@ import Worker from "./child-worker?worker";
 import type { FzfResultItem } from "../../lib/main";
 
 import list from "../../date-fns.json";
-// TODO revert to date-fns list
-// const list = new Array(999999).fill("abcde");
 
 // Idea of these constansts is taken from
 // https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/matcher.go#L42
-//
-// Value of these constants have been modified:
-// const __NOT__USED__NUM_PARTITIONS_MULTIPLIER = 8;
 const MAX_PARTITIONS = 32;
 const PARTITIONS = Math.max(
+  // hardwareConcurrency is basically what runtime.NumCPU() is in Golang
   Math.min(navigator.hardwareConcurrency ?? 4, MAX_PARTITIONS) - 1,
   1
 );
@@ -89,7 +85,7 @@ const fzfFindAsync = async (query: string) => {
     result.sort((a, b) => b.result.score - a.result.score);
     return result.slice(0, 32);
   } catch {
-    // TODO
+    // TODO null ain't the best return, maybe throw reject w/ error?
     console.log("err");
     return null;
   }
