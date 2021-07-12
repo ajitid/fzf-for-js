@@ -10,11 +10,13 @@ import type { Result } from "./algo";
 interface Options {
   cache: boolean;
   maxResultItems: number;
+  sort: boolean;
 }
 
 const defaultOpts: Options = {
   cache: true,
   maxResultItems: Infinity,
+  sort: true,
 };
 
 export interface FzfResultItem {
@@ -60,7 +62,8 @@ export class Fzf {
         return { str, result: match[0], pos: match[1] };
       })
       .filter((v) => v.result.score !== 0);
-    result.sort((a, b) => b.result.score - a.result.score);
+
+    if (this.opts.sort) result.sort((a, b) => b.result.score - a.result.score);
 
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);

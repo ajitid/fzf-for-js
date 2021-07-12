@@ -26,6 +26,9 @@ export class WorkerPool {
     // hardwareConcurrency is basically what runtime.NumCPU() is in Golang
   ) {
     let worker = (this.workerFactory = workerFactory)();
+    // FIXME check why it isn't working
+    // @ts-ignore
+    // this["find"] = this._method["find"];
     this.poolSize = size;
     this.used = 1;
     this.pool = [worker];
