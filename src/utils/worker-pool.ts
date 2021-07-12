@@ -1,4 +1,4 @@
-// from https://github.com/developit/greenlet/issues/31#issuecomment-392983449
+// modfied version of https://github.com/developit/greenlet/issues/31#issuecomment-392983449
 
 import * as Comlink from "comlink";
 
@@ -9,7 +9,7 @@ import * as Comlink from "comlink";
 
   const addWorkerFactory = () => Comlink.wrap(new AddWorker());
   const pool = new WorkerPool(addWorkerFactory)
-  pool.doStuff();
+  pool.callFn("fnName")(arg1, arg2);
   ```
 */
 
@@ -44,14 +44,16 @@ export class WorkerPool {
   }
 
   private nextJob() {
+    const job = this.jobs.shift();
+    if (!job) return;
+
     let worker = this.pool.pop();
     if (!worker) {
       if (this.used >= this.poolSize) return;
       this.used++;
       worker = Comlink.wrap(this.workerFactory());
     }
-    const job = this.jobs.shift();
-    if (!job) return;
+
     // @ts-expect-error any type
     worker[job.method](...job.args)
       .then(job.y)
