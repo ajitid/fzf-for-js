@@ -4,7 +4,7 @@ import { WorkerPool } from "../worker-pool";
 import Worker from "./child-worker?worker";
 import type { FzfResultItem } from "../../lib/main";
 
-import list from "../../list.json";
+import list from "../../lists/words.json";
 
 // Idea of these constansts is taken from
 // https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/matcher.go#L42

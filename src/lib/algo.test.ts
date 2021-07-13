@@ -61,7 +61,7 @@ function assertMatch2(
     caseSensitive,
     normalize,
     forward,
-    input,
+    strToRunes(input),
     strToRunes(pattern),
     true,
     null
