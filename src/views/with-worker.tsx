@@ -14,7 +14,7 @@ export function WithWorker() {
 
   const [result, setResult] = useState<FzfResultItem[]>([]);
 
-  const handleInputChange = async (input: string) => {
+  const handleInputChange = (input: string) => {
     setInput(input);
     if (input === "") {
       setResult([]);
@@ -22,9 +22,10 @@ export function WithWorker() {
     }
 
     // @ts-ignore
-    const result = await fzfFindAsync(input);
-    if (result === null) return;
-    setResult(result);
+    fzfFindAsync(input).then((result) => {
+      if (result === null) return;
+      setResult(result);
+    });
   };
 
   return (
