@@ -10,13 +10,13 @@ import type { Result } from "./algo";
 interface Options {
   cache: boolean;
   maxResultItems: number;
-  sort: boolean;
+  // TODO we need different sort metric
+  // sort: boolean;
 }
 
 const defaultOpts: Options = {
   cache: true,
   maxResultItems: Infinity,
-  sort: true,
 };
 
 export interface FzfResultItem {
@@ -67,7 +67,7 @@ export class Fzf {
       })
       .filter((v) => v.result.score !== 0);
 
-    if (this.opts.sort) result.sort((a, b) => b.result.score - a.result.score);
+    result.sort((a, b) => b.result.score - a.result.score);
 
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
