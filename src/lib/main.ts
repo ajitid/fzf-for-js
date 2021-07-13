@@ -50,17 +50,17 @@ export class Fzf<U> {
   }
 
   find = (query: string): FzfResultItem<U>[] => {
-    let caseSensitive = false;
-    // smartcase
-    if (query.toLowerCase() !== query) {
-      caseSensitive = true;
-    }
-
     if (this.opts.cache) {
       const cachedResult = this.cache[query];
       if (cachedResult !== undefined) {
         return cachedResult;
       }
+    }
+
+    let caseSensitive = false;
+    // smartcase
+    if (query.toLowerCase() !== query) {
+      caseSensitive = true;
     }
 
     const runes = strToRunes(query);
