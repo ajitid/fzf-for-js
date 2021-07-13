@@ -84,8 +84,8 @@ const fzfFindAsync = async (query: string) => {
   }
 
   try {
-    let abortor = {
-      signal: false,
+    let signals = {
+      stop: false,
     };
 
     const partialResultsPromise = Promise.all<FzfResultItem[]>(
@@ -93,14 +93,14 @@ const fzfFindAsync = async (query: string) => {
         return pool.callFn("find")(
           slice,
           query,
-          Comlink.proxy(() => abortor.signal)
+          Comlink.proxy(() => signals.stop)
         ) as Promise<FzfResultItem[]>;
       })
     );
 
     const { promise, abort } = resultOrAbort(partialResultsPromise);
     abortPrevJob = () => {
-      abortor.signal = true;
+      signals.stop = true;
       abort();
     };
     const partialResults = await promise;
