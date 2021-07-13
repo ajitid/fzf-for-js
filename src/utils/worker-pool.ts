@@ -7,7 +7,7 @@ import * as Comlink from "comlink";
   ```
   import AddWorker from "../utils/add-worker?worker";
 
-  const addWorkerFactory = () => Comlink.wrap(new AddWorker());
+  const addWorkerFactory = () => new AddWorker();
   const pool = new WorkerPool(addWorkerFactory)
   pool.callFn("fnName")(arg1, arg2);
   ```
