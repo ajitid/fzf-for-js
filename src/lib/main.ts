@@ -17,7 +17,7 @@ interface Options<U> {
 }
 
 const defaultOpts: Options<any> = {
-  cache: true,
+  cache: false,
   maxResultItems: Infinity,
   selector: (v) => v,
 };
