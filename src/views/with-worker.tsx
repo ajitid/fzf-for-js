@@ -12,19 +12,19 @@ const { fzfFindAsync } = Comlink.wrap(new FzfWorker());
 export function WithWorker() {
   const [input, setInput] = useState("");
 
-  const [result, setResult] = useState<FzfResultItem[]>([]);
+  const [results, setResults] = useState<FzfResultItem[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
     if (input === "") {
-      setResult([]);
+      setResults([]);
       return;
     }
 
     // @ts-ignore
-    fzfFindAsync(input).then((result) => {
-      if (result === null) return;
-      setResult(result);
+    fzfFindAsync(input).then((results) => {
+      if (results === null) return;
+      setResults(results);
     });
   };
 
@@ -42,14 +42,14 @@ export function WithWorker() {
       <div className="pt-2">
         {input !== "" ? (
           <ul>
-            {result.map((item, index) => (
+            {results.map((result, index) => (
               <li key={index} className="py-1">
                 <HighlightChars
-                  str={item.str}
-                  highlightIndices={item.pos ?? []}
+                  str={result.item}
+                  highlightIndices={result.pos ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {item.result.score}
+                  {result.result.score}
                 </span>
               </li>
             ))}

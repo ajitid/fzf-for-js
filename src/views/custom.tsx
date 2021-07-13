@@ -15,26 +15,25 @@ const list: Stuff[] = [
 ];
 
 const fzf = new Fzf(list, {
-  cache: false,
   selector: (v) => v.displayName,
 });
 
 export function Custom() {
   const [input, setInput] = useState("");
 
-  const [result, setResult] = useState<FzfResultItem<Stuff>[]>([]);
+  const [results, setResults] = useState<FzfResultItem<Stuff>[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
     if (input === "") {
-      setResult([]);
+      setResults([]);
       return;
     }
 
-    let result = fzf.find(input);
+    let results = fzf.find(input);
     // limiting size of the result to avoid jank while rendering it
-    result = result.slice(0, 32);
-    setResult(result);
+    results = results.slice(0, 32);
+    setResults(results);
   };
 
   return (
@@ -51,14 +50,14 @@ export function Custom() {
       <div className="pt-2">
         {input !== "" ? (
           <ul>
-            {result.map((item) => (
-              <li key={item.str.id} className="py-1">
+            {results.map((result) => (
+              <li key={result.item.id} className="py-1">
                 <HighlightChars
-                  str={item.str.displayName}
-                  highlightIndices={item.pos ?? []}
+                  str={result.item.displayName}
+                  highlightIndices={result.pos ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {item.result.score}
+                  {result.result.score}
                 </span>
               </li>
             ))}

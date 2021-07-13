@@ -23,7 +23,7 @@ const defaultOpts: Options<any> = {
 };
 
 export interface FzfResultItem<U = string> {
-  str: U;
+  item: U;
   result: Result;
   pos: number[] | null;
 }
@@ -39,13 +39,13 @@ type ConditionalOptions<U> = U extends string
 
 export class Fzf<U> {
   private runesList: Rune[][];
-  private strList: U[];
+  private items: U[];
   readonly opts: Options<U>;
   private cache: Record<query, FzfResultItem<U>[]> = {};
 
   constructor(list: U[], options: ConditionalOptions<U> = defaultOpts) {
     this.opts = { ...defaultOpts, ...options };
-    this.strList = list;
+    this.items = list;
     this.runesList = list.map((item) => strToRunes(this.opts.selector(item)));
   }
 
@@ -74,7 +74,7 @@ export class Fzf<U> {
         true,
         slab
       );
-      return { str: this.strList[index], result: match[0], pos: match[1] };
+      return { item: this.items[index], result: match[0], pos: match[1] };
     };
     const thresholdFilter = (v: FzfResultItem<U>) => v.result.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
@@ -102,19 +102,19 @@ export const fzfQuick = (query: string) => {
 
   const runes = strToRunes(query);
 
-  return (str: string) => {
+  return (text: string): FzfResultItem => {
     // TODO this conversion needs to be somewhere else
-    const item = strToRunes(str);
+    const textRunes = strToRunes(text);
 
     const match = fuzzyMatchV2(
       caseSensitive,
       false,
       false,
-      item,
+      textRunes,
       runes,
       true,
       slab
     );
-    return { str, result: match[0], pos: match[1] };
+    return { item: text, result: match[0], pos: match[1] };
   };
 };
