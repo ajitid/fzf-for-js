@@ -28,6 +28,7 @@ export interface FzfResultItem {
 
 type query = string;
 
+// TODO maybe: do not initialise slab unless an fzf algo that needs slab gets called
 const slab = makeSlab(SLAB_16_SIZE, SLAB_32_SIZE);
 
 export class Fzf {
