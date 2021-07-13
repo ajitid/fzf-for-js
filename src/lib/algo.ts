@@ -5,7 +5,8 @@
 import { normalized } from "./normalize";
 import { Slab } from "./slab";
 import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
-import { Rune, strToRunes, runesToStr } from "./runes";
+import { Rune, runesToStr } from "./runes";
+import { whitespacesAtEnd, whitespacesAtStart } from "./char";
 
 const DEBUG = false;
 
@@ -169,15 +170,12 @@ function bonusFor(prevClass: Char, currClass: Char): Int16 {
   return 0;
 }
 
-function bonusAt(input: string, idx: number): Int16 {
+function bonusAt(input: Rune[], idx: number): Int16 {
   if (idx === 0) {
     return BONUS_BOUNDARY;
   }
 
-  return bonusFor(
-    charClassOf(input[idx - 1].codePointAt(0)!),
-    charClassOf(input[idx].codePointAt(0)!)
-  );
+  return bonusFor(charClassOf(input[idx - 1]), charClassOf(input[idx]));
 }
 
 function normalizeRune(rune: Rune): Rune {
@@ -199,34 +197,34 @@ export type AlgoFn = (
   caseSensitive: boolean,
   normalize: boolean,
   forward: boolean,
-  input: string,
+  input: Rune[],
   pattern: Rune[],
   withPos: boolean,
   slab: Slab | null
 ) => [Result, number[] | null];
 
 function trySkip(
-  input: string,
+  input: Rune[],
   caseSensitive: boolean,
-  char: string,
+  char: Rune,
   from: number
 ): number {
-  let rest = input.substring(from);
+  let rest = input.slice(from);
   let idx = rest.indexOf(char);
   if (idx === 0) {
     return from;
   }
 
-  if (!caseSensitive && char >= "a" && char <= "z") {
+  if (!caseSensitive && char >= SMALL_A_RUNE && char <= SMALL_Z_RUNE) {
     if (idx > 0) {
-      rest = rest.substring(0, idx);
+      rest = rest.slice(0, idx);
     }
 
     // TODO I hope that I'm doing it right
     // convert ascii lower to upper by subtracting 32 (a -> A)
     // and then checking if it is present in str
     // dunno, this logic looks odd for chars which aren't alphabets
-    const uidx = rest.indexOf(String.fromCodePoint(char.codePointAt(0)! - 32));
+    const uidx = rest.indexOf(char - 32);
     if (uidx >= 0) {
       idx = uidx;
     }
@@ -250,7 +248,7 @@ function isAscii(runes: Rune[]) {
 }
 
 function asciiFuzzyIndex(
-  input: string,
+  input: Rune[],
   pattern: Rune[],
   caseSensitive: boolean
 ): number {
@@ -260,7 +258,7 @@ function asciiFuzzyIndex(
    * https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/util/chars.go#L38-L43
    * and https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/util/chars.go#L48
    */
-  if (!isAscii(strToRunes(input))) {
+  if (!isAscii(input)) {
     return 0;
   }
 
@@ -272,12 +270,7 @@ function asciiFuzzyIndex(
     idx = 0;
 
   for (let pidx = 0; pidx < pattern.length; pidx++) {
-    idx = trySkip(
-      input,
-      caseSensitive,
-      String.fromCodePoint(pattern[pidx]),
-      idx
-    );
+    idx = trySkip(input, caseSensitive, pattern[pidx], idx);
     if (idx < 0) {
       return -1;
     }
@@ -349,7 +342,7 @@ export const fuzzyMatchV2: AlgoFn = (
   const [, T] = alloc32(offset32, slab, N);
 
   for (let i = 0; i < T.length; i++) {
-    T[i] = input.codePointAt(i)!;
+    T[i] = input[i];
   }
 
   // Phase 2. Calculate bonus for each point
@@ -591,7 +584,7 @@ export const fuzzyMatchV2: AlgoFn = (
 function calculateScore(
   caseSensitive: boolean,
   normalize: boolean,
-  text: string,
+  text: Rune[],
   pattern: Rune[],
   sidx: number,
   eidx: number,
@@ -607,11 +600,11 @@ function calculateScore(
   let prevCharClass = Char.NonWord;
 
   if (sidx > 0) {
-    prevCharClass = charClassOf(text[sidx - 1].codePointAt(0)!);
+    prevCharClass = charClassOf(text[sidx - 1]);
   }
 
   for (let idx = sidx; idx < eidx; idx++) {
-    let rune = text[idx].codePointAt(0)!;
+    let rune = text[idx];
     const charClass = charClassOf(rune);
 
     if (!caseSensitive) {
@@ -696,7 +689,7 @@ export const fuzzyMatchV1: AlgoFn = (
   const lenPattern = pattern.length;
 
   for (let index = 0; index < lenRunes; index++) {
-    let rune = text[indexAt(index, lenRunes, forward)].codePointAt(0)!;
+    let rune = text[indexAt(index, lenRunes, forward)];
 
     if (!caseSensitive) {
       if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
@@ -730,7 +723,7 @@ export const fuzzyMatchV1: AlgoFn = (
 
     for (let index = eidx - 1; index >= sidx; index--) {
       const tidx = indexAt(index, lenRunes, forward);
-      let rune = text[tidx].codePointAt(0)!;
+      let rune = text[tidx];
 
       if (!caseSensitive) {
         if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
@@ -804,7 +797,7 @@ export const exactMatchNaive: AlgoFn = (
 
   for (let index = 0; index < lenRunes; index++) {
     const index_ = indexAt(index, lenRunes, forward);
-    let rune = text[index_].codePointAt(0)!;
+    let rune = text[index_];
 
     if (!caseSensitive) {
       if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
@@ -891,7 +884,7 @@ export const prefixMatch: AlgoFn = (
   let trimmedLen = 0;
   // check if pattern[0] is not a whitespace
   if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
-    trimmedLen = text.length - text.trimStart().length;
+    trimmedLen = whitespacesAtStart(text);
   }
 
   if (text.length - trimmedLen < pattern.length) {
@@ -899,7 +892,7 @@ export const prefixMatch: AlgoFn = (
   }
 
   for (const [index, r] of pattern.entries()) {
-    let rune = text[trimmedLen + index].codePointAt(0)!;
+    let rune = text[trimmedLen + index];
 
     if (!caseSensitive) {
       rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
@@ -944,7 +937,7 @@ export const suffixMatch: AlgoFn = (
     String.fromCodePoint(pattern[pattern.length - 1]).match(/\s/) ===
       null /* last el in pattern is not a space */
   ) {
-    trimmedLen -= text.length - text.trimEnd().length;
+    trimmedLen -= whitespacesAtEnd(text);
   }
 
   if (pattern.length === 0) {
@@ -958,7 +951,7 @@ export const suffixMatch: AlgoFn = (
   }
 
   for (const [index, r] of pattern.entries()) {
-    let rune = text[index + diff].codePointAt(0)!;
+    let rune = text[index + diff];
 
     if (!caseSensitive) {
       rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
@@ -1005,12 +998,12 @@ export const equalMatch: AlgoFn = (
   let trimmedLen = 0;
   // check if first el in pattern is not a whitespace
   if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
-    trimmedLen = text.length - text.trimStart().length;
+    trimmedLen = whitespacesAtStart(text);
   }
 
   let trimmedEndLen = 0;
   if (String.fromCodePoint(pattern[lenPattern - 1]).match(/\s/) === null) {
-    trimmedEndLen = text.length - text.trimEnd().length;
+    trimmedEndLen = whitespacesAtEnd(text);
   }
 
   if (text.length - trimmedLen - trimmedEndLen != lenPattern) {
@@ -1019,7 +1012,7 @@ export const equalMatch: AlgoFn = (
 
   let match = true;
   if (normalize) {
-    const runes = strToRunes(text);
+    const runes = text;
 
     for (const [idx, pchar] of pattern.entries()) {
       let rune = runes[trimmedLen + idx];
@@ -1034,7 +1027,10 @@ export const equalMatch: AlgoFn = (
       }
     }
   } else {
-    let runesStr = text.substring(trimmedLen, text.length - trimmedEndLen);
+    let runesStr = runesToStr(text).substring(
+      trimmedLen,
+      text.length - trimmedEndLen
+    );
 
     if (!caseSensitive) {
       runesStr = runesStr.toLowerCase();

@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import { Fzf, FzfResultItem } from "../lib/main";
 import list from "../list.json";
 
-const fzf = new Fzf(list);
+const fzf = new Fzf(list, {
+  cache: false,
+});
 
 export function Basic() {
   const [input, setInput] = useState("");
