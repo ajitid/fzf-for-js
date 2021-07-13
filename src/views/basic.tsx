@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Fzf, FzfResultItem } from "../lib/main";
-import list from "../list.json";
+import list from "../lists/date-fns-repo-folders.json";
 
 const fzf = new Fzf(list, {
   cache: false,
