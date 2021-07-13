@@ -6,6 +6,7 @@ import { strToRunes } from "./runes";
   and https://github.com/microsoft/TypeScript/issues/9944.
 */
 import type { Result } from "./algo";
+import { makeSlab, SLAB_16_SIZE, SLAB_32_SIZE } from "./slab";
 
 interface Options {
   cache: boolean;
@@ -26,6 +27,8 @@ export interface FzfResultItem {
 }
 
 type query = string;
+
+const slab = makeSlab(SLAB_16_SIZE, SLAB_32_SIZE);
 
 export class Fzf {
   private list;
@@ -61,7 +64,7 @@ export class Fzf {
           str,
           runes,
           true,
-          null
+          slab
         );
         return { str, result: match[0], pos: match[1] };
       })
@@ -96,7 +99,7 @@ export const fzfQuick = (query: string) => {
       str,
       runes,
       true,
-      null
+      slab
     );
     return { str, result: match[0], pos: match[1] };
   };

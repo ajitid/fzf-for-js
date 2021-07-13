@@ -9,6 +9,14 @@ import { Rune, strToRunes, runesToStr } from "./runes";
 
 const DEBUG = false;
 
+const MAX_ASCII = "\u007F".codePointAt(0)!;
+const CAPITAL_A_RUNE = "A".codePointAt(0)!;
+const CAPITAL_Z_RUNE = "Z".codePointAt(0)!;
+const SMALL_A_RUNE = "a".codePointAt(0)!;
+const SMALL_Z_RUNE = "z".codePointAt(0)!;
+const NUMERAL_ZERO_RUNE = "0".codePointAt(0)!;
+const NUMERAL_NINE_RUNE = "9".codePointAt(0)!;
+
 function indexAt(index: number, max: number, forward: boolean) {
   if (forward) {
     return index;
@@ -105,13 +113,11 @@ function alloc32(
 // huge garbage collection. JS can't parse it in terms of bytes so I might need to use
 // char array instead (which will technically be string array)
 function charClassOfAscii(rune: Rune): Char {
-  const char = String.fromCodePoint(rune);
-
-  if (char >= "a" && char <= "z") {
+  if (rune >= SMALL_A_RUNE && rune <= SMALL_Z_RUNE) {
     return Char.Lower;
-  } else if (char >= "A" && char <= "Z") {
+  } else if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
     return Char.Upper;
-  } else if (char >= "0" && char <= "9") {
+  } else if (rune >= NUMERAL_ZERO_RUNE && rune <= NUMERAL_NINE_RUNE) {
     return Char.Number;
   } else {
     return Char.NonWord;
@@ -137,8 +143,6 @@ function charClassOfNonAscii(rune: Rune): Char {
 
   return Char.NonWord;
 }
-
-const MAX_ASCII = "\u007F".codePointAt(0)!;
 
 function charClassOf(rune: Rune): Char {
   if (rune <= MAX_ASCII) {
@@ -611,7 +615,7 @@ function calculateScore(
     const charClass = charClassOf(rune);
 
     if (!caseSensitive) {
-      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+      if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
         rune += 32;
       } else if (rune > MAX_ASCII) {
         rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
@@ -695,7 +699,7 @@ export const fuzzyMatchV1: AlgoFn = (
     let rune = text[indexAt(index, lenRunes, forward)].codePointAt(0)!;
 
     if (!caseSensitive) {
-      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+      if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
         rune += 32;
       } else if (rune > MAX_ASCII) {
         rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
@@ -729,7 +733,7 @@ export const fuzzyMatchV1: AlgoFn = (
       let rune = text[tidx].codePointAt(0)!;
 
       if (!caseSensitive) {
-        if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+        if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
           rune += 32;
         } else if (rune > MAX_ASCII) {
           rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
@@ -803,7 +807,7 @@ export const exactMatchNaive: AlgoFn = (
     let rune = text[index_].codePointAt(0)!;
 
     if (!caseSensitive) {
-      if (rune >= "A".codePointAt(0)! && rune <= "Z".codePointAt(0)!) {
+      if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
         rune += 32;
       } else if (rune > MAX_ASCII) {
         rune = String.fromCodePoint(rune).toLowerCase().codePointAt(0)!;
