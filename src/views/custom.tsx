@@ -54,7 +54,7 @@ export function Custom() {
               <li key={result.item.id} className="py-1">
                 <HighlightChars
                   str={result.item.displayName}
-                  highlightIndices={result.pos ?? []}
+                  highlightIndices={result.positions ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
                   {result.result.score}

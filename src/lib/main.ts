@@ -25,7 +25,7 @@ const defaultOpts: Options<any> = {
 export interface FzfResultItem<U = string> {
   item: U;
   result: Result;
-  pos: number[] | null;
+  positions: number[] | null;
 }
 
 type query = string;
@@ -74,7 +74,7 @@ export class Fzf<U> {
         true,
         slab
       );
-      return { item: this.items[index], result: match[0], pos: match[1] };
+      return { item: this.items[index], result: match[0], positions: match[1] };
     };
     const thresholdFilter = (v: FzfResultItem<U>) => v.result.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
@@ -115,6 +115,6 @@ export const fzfQuick = (query: string) => {
       true,
       slab
     );
-    return { item: text, result: match[0], pos: match[1] };
+    return { item: text, result: match[0], positions: match[1] };
   };
 };
