@@ -9,19 +9,19 @@ let fzf = new Fzf(wordList);
 export function Basic() {
   const [input, setInput] = useState("");
 
-  const [results, setResults] = useState<FzfResultItem[]>([]);
+  const [entries, setEntries] = useState<FzfResultItem[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
     if (input === "") {
-      setResults([]);
+      setEntries([]);
       return;
     }
 
-    let results = fzf.find(input);
+    let entries = fzf.find(input);
     // limiting size of the result to avoid jank while rendering it
-    results = results.slice(0, 32);
-    setResults(results);
+    entries = entries.slice(0, 32);
+    setEntries(entries);
   };
 
   const [choice, setChoice] = useState("words");
@@ -39,7 +39,7 @@ export function Basic() {
     }
 
     setInput("");
-    setResults([]);
+    setEntries([]);
   };
 
   useEffect(() => {
@@ -87,14 +87,14 @@ export function Basic() {
       <div className="pt-2">
         {input !== "" ? (
           <ul>
-            {results.map((result, index) => (
+            {entries.map((entry, index) => (
               <li key={index} className="py-1">
                 <HighlightChars
-                  str={result.item}
-                  highlightIndices={result.positions ?? []}
+                  str={entry.item}
+                  highlightIndices={entry.positions ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {result.result.score}
+                  {entry.result.score}
                 </span>
               </li>
             ))}
