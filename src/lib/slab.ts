@@ -13,3 +13,9 @@ export function makeSlab(size16: number, size32: number): Slab {
     i32: new Int32Array(size32),
   };
 }
+
+// TODO maybe: do not initialise slab unless an fzf algo that needs slab gets called
+//
+// seems like a slab can be reused **without** setting its arrs' values to 0
+// everytime we call algo fn
+export const slab = makeSlab(SLAB_16_SIZE, SLAB_32_SIZE);

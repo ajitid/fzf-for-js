@@ -1,7 +1,7 @@
 {
   "===== INFO =====": "",
   "name": "fzf",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Do fuzzy matching using fzf algorithm in JavaScript",
   "license": "SEE LICENSE IN license.txt",
   "keywords": [

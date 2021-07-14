@@ -1,6 +1,35 @@
 import * as Comlink from "comlink";
 
-import { fzfQuick } from "../../lib/main";
+import { fuzzyMatchV2 } from "../../lib/algo";
+import { FzfResultItem } from "../../lib/main";
+import { strToRunes } from "../../lib/runes";
+import { slab } from "../../lib/slab";
+
+const fzfQuick = (query: string) => {
+  let caseSensitive = false;
+  // smartcase
+  if (query.toLowerCase() !== query) {
+    caseSensitive = true;
+  }
+
+  const runes = strToRunes(query);
+
+  return (text: string): FzfResultItem => {
+    // TODO this conversion needs to be somewhere else
+    const textRunes = strToRunes(text);
+
+    const match = fuzzyMatchV2(
+      caseSensitive,
+      false,
+      false,
+      textRunes,
+      runes,
+      true,
+      slab
+    );
+    return { item: text, result: match[0], positions: match[1] };
+  };
+};
 
 Comlink.expose({
   find: async (

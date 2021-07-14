@@ -4,6 +4,8 @@ import { WorkerPool } from "../worker-pool";
 import Worker from "./child-worker?worker";
 import type { FzfResultItem } from "../../lib/main";
 
+// this needs list with 90k items or above actually stress CPU
+// so that multi-thread paradigm help us to sped up calculation
 import list from "../../lists/words.json";
 
 // Idea of these constansts is taken from

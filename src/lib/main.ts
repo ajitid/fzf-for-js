@@ -6,7 +6,7 @@ import { Rune, strToRunes } from "./runes";
   and https://github.com/microsoft/TypeScript/issues/9944.
 */
 import type { Result } from "./algo";
-import { makeSlab, SLAB_16_SIZE, SLAB_32_SIZE } from "./slab";
+import { slab } from "./slab";
 
 interface Options<U> {
   cache: boolean;
@@ -29,9 +29,6 @@ export interface FzfResultItem<U = string> {
 }
 
 type query = string;
-
-// TODO maybe: do not initialise slab unless an fzf algo that needs slab gets called
-const slab = makeSlab(SLAB_16_SIZE, SLAB_32_SIZE);
 
 // from https://stackoverflow.com/a/52318137/7683365
 type OptionsTuple<U> = U extends string
@@ -93,29 +90,3 @@ export class Fzf<U> {
     return result;
   };
 }
-
-export const fzfQuick = (query: string) => {
-  let caseSensitive = false;
-  // smartcase
-  if (query.toLowerCase() !== query) {
-    caseSensitive = true;
-  }
-
-  const runes = strToRunes(query);
-
-  return (text: string): FzfResultItem => {
-    // TODO this conversion needs to be somewhere else
-    const textRunes = strToRunes(text);
-
-    const match = fuzzyMatchV2(
-      caseSensitive,
-      false,
-      false,
-      textRunes,
-      runes,
-      true,
-      slab
-    );
-    return { item: text, result: match[0], positions: match[1] };
-  };
-};
