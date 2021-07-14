@@ -33,18 +33,19 @@ type query = string;
 // TODO maybe: do not initialise slab unless an fzf algo that needs slab gets called
 const slab = makeSlab(SLAB_16_SIZE, SLAB_32_SIZE);
 
-type ConditionalOptions<U> = U extends string
-  ? Partial<Options<U>>
-  : Partial<Options<U>> & { selector: Options<U>["selector"] };
+// from https://stackoverflow.com/a/52318137/7683365
+type OptionsTuple<U> = U extends string
+  ? [options?: Partial<Options<U>>]
+  : [options: Partial<Options<U>> & { selector: Options<U>["selector"] }];
 
 export class Fzf<U> {
   private runesList: Rune[][];
   private items: U[];
-  readonly opts: Options<U>;
+  private readonly opts: Options<U>;
   private cache: Record<query, FzfResultItem<U>[]> = {};
 
-  constructor(list: U[], options: ConditionalOptions<U> = defaultOpts) {
-    this.opts = { ...defaultOpts, ...options };
+  constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
+    this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
     this.runesList = list.map((item) => strToRunes(this.opts.selector(item)));
   }
