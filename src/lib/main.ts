@@ -12,6 +12,7 @@ interface Options<U> {
   cache: boolean;
   maxResultItems: number;
   selector: (v: U) => string;
+  casing: "smart-case" | "case-sensitive" | "case-insensitive";
   // TODO we need different sort metric
   // sort: boolean;
 }
@@ -20,6 +21,7 @@ const defaultOpts: Options<any> = {
   cache: false,
   maxResultItems: Infinity,
   selector: (v) => v,
+  casing: "smart-case",
 };
 
 export interface FzfResultItem<U = string> {
@@ -56,9 +58,17 @@ export class Fzf<U> {
     }
 
     let caseSensitive = false;
-    // smartcase
-    if (query.toLowerCase() !== query) {
-      caseSensitive = true;
+    switch (this.opts.casing) {
+      case "smart-case":
+        if (query.toLowerCase() !== query) {
+          caseSensitive = true;
+        }
+        break;
+      case "case-sensitive":
+        caseSensitive = true;
+        break;
+      case "case-insensitive":
+        caseSensitive = false;
     }
 
     const runes = strToRunes(query);
