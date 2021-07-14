@@ -16,6 +16,7 @@ const list: Stuff[] = [
 
 const fzf = new Fzf(list, {
   selector: (v) => v.displayName,
+  maxResultItems: 32,
 });
 
 export function Custom() {
@@ -31,8 +32,6 @@ export function Custom() {
     }
 
     let entries = fzf.find(input);
-    // limiting size of the result to avoid jank while rendering it
-    entries = entries.slice(0, 32);
     setEntries(entries);
   };
 

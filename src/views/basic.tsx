@@ -4,7 +4,10 @@ import { Fzf, FzfResultItem } from "../lib/main";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
-let fzf = new Fzf(wordList);
+let fzf = new Fzf(wordList, {
+  // limiting size of the result to avoid jank while rendering it
+  maxResultItems: 32,
+});
 
 export function Basic() {
   const [input, setInput] = useState("");
@@ -19,8 +22,6 @@ export function Basic() {
     }
 
     let entries = fzf.find(input);
-    // limiting size of the result to avoid jank while rendering it
-    entries = entries.slice(0, 32);
     setEntries(entries);
   };
 
