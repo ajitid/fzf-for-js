@@ -87,6 +87,7 @@ export class Fzf<U> {
         caseSensitive = true;
         break;
       case "case-insensitive":
+        query = query.toLowerCase();
         caseSensitive = false;
     }
 
