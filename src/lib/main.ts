@@ -89,6 +89,7 @@ export class Fzf<U> {
       case "case-insensitive":
         query = query.toLowerCase();
         caseSensitive = false;
+        break;
     }
 
     const runes = strToRunes(query);
