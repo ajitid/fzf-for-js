@@ -1,4 +1,4 @@
-# [WIP] fzf for JavaScript
+# [WIP] FZF for JavaScript
 
 <img src="assets/landing.gif" />
 

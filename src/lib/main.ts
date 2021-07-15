@@ -9,9 +9,28 @@ import type { Result } from "./algo";
 import { slab } from "./slab";
 
 interface Options<U> {
+  /**
+   * Cache the results for the queries that you'll make.
+   *
+   * @defaultValue false
+   */
   cache: boolean;
+  /**
+   * If `maxResultItems` is 32, top 32 items that matches your query will be returned.
+   * By default all matched items are returned.
+   *
+   * @defaultValue Infinity
+   */
   maxResultItems: number;
+  /**
+   * For each item in the list, target a specific property of the item to search for.
+   */
   selector: (v: U) => string;
+  /**
+   * Defines what type of case sensitive search you want.
+   *
+   * @defaultValue "smart-case"
+   */
   casing: "smart-case" | "case-sensitive" | "case-insensitive";
   // TODO we need different sort metric
   // sort: boolean;
