@@ -12,7 +12,7 @@ import { WithWorker } from "./views/with-worker";
 
 const mdxComponents = {
   wrapper: (props: any) => (
-    <div className="container mx-auto prose lg:max-w-3xl">
+    <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
       <main {...props} />
     </div>
   ),
