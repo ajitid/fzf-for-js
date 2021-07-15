@@ -2,94 +2,94 @@
 // Converted automatically using ./tools/themeFromVsCode
 export const theme = {
   plain: {
-    color: '#403f53',
-    backgroundColor: '#f3f7fb',
+    color: "#403f53",
+    backgroundColor: "#fdfdfd",
   },
   styles: [
     {
-      types: ['changed'],
+      types: ["changed"],
       style: {
-        color: 'rgb(162, 191, 252)',
-        fontStyle: 'italic',
+        color: "rgb(162, 191, 252)",
+        fontStyle: "italic",
       },
     },
     {
-      types: ['deleted'],
+      types: ["deleted"],
       style: {
-        color: 'rgba(239, 83, 80, 0.56)',
-        fontStyle: 'italic',
+        color: "rgba(239, 83, 80, 0.56)",
+        fontStyle: "italic",
       },
     },
     {
-      types: ['inserted', 'attr-name'],
+      types: ["inserted", "attr-name"],
       style: {
-        color: 'rgb(72, 118, 214)',
-        fontStyle: 'italic',
+        color: "rgb(72, 118, 214)",
+        fontStyle: "italic",
       },
     },
     {
-      types: ['comment'],
+      types: ["comment"],
       style: {
-        color: 'rgb(152, 159, 177)',
-        fontStyle: 'italic',
+        color: "rgb(152, 159, 177)",
+        fontStyle: "italic",
       },
     },
     {
-      types: ['string', 'builtin', 'char', 'constant', 'url'],
+      types: ["string", "builtin", "char", "constant", "url"],
       style: {
-        color: 'rgb(72, 118, 214)',
+        color: "rgb(72, 118, 214)",
       },
     },
     {
-      types: ['variable'],
+      types: ["variable"],
       style: {
-        color: 'rgb(201, 103, 101)',
+        color: "rgb(201, 103, 101)",
       },
     },
     {
-      types: ['number'],
+      types: ["number"],
       style: {
-        color: 'rgb(170, 9, 130)',
+        color: "rgb(170, 9, 130)",
       },
     },
     {
       // This was manually added after the auto-generation
       // so that punctuations are not italicised
-      types: ['punctuation'],
+      types: ["punctuation"],
       style: {
-        color: 'rgb(153, 76, 195)',
+        color: "rgb(153, 76, 195)",
       },
     },
     {
-      types: ['function', 'selector', 'doctype'],
+      types: ["function", "selector", "doctype"],
       style: {
-        color: 'rgb(153, 76, 195)',
-        fontStyle: 'italic',
+        color: "rgb(153, 76, 195)",
+        fontStyle: "italic",
       },
     },
     {
-      types: ['class-name'],
+      types: ["class-name"],
       style: {
-        color: 'rgb(17, 17, 17)',
+        color: "rgb(17, 17, 17)",
       },
     },
     {
-      types: ['tag'],
+      types: ["tag"],
       style: {
-        color: 'rgb(153, 76, 195)',
+        color: "rgb(153, 76, 195)",
       },
     },
     {
-      types: ['operator', 'property', 'keyword', 'namespace'],
+      types: ["operator", "property", "keyword", "namespace"],
       style: {
-        color: 'rgb(12, 123, 155)',
+        color: "rgb(12, 123, 155)",
       },
     },
     {
-      types: ['boolean'],
+      types: ["boolean"],
       style: {
-        color: 'rgb(188, 84, 84)',
+        color: "rgb(188, 84, 84)",
       },
     },
   ],
-}
+};

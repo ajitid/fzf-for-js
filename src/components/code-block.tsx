@@ -27,7 +27,7 @@ export const CodeBlock = ({ children, className = "" }: Props) => {
           <div className="flex justify-end">
             <div
               style={{
-                backgroundColor: "#f3f7fb",
+                backgroundColor: "#fdfdfd",
               }}
               className="relative z-10 -mb-3 inline-block text-sm border text-gray-400 px-3 py-1 rounded leading-none mr-4"
             >
