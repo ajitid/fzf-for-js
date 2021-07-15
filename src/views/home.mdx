@@ -12,7 +12,6 @@ Install FZF by typing the following command in your shell:
 npm i fzf
 ```
 
-
 ## Usage
 
 Basic Usage:
@@ -89,7 +88,7 @@ const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.po
 // where an `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
-Find a [working example](https://fzf.vercel.app/basic) for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
+Find a [working example](basic) for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
 
 **Note**: If there is a need to modify the list after you've initialized FZF using `const fzf = new Fzf(list)` and you want to make a query using `fzf.find()` after this modification, we strongly suggest you to replace `const` with `let` and re-initialize FZF before you make the query. This is suggested because FZF makes some calculations when it is initialized, and these calculations could become outdated because of the modification made.
 
