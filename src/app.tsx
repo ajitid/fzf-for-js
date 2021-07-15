@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { mdx, MDXProvider } from "@mdx-js/react";
+import { MDXProvider } from "@mdx-js/react";
 
 import "./app.css";
 
+import { CodeBlock } from "./components/code-block";
 import Home from "./views/home.mdx";
 import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
@@ -15,6 +16,7 @@ const mdxComponents = {
       <main {...props} />
     </div>
   ),
+  code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
 };
 
 export function App() {
