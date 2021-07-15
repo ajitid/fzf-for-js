@@ -29,7 +29,7 @@ export function WithWorker() {
   };
 
   return (
-    <div className="min-h-screen antialiased break-words px-6 py-4">
+    <div className="px-6 py-4">
       <div>
         <input
           autoFocus

@@ -51,7 +51,7 @@ export function Basic() {
   });
 
   return (
-    <div className="min-h-screen antialiased break-words px-6 py-4">
+    <div className="px-6 py-4">
       <div className="flex justify-end items-center">
         <input
           type="radio"
