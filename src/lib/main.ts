@@ -69,13 +69,6 @@ export class Fzf<U> {
   }
 
   find = (query: string): FzfResultItem<U>[] => {
-    if (this.opts.cache) {
-      const cachedResult = this.cache[query];
-      if (cachedResult !== undefined) {
-        return cachedResult;
-      }
-    }
-
     let caseSensitive = false;
     switch (this.opts.casing) {
       case "smart-case":
@@ -90,6 +83,13 @@ export class Fzf<U> {
         query = query.toLowerCase();
         caseSensitive = false;
         break;
+    }
+
+    if (this.opts.cache) {
+      const cachedResult = this.cache[query];
+      if (cachedResult !== undefined) {
+        return cachedResult;
+      }
     }
 
     const runes = strToRunes(query);
