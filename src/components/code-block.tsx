@@ -23,7 +23,7 @@ export const CodeBlock = ({ children, className = "" }: Props) => {
       language={lang as Language}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div>
+        <div className="-mt-3">
           <div className="flex justify-end">
             <div
               style={{
