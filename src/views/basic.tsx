@@ -4,10 +4,12 @@ import { Fzf, FzfResultItem } from "../lib/main";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
-let fzf = new Fzf(wordList, {
+const options = {
   // limiting size of the result to avoid jank while rendering it
   maxResultItems: 32,
-});
+};
+
+let fzf = new Fzf(wordList, options);
 
 export function Basic() {
   const [input, setInput] = useState("");
@@ -30,12 +32,12 @@ export function Basic() {
   const selectChoice = (choice: string) => {
     switch (choice) {
       case "date-fns":
-        fzf = new Fzf(dateFnDirList);
+        fzf = new Fzf(dateFnDirList, options);
         setChoice("date-fns");
         break;
       case "words":
       default:
-        fzf = new Fzf(wordList);
+        fzf = new Fzf(wordList, options);
         setChoice("words");
     }
 
