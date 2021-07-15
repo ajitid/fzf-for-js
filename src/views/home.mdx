@@ -68,7 +68,7 @@ and you query for 'pi' you will get Pikachu, Vulpix and Typholsion but if you qu
 
 ### Highlighting matched characters
 
-It might be that you need to highlight matched characters of items in the result. Let's take the example above with query 'pi'. The result will be:
+Let's take the list above with query 'pi'. The result will be:
 
 <div><b>Pi</b>kachu</div>
 <div>Vul<b>pi</b>x</div>
@@ -93,7 +93,7 @@ const HighlightChars = (props) => {
 
 // and can be used like so:
 const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions ?? []} />
-// where an `entry` is an item from the result list which is returned from `fzf.find()`
+// where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
 Find a [working example](basic) for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
@@ -114,7 +114,7 @@ Find a [working example](basic) for this and its [sourcecode](https://github.com
 - `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
 
-#### find(query)
+### `fzf.find(query)`
 
 For the code below
 
