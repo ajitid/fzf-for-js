@@ -21,7 +21,7 @@ const mdxComponents = {
 
 export function App() {
   return (
-    <div className="min-h-screen antialiased break-words">
+    <div className="min-h-screen antialiased break-words py-6">
       <MDXProvider components={mdxComponents}>
         <Router>
           <Routes>

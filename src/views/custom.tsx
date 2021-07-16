@@ -36,7 +36,7 @@ export function Custom() {
   };
 
   return (
-    <div className="px-6 py-4">
+    <div className="px-6">
       <div>
         <input
           autoFocus
