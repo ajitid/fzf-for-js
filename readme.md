@@ -1,17 +1,27 @@
-# [WIP] FZF for JavaScript
+# FZF for JavaScript
 
 [![CI](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
 ![Vercel](https://ajitid-vercel-badge.vercel.app/api/ajitid/fzf-for-js)
 
-<img src="assets/landing.gif" />
+[//]: # "Image, text and counter/assist image needs to follow this order to be correctly aligned"
 
-## Install
+<img src="assets/landing.gif" align="right" />
+
+[Docs](https://fzf.vercel.app) · [Demo](https://fzf.vercel.app/basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+
+Originally available as [a fuzzy finder for CLIs](https://github.com/junegunn/fzf), FZF for JavaScript is a port of FZF's main algorithm so it can be used in browser context.
+
+<img src="assets/landing-assist.png" width="100%" height="0.001px" />
+
+## Quick look
+
+Install FZF using:
 
 ```sh
 npm i fzf
 ```
 
-## Usage
+Then you can use it like:
 
 ```js
 import { Fzf } from 'fzf'
@@ -26,4 +36,16 @@ const entries = fzf.find('li')
 console.log('ranking is:')
 results.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
 ```
+
+For more ways to use FZF, [visit documentation](https://fzf.vercel.app/).
+
+## Motivation
+
+Command palette is becoming ubiquitous – you can find it in code editors ([Sublime Text](https://www.sublimetext.com/blog/articles/sublime-text-2-beta), VS Code), design tools ([Figma](https://forum.figma.com/t/new-quick-actions-menu/1788)), project management apps ([Height](https://twitter.com/michaelvillar/status/1347276324772192256), [Linear](https://linear.app/)), source control tools ([Fork](https://fork.dev/blog/posts/quick-launch/), Sublime Merge). Web apps are becoming more prevelant as well. FZF has a great fuzzy finding mechanism which could be used outside of CLI and into these palettes.
+
+There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-palette)  about command palettes if you want to learn more.
+
+## Thanks
+
+- Junegunn Choi (author of FZF, [website](https://junegunn.kr/)) – for making his work available and accessible to us. You can [sponsor his project](https://github.com/junegunn/fzf).
 
