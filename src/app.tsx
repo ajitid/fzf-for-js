@@ -5,7 +5,7 @@ import { MDXProvider } from "@mdx-js/react";
 import "./app.css";
 
 import { CodeBlock } from "./components/code-block";
-import Home from "./views/home.mdx";
+import Docs from "./views/docs.mdx";
 import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
 import { WithWorker } from "./views/with-worker";
@@ -25,7 +25,7 @@ export function App() {
       <MDXProvider components={mdxComponents}>
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Docs />} />
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
             <Route path="with-worker" element={<WithWorker />} />
