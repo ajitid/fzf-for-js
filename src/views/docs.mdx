@@ -64,17 +64,17 @@ FZF does smart case searching by default. This means that if the list is
 const list = ['Vulpix', 'Pikachu', 'Bulbasaur', 'Typholsion']
 ```
 
-and you query for 'pi' you will get Pikachu, Vulpix and Typholsion but if you query for 'Pi' you will only get Pikachu back. This can be customized in options.
+and you query for "pi" you will get Pikachu, Vulpix and Typholsion but if you query for "Pi" you will only get Pikachu back. This can be customized in options.
 
 ### Highlighting matched characters
 
-Let's take the list above with query 'pi'. The result will be:
+Let's take the list above with query "pi". The result will be:
 
 <div><b>Pi</b>kachu</div>
 <div>Vul<b>pi</b>x</div>
 <div>Ty<b>p</b>hols<b>i</b>on</div>
 
-To do this in React for example, it would be:
+To highlight characters "p" and "i" using React for example, it would be:
 
 ```js
 const HighlightChars = (props) => {
