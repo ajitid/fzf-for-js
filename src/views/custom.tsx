@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { HighlightChars } from "../components/highlight-chars";
 import { Fzf, FzfResultItem } from "../lib/main";
 
 interface Stuff {
@@ -71,25 +72,3 @@ export function Custom() {
     </div>
   );
 }
-
-interface HighlightCharsProps {
-  str: string;
-  highlightIndices: number[];
-}
-
-const HighlightChars = (props: HighlightCharsProps) => {
-  const strArr = props.str.split("");
-  const nodes = strArr.map((v, i) => {
-    if (props.highlightIndices.includes(i)) {
-      return (
-        <span key={i} className="font-semibold">
-          {v}
-        </span>
-      );
-    } else {
-      return v;
-    }
-  });
-
-  return <>{nodes}</>;
-};

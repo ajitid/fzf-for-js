@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Fzf, FzfResultItem } from "../lib/main";
+import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
@@ -113,25 +114,3 @@ export function Basic() {
     </div>
   );
 }
-
-interface HighlightCharsProps {
-  str: string;
-  highlightIndices: number[];
-}
-
-const HighlightChars = (props: HighlightCharsProps) => {
-  const strArr = props.str.split("");
-  const nodes = strArr.map((v, i) => {
-    if (props.highlightIndices.includes(i)) {
-      return (
-        <span key={i} className="font-semibold">
-          {v}
-        </span>
-      );
-    } else {
-      return v;
-    }
-  });
-
-  return <>{nodes}</>;
-};
