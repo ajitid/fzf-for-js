@@ -32,6 +32,18 @@ interface Options<U> {
    * @defaultValue "smart-case"
    */
   casing: "smart-case" | "case-sensitive" | "case-insensitive";
+  /**
+   * If true, FZF will try to remove diacritics from list items.
+   * This is useful if the list contains items with diacritics but
+   * you want to query with plain A-Z letters.
+   *
+   * @example
+   * Zoë →  Zoe
+   * blessèd →  blessed
+   *
+   * @defaultValue false
+   */
+  normalize: boolean;
   // TODO we need different sort metric
   // sort: boolean;
 }
@@ -41,6 +53,7 @@ const defaultOpts: Options<any> = {
   maxResultItems: Infinity,
   selector: (v) => v,
   casing: "smart-case",
+  normalize: false,
 };
 
 export interface FzfResultItem<U = string> {
@@ -96,7 +109,7 @@ export class Fzf<U> {
     const getResult = (item: Rune[], index: number) => {
       const match = fuzzyMatchV2(
         caseSensitive,
-        false,
+        this.opts.normalize,
         false,
         item,
         runes,

@@ -113,6 +113,7 @@ Find a [working example](basic) for this and its [sourcecode](https://github.com
 - `maxResultItems?` - number, defaults to `Infinity` - If `maxResultItems` is 32, top 32 items that matches your query will be returned. By default all matched items are returned.
 - `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
+- `normalize?` - boolean, defaults to `false` - If true, FZF will try to remove diacritics from list items. This is useful if the list contains items with diacritics but you want to query with plain A-Z letters. Example Zoë will be converted to Zoe.
 
 ### `fzf.find(query)`
 
