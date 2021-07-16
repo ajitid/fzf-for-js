@@ -1,5 +1,8 @@
 # [WIP] FZF for JavaScript
 
+[![CI](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
+![Vercel](https://ajitid-vercel-badge.vercel.app/api/ajitid/fzf-for-js)
+
 <img src="assets/landing.gif" />
 
 ## Install
