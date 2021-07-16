@@ -10,6 +10,7 @@ import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
 import { WithWorker } from "./views/with-worker";
 import linkIconSrc from "./assets/link.svg";
+import { Dunno } from "./views/dunno";
 
 function getAnchor(text: string) {
   return text
@@ -91,6 +92,7 @@ export function App() {
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
             <Route path="with-worker" element={<WithWorker />} />
+            <Route path="dunno" element={<Dunno />} />
             <Route path="*" element={<div>not found</div>} />
           </Routes>
         </Router>
