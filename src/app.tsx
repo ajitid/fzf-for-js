@@ -80,6 +80,14 @@ const mdxComponents = {
   ),
 };
 
+const oldDocs = ["0.0.18"];
+const oldDocsPath = oldDocs.map((v) => {
+  return {
+    version: v,
+    Component: React.lazy(() => import(`./views/docs-${v}.mdx`)),
+  };
+});
+
 export function App() {
   return (
     <div className="min-h-screen antialiased break-words py-6">
@@ -89,6 +97,19 @@ export function App() {
             <Route path="/" element={<Docs />} />
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
+            {oldDocsPath.map((v) => {
+              return (
+                <Route
+                  path={"sdf"}
+                  key={v.version}
+                  element={
+                    <React.Suspense fallback={() => null}>
+                      <v.Component />
+                    </React.Suspense>
+                  }
+                />
+              );
+            })}
             <Route path="*" element={<div>not found</div>} />
           </Routes>
         </Router>
