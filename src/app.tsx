@@ -1,6 +1,8 @@
 import React, { forwardRef, isValidElement } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { MDXProvider } from "@mdx-js/react";
+// @ts-ignore missing types
+import preval from "preval.macro";
 
 import "./app.css";
 
@@ -80,11 +82,16 @@ const mdxComponents = {
   ),
 };
 
-const oldDocs = ["0.0.18"];
-const oldDocsPath = oldDocs.map((v) => {
+const {
+  fileVersions: docsVersions,
+}: {
+  fileVersions: string[];
+} = preval`module.exports = require('./old-docs-list')`;
+
+const oldDocs = docsVersions.map((version) => {
   return {
-    version: v,
-    Component: React.lazy(() => import(`./views/docs-${v}.mdx`)),
+    version,
+    Component: React.lazy(() => import(`./views/old-docs/${version}.mdx`)),
   };
 });
 
@@ -97,13 +104,13 @@ export function App() {
             <Route path="/" element={<Docs />} />
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
-            {oldDocsPath.map((v) => {
+            {oldDocs.map((v) => {
               return (
                 <Route
-                  path={"sdf"}
                   key={v.version}
+                  path={`docs/versions/${v.version.replaceAll(".", "-")}`}
                   element={
-                    <React.Suspense fallback={() => null}>
+                    <React.Suspense fallback={null}>
                       <v.Component />
                     </React.Suspense>
                   }
