@@ -9,7 +9,7 @@
     "fuzzy-string-match",
     "fuzzy-search"
   ],
-  "homepage": "https://fzf.vercel.app",
+  "homepage": "https://fzf.netlify.app",
   "repository": "ajitid/fzf-for-js",
   "author": {
     "name": "ajit",

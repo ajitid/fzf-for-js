@@ -1,13 +1,13 @@
 # FZF for JavaScript
 
-[![CI](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
-![Vercel](https://ajitid-vercel-badge.vercel.app/api/ajitid/fzf-for-js)
+[![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
+[![Docs deployment status](https://api.netlify.com/api/v1/badges/e4324b0d-d5b2-4139-a688-e58f32a5af6b/deploy-status)](https://app.netlify.com/sites/fzf/deploys)
 
 [//]: # "Image, text and counter/assist image needs to follow this order to be correctly aligned"
 
 <img src="assets/landing.gif" align="right" />
 
-[Docs](https://fzf.vercel.app) · [Demo](https://fzf.vercel.app/basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+[Docs](https://fzf.netlify.app) · [Demo](https://fzf.netlify.app/basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
 
 Originally available as [a fuzzy finder for CLIs](https://github.com/junegunn/fzf), FZF for JavaScript is a port of FZF's main algorithm so it can be used in browser context.
 
@@ -37,7 +37,7 @@ console.log('ranking is:')
 results.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
 ```
 
-For more ways to use FZF, [visit documentation](https://fzf.vercel.app/).
+For more ways to use FZF, [visit documentation](https://fzf.netlify.app/).
 
 ## Motivation
 
