@@ -1,18 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+import pkg from "../../package.json";
+
 interface Props {
   versions: string[];
 }
 
 export const DocsVersions = (props: Props) => {
   return (
-    <div>
-      <h1>FZF Docs Versions</h1>
+    <div className="container mx-auto">
+      <h1 className="text-2xl font-bold mb-3">FZF Docs Versions</h1>
       <ul>
+        <Link to="/" className="text-blue-700">
+          {pkg.version} (latest)
+        </Link>
         {props.versions.map((v) => (
           <li key={v}>
-            <Link to={`${v.replaceAll(".", "-")}`}>{v}</Link>
+            <Link to={`${v.replaceAll(".", "-")}`} className="text-blue-700">
+              {v}
+            </Link>
           </li>
         ))}
       </ul>

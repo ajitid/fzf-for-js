@@ -115,7 +115,11 @@ export function App() {
                   key={v.version}
                   path={`docs/versions/${v.version.replaceAll(".", "-")}`}
                   element={
-                    <React.Suspense fallback="Loading...">
+                    <React.Suspense
+                      fallback={
+                        <div className="mt-3 text-center">Loading...</div>
+                      }
+                    >
                       <v.Component />
                     </React.Suspense>
                   }
