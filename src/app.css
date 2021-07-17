@@ -9,3 +9,7 @@
 .heading-link:hover img {
   visibility: visible;
 }
+
+.docs-hidden {
+  display: none;
+}
