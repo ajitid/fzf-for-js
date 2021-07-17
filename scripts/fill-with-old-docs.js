@@ -11,7 +11,7 @@ shell.touch("src/views/old-docs/.gitkeep");
 const writeFile = (verMajor, verMinor) => {
   const nextCommitHash = shell
     .exec(
-      `git log -S '"version": "${verMajor}.${verMinor}' --oneline -n 1 --branches main -- package.json`,
+      `git log -S '"version": "${verMajor}.${verMinor}' --oneline -n 1 --branches HEAD -- package.json`,
       {
         silent: true,
       }
@@ -39,7 +39,7 @@ for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
   } else {
     const nextCommitHash = shell
       .exec(
-        `git log -S '"version": "${i}.' --oneline -n 1 --branches main -- package.json`,
+        `git log -S '"version": "${i}.' --oneline -n 1 --branches HEAD -- package.json`,
         {
           silent: true,
         }
