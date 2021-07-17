@@ -10,7 +10,7 @@ const options = {
   maxResultItems: 32,
 };
 
-let fzf = new Fzf(wordList, options);
+let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
 
 export function Basic() {
   const [input, setInput] = useState("");
@@ -38,7 +38,7 @@ export function Basic() {
         break;
       case "words":
       default:
-        fzf = new Fzf(wordList, options);
+        fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
         setChoice("words");
     }
 
