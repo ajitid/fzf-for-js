@@ -22,7 +22,8 @@
     "build": "npm run build:modules && npm run build:types",
     "build:modules": "tsc && vite build",
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
-    "build:docs": "tsc && vite build -c vite-for-docs.config.ts",
+    "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
+    "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
     "test": "jest src",
     "fill-with-old-docs": "node scripts/fill-with-old-docs.js"
   },

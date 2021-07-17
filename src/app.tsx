@@ -11,6 +11,7 @@ import Docs from "./views/docs.mdx";
 import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
 import linkIconSrc from "./assets/link.svg";
+import { DocsVersions } from "./views/docs-versions";
 
 function getAnchor(text: string) {
   return text
@@ -104,6 +105,10 @@ export function App() {
             <Route path="/" element={<Docs />} />
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
+            <Route
+              path="docs/versions"
+              element={<DocsVersions versions={docsVersions} />}
+            />
             {oldDocs.map((v) => {
               return (
                 <Route
