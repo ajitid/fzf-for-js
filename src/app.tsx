@@ -8,7 +8,6 @@ import { CodeBlock } from "./components/code-block";
 import Docs from "./views/docs.mdx";
 import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
-import { WithWorker } from "./views/with-worker";
 import linkIconSrc from "./assets/link.svg";
 
 function getAnchor(text: string) {
@@ -90,7 +89,6 @@ export function App() {
             <Route path="/" element={<Docs />} />
             <Route path="basic" element={<Basic />} />
             <Route path="custom" element={<Custom />} />
-            <Route path="with-worker" element={<WithWorker />} />
             <Route path="*" element={<div>not found</div>} />
           </Routes>
         </Router>
