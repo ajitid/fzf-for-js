@@ -38,7 +38,6 @@ const slices = sliceList();
 const workerFactory = () => new Worker();
 const pool = new WorkerPool(workerFactory, PARTITIONS);
 
-// TODO replace `any`
 const resultOrAbort = <T>(promises: Promise<T>) => {
   let signal = false;
   const abort = () => {
@@ -76,7 +75,8 @@ let lastJobId = "";
 const fzfFindAsync = async (query: string) => {
   const jobId = `fzf::${query}::${Date.now()}`;
   lastJobId = jobId;
-  // TODO cancel previous query
+
+  // cancel previous query
   pool.jobs = [];
   abortPrevJob();
 
@@ -119,8 +119,6 @@ const fzfFindAsync = async (query: string) => {
     cache[query] = result;
     return result;
   } catch (error) {
-    // TODO null ain't the best return, maybe throw reject w/ error?
-    // same for early returns in try blcok?
     console.log("scratched results for", query, { error });
     return null;
   }

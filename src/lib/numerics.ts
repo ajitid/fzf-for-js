@@ -1,8 +1,7 @@
 export type Int16 = Int16Array[0];
 export type Int32 = Int32Array[0];
 
-// TODO extract these numeric operations out
-// short, int, long https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
+// for short, int, long naming convention https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
 export function toShort(number: number): Int16 {
   /*
   // with this implementation, I don't think it does anything
@@ -29,6 +28,8 @@ export function maxInt16(num1: number, num2: number) {
   // as it is returning a number only, not int16
   const arr = Int16Array.from([num1, num2]);
   return arr[0] > arr[1] ? arr[0] : arr[1];
+  // also converting to int16 just for comparison accumulates
+  // overhead if done thousands of times
   */
   return num1 > num2 ? num1 : num2;
 }

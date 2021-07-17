@@ -35,7 +35,7 @@ export interface Result {
 
 export const SCORE_MATCH = 16,
   SCORE_GAP_START = -3,
-  // FIXME: sure it shouldn't be renamed as "extension"??
+  // TODO: you sure it shouldn't be named "extension"??
   SCORE_GAP_EXTENTION = -1,
   BONUS_BOUNDARY = SCORE_MATCH / 2,
   BONUS_NON_WORD = SCORE_MATCH / 2,
