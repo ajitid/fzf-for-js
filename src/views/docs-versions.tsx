@@ -15,13 +15,16 @@ export const DocsVersions = (props: Props) => {
         <Link to="/" className="text-blue-700">
           {pkg.version} (latest)
         </Link>
-        {props.versions.map((v) => (
-          <li key={v}>
-            <Link to={`${v.replaceAll(".", "-")}`} className="text-blue-700">
-              {v}
-            </Link>
-          </li>
-        ))}
+        {props.versions
+          .sort()
+          .reverse()
+          .map((v) => (
+            <li key={v}>
+              <Link to={`${v.replaceAll(".", "-")}`} className="text-blue-700">
+                {v}
+              </Link>
+            </li>
+          ))}
       </ul>
     </div>
   );
