@@ -1,4 +1,4 @@
-# FZF for JavaScript
+# FZF for JavaScript (Preview)
 
 [![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
 [![Docs deployment status](https://img.shields.io/netlify/e4324b0d-d5b2-4139-a688-e58f32a5af6b?label=Docs&logo=netlify)](https://app.netlify.com/sites/fzf/deploys)
