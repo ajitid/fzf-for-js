@@ -1,0 +1,135 @@
+# FZF for JavaScript
+
+[Demo](basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+
+[FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
+
+_"FZF for JavaScript" will be referred as "FZF" from here on._
+
+## Installation
+
+Install FZF by typing the following command in your shell:
+
+```sh
+npm i fzf
+```
+
+## Usage
+
+### Basic usage
+
+```js
+import { Fzf } from 'fzf'
+
+const list = ['go', 'javascript', 'python', 'rust', 
+              'swift', 'kotlin', 'elixir', 'java', 
+              'lisp', 'v', 'zig', 'nim', 'rescript', 
+              'd', 'haskell']
+
+const fzf = new Fzf(list)
+
+const entries = fzf.find('li')
+const ranking = entries.map(entry => entry.item).join(', ')
+console.log(ranking) // Output: lisp, kotlin, elixir
+```
+
+### Non-string list
+
+When life is not simple and items in list aren't just plain strings:
+
+```js
+const list = [
+  { id: '1', displayName: 'abcd' },
+  { id: '2', displayName: 'bcde' },
+  { id: '3', displayName: 'cdef' },
+  { id: '4', displayName: 'defg' },
+  { id: '5', displayName: 'efgh' },
+];
+
+const fzf = new Fzf(list, {
+  // With selector you tell FZF where it can find 
+  // the string that you want to query on
+  selector: (item) => item.displayName,
+});
+const entries = fzf.find('cd')
+const ranking = entries.map(entry => entry.item.displayName).join(', ')
+console.log(ranking) // Output: cdef, abcd, bcde
+```
+
+### Case sensitivity
+
+FZF does smart case searching by default. This means that if the list is
+
+```js
+const list = ['Vulpix', 'Pikachu', 'Bulbasaur', 'Typholsion']
+```
+
+and you query for 'pi' you will get Pikachu, Vulpix and Typholsion but if you query for 'Pi' you will only get Pikachu back. This can be customized in options.
+
+### Highlighting matched characters
+
+Let's take the list above with query 'pi'. The result will be:
+
+<div><b>Pi</b>kachu</div>
+<div>Vul<b>pi</b>x</div>
+<div>Ty<b>p</b>hols<b>i</b>on</div>
+
+To do this in React for example, it would be:
+
+```js
+const HighlightChars = (props) => {
+  const chars = props.str.split("");
+
+  const nodes = chars.map((char, i) => {
+    if (props.highlightIndices.includes(i)) {
+      return <b key={i}>{char}</b>;
+    } else {
+      return char;
+    }
+  });
+
+  return <>{nodes}</>;
+};
+
+// and can be used like so:
+const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions ?? []} />
+// where `entry` is an item from the result list which is returned from `fzf.find()`
+```
+
+Find a [working example](basic) for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
+
+### Notes
+
+- If the list is modified after you've initialized FZF using `const fzf = new Fzf(list)` and you want to query using `fzf.find()` after this modification, we strongly suggest you to re-initialize FZF before you make any query. This is suggested because FZF makes some calculations when it is initialized, and these calculations could become outdated because of the modification made.
+
+## API
+
+### `new Fzf(list, options?)`
+
+`list` can be a list of strings or can have items where in any property of item can resolve to a string.
+
+`options`:
+- `cache?` - boolean, defaults to `false` - Cache the results for the queries that you'll make.
+- `maxResultItems?` - number, defaults to `Infinity` - If `maxResultItems` is 32, top 32 items that matches your query will be returned. By default all matched items are returned.
+- `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
+- `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
+
+### `fzf.find(query)`
+
+For the code below
+
+```js
+const entries = (new Fzf(list)).find(query); 
+const entry = entries[0];
+```
+
+`entries` is a list of all the items that were able to match with `query` string.
+
+Each `entry` contains:
+- `item` - Original item that you send in the `list`.
+- `result`:
+  - `start` - number - Start index where the item is matched.
+  - `end` - number - End index + 1 where the item is matched.
+  - `score` - number - Higher the score, closest the item is matched to the query.
+- `positions` - Indices of the characters that were matched in the item.
+
