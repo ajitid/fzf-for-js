@@ -1,3 +1,5 @@
+import { version as newestVersion } from "../../package.json";
+
 function loadScript(
   filePath: string,
   successMsg = "loaded",
@@ -10,15 +12,23 @@ function loadScript(
   document.querySelector("head")?.appendChild(scriptTag);
 }
 
-export const expose = () => {
+export const expose = (version = "") => {
+  version = version ? "@" + version : "";
+
   loadScript(
-    "https://unpkg.com/fzf/dist/fzf.umd.js",
+    `https://unpkg.com/fzf${version}/dist/fzf.umd.js`,
     "FZF is now available using `fzf.Fzf`"
   );
 };
 
 if (import.meta.env.PROD) {
-  console.log("To use FZF here, type `init()`");
+  console.log(
+    '%cFZF\n%cTo use FZF here type, `init()` or `init("' +
+      newestVersion +
+      '" /* version */)`',
+    "font-size:1.2rem;font-style:italic;font-weight:bold",
+    ""
+  );
 }
 
 // @ts-ignore
