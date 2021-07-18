@@ -1,13 +1,16 @@
 {
   "===== INFO =====": "",
   "name": "fzf",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Do fuzzy matching using FZF algorithm in JavaScript",
   "license": "BSD-3-Clause",
   "keywords": [
     "fzf",
-    "fuzzy-string-match",
-    "fuzzy-search"
+    "fuzzy-search",
+    "fuzzy-match",
+    "fuzzy",
+    "search",
+    "find"
   ],
   "homepage": "https://fzf.netlify.app",
   "repository": "ajitid/fzf-for-js",
