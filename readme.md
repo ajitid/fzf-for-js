@@ -34,7 +34,7 @@ const list = ['go', 'javascript', 'python', 'rust',
 const fzf = new Fzf(list)
 const entries = fzf.find('li')
 console.log('ranking is:')
-results.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
+entries.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
 ```
 
 For more ways to use FZF, [visit documentation](https://fzf.netlify.app/).
