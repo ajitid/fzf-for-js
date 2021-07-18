@@ -12,6 +12,7 @@ import { Basic } from "./views/basic";
 import { Custom } from "./views/custom";
 import linkIconSrc from "./assets/link.svg";
 import { DocsVersions } from "./views/docs-versions";
+import "./utils/expose";
 
 function getAnchor(text: string) {
   return text
