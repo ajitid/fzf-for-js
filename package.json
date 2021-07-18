@@ -3,7 +3,7 @@
   "name": "fzf",
   "version": "0.2.3",
   "description": "Do fuzzy matching using FZF algorithm in JavaScript",
-  "license": "SEE LICENSE IN license.txt",
+  "license": "BSD-3-Clause",
   "keywords": [
     "fzf",
     "fuzzy-string-match",
