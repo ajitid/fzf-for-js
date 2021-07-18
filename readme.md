@@ -15,7 +15,7 @@ Originally available as [a fuzzy finder for CLIs](https://github.com/junegunn/fz
 
 ## Quick look
 
-Install FZF using:
+Install FZF for JavaScript using:
 
 ```sh
 npm i fzf
@@ -37,7 +37,7 @@ console.log('ranking is:')
 entries.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
 ```
 
-For more ways to use FZF, [visit documentation](https://fzf.netlify.app/).
+For more ways to use this library, [visit documentation](https://fzf.netlify.app/).
 
 ## Motivation
 
