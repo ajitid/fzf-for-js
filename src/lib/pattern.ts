@@ -1,14 +1,29 @@
+import {
+  equalMatch,
+  exactMatchNaive,
+  fuzzyMatchV2,
+  prefixMatch,
+  suffixMatch,
+} from "./algo";
 import { normalizeRune } from "./normalize";
 import { Rune, runesToStr, strToRunes } from "./runes";
 import { Casing } from "./types";
 
-enum TermType {
+export enum TermType {
   Fuzzy,
   Exact,
   Prefix,
   Suffix,
   Equal,
 }
+
+export const termTypeMap = {
+  [TermType.Fuzzy]: fuzzyMatchV2,
+  [TermType.Exact]: exactMatchNaive,
+  [TermType.Prefix]: prefixMatch,
+  [TermType.Suffix]: suffixMatch,
+  [TermType.Equal]: equalMatch,
+};
 
 interface Term {
   typ: number;
@@ -19,6 +34,80 @@ interface Term {
 }
 
 type TermSet = Term[];
+
+export function buildPatternForExtendedSearch(
+  fuzzy: boolean,
+  caseMode: Casing,
+  normalize: boolean,
+  str: string
+) {
+  let cacheable = true;
+
+  str = str.trimLeft();
+
+  // while(str.endsWith(' ') && !str.endsWith('\\ ')) {
+  //   str= str.substring(0, str.length - 1)
+  // }
+  // ^^ simplified below:
+  {
+    const trimmedAtRightStr = str.trimRight();
+    if (
+      trimmedAtRightStr.endsWith("\\") &&
+      str[trimmedAtRightStr.length] === " "
+    ) {
+      str = trimmedAtRightStr + " ";
+    } else {
+      str = trimmedAtRightStr;
+    }
+  }
+
+  // TODO cache not implemented here
+  // https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/pattern.go#L100-L103
+  // to implement cache, search for all cache word uses in pattern.go
+
+  // sortable turns to false initially in junegunn/fzf for extended matches
+  let sortable = false;
+  let termSets: TermSet[] = [];
+
+  termSets = parseTerms(fuzzy, caseMode, normalize, str);
+
+  Loop: for (const termSet of termSets) {
+    for (const [idx, term] of termSet.entries()) {
+      if (!term.inv) {
+        sortable = true;
+      }
+
+      if (
+        idx > 0 ||
+        term.inv ||
+        (fuzzy && term.typ !== TermType.Fuzzy) ||
+        (!fuzzy && term.typ !== TermType.Exact)
+      ) {
+        cacheable = false;
+        if (sortable) {
+          break Loop;
+        }
+      }
+    }
+  }
+
+  return {
+    // case sensitive will always remain true for extended match
+    // caseSensitive: true,
+
+    // this modified str can be used as cache as pattern cache
+    // see https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/pattern.go#L100
+    //
+    // there is also buildCacheKey https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/pattern.go#L261
+    // which i believe has a different purpose
+    str,
+    // ^ this in junegunn/fzf is `text: []rune(asString)`
+
+    termSets,
+    sortable,
+    cacheable,
+  };
+}
 
 function parseTerms(
   fuzzy: boolean,

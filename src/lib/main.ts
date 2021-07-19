@@ -9,6 +9,7 @@ import type { Result } from "./algo";
 import { slab } from "./slab";
 import { normalizeRune } from "./normalize";
 import { Casing } from "./types";
+import { buildPatternForExtendedSearch } from "./pattern";
 
 interface Options<U> {
   /**
