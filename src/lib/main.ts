@@ -8,6 +8,7 @@ import { Rune, strToRunes } from "./runes";
 import type { Result } from "./algo";
 import { slab } from "./slab";
 import { normalizeRune } from "./normalize";
+import { Casing } from "./types";
 
 interface Options<U> {
   /**
@@ -32,7 +33,7 @@ interface Options<U> {
    *
    * @defaultValue "smart-case"
    */
-  casing: "smart-case" | "case-sensitive" | "case-insensitive";
+  casing: Casing;
   /**
    * If true, FZF will try to remove diacritics from list items.
    * This is useful if the list contains items with diacritics but

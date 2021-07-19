@@ -1,6 +1,6 @@
 import { Rune } from "./runes";
 
-export const normalized: Record<number, string> = {
+const normalized: Record<number, string> = {
   0x00e1: "a", //  WITH ACUTE, LATIN SMALL LETTER
   0x0103: "a", //  WITH BREVE, LATIN SMALL LETTER
   0x01ce: "a", //  WITH CARON, LATIN SMALL LETTER
@@ -472,7 +472,6 @@ export const normalized: Record<number, string> = {
   ["ự".codePointAt(0)!]: "u",
 };
 
-
 export function normalizeRune(rune: Rune): Rune {
   if (rune < 0x00c0 || rune > 0x2184) {
     return rune;
@@ -487,4 +486,3 @@ export function normalizeRune(rune: Rune): Rune {
 
   return rune;
 }
-
