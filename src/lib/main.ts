@@ -110,7 +110,7 @@ export class Fzf<U> {
       const match = fuzzyMatchV2(
         caseSensitive,
         this.opts.normalize,
-        false,
+        true,
         item,
         runes,
         true,
