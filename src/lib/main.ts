@@ -1,4 +1,4 @@
-import { fuzzyMatchV2 } from "./algo";
+import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn } from "./algo";
 import { Rune, strToRunes } from "./runes";
 /*
   `Result` type needs to be imported otherwise TS will complain while generating types.
@@ -44,6 +44,13 @@ interface Options<U> {
    * @defaultValue false
    */
   normalize: boolean;
+  /*
+   * Fuzzy algo to choose. Each algo has their own advantages, see here:
+   * https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5
+   *
+   * @defaultValue "v2"
+   */
+  algo: "v1" | "v2";
   // TODO we need different sort metric
   // sort: boolean;
 }
@@ -54,6 +61,7 @@ const defaultOpts: Options<any> = {
   selector: (v) => v,
   casing: "smart-case",
   normalize: false,
+  algo: "v2",
 };
 
 export interface FzfResultItem<U = string> {
@@ -74,11 +82,13 @@ export class Fzf<U> {
   private items: U[];
   private readonly opts: Options<U>;
   private cache: Record<query, FzfResultItem<U>[]> = {};
+  private algoFn: AlgoFn;
 
   constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
     this.runesList = list.map((item) => strToRunes(this.opts.selector(item)));
+    this.algoFn = this.opts.algo === "v2" ? fuzzyMatchV2 : fuzzyMatchV1;
   }
 
   find = (query: string): FzfResultItem<U>[] => {
@@ -107,7 +117,7 @@ export class Fzf<U> {
 
     const runes = strToRunes(query);
     const getResult = (item: Rune[], index: number) => {
-      const match = fuzzyMatchV2(
+      const match = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         true,
