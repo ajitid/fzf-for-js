@@ -60,7 +60,7 @@ const defaultOpts: Options<any> = {
   maxResultItems: Infinity,
   selector: (v) => v,
   casing: "smart-case",
-  normalize: false,
+  normalize: true,
   algo: "v2",
 };
 
