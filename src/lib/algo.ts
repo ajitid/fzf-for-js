@@ -2,7 +2,7 @@
 // and using https://github.com/nvim-telescope/telescope-fzf-native.nvim/blob/f0379f50aa79a2bf028340067e443a3079b29d54/src/fzf.c
 // for extra reference
 
-import { normalized } from "./normalize";
+import { normalizeRune } from "./normalize";
 import { Slab } from "./slab";
 import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
 import { Rune, runesToStr } from "./runes";
@@ -176,21 +176,6 @@ function bonusAt(input: Rune[], idx: number): Int16 {
   }
 
   return bonusFor(charClassOf(input[idx - 1]), charClassOf(input[idx]));
-}
-
-function normalizeRune(rune: Rune): Rune {
-  if (rune < 0x00c0 || rune > 0x2184) {
-    return rune;
-  }
-
-  // while a char can be converted to hex using str.charCodeAt().toString(16), it is not needed
-  // because in `normalized` map those hex in keys will be converted to decimals.
-  // Also we are passing a number instead of a converting a char so the above line doesn't apply (and that
-  // we are using codePointAt instead of charCodeAt)
-  const normalizedChar = normalized[rune];
-  if (normalizedChar !== undefined) return normalizedChar.codePointAt(0)!;
-
-  return rune;
 }
 
 export type AlgoFn = (

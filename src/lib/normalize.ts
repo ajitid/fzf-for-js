@@ -1,3 +1,5 @@
+import { Rune } from "./runes";
+
 export const normalized: Record<number, string> = {
   0x00e1: "a", //  WITH ACUTE, LATIN SMALL LETTER
   0x0103: "a", //  WITH BREVE, LATIN SMALL LETTER
@@ -469,3 +471,20 @@ export const normalized: Record<number, string> = {
   ["ữ".codePointAt(0)!]: "u",
   ["ự".codePointAt(0)!]: "u",
 };
+
+
+export function normalizeRune(rune: Rune): Rune {
+  if (rune < 0x00c0 || rune > 0x2184) {
+    return rune;
+  }
+
+  // while a char can be converted to hex using str.charCodeAt().toString(16), it is not needed
+  // because in `normalized` map those hex in keys will be converted to decimals.
+  // Also we are passing a number instead of a converting a char so the above line doesn't apply (and that
+  // we are using codePointAt instead of charCodeAt)
+  const normalizedChar = normalized[rune];
+  if (normalizedChar !== undefined) return normalizedChar.codePointAt(0)!;
+
+  return rune;
+}
+
