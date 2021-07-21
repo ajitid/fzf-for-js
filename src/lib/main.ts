@@ -7,6 +7,7 @@ import { Rune, strToRunes } from "./runes";
 */
 import type { Result } from "./algo";
 import { slab } from "./slab";
+import { normalizeRune } from "./normalize";
 
 interface Options<U> {
   /**
@@ -114,7 +115,11 @@ export class Fzf<U> {
       }
     }
 
-    const runes = strToRunes(query);
+    let runes = strToRunes(query);
+    if (this.opts.normalize) {
+      runes = runes.map(normalizeRune);
+    }
+
     const getResult = (item: Rune[], index: number) => {
       const match = this.algoFn(
         caseSensitive,
