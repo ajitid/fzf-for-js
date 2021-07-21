@@ -64,9 +64,8 @@ const defaultOpts: Options<any> = {
   algo: "v2",
 };
 
-export interface FzfResultItem<U = string> {
+export interface FzfResultEntry<U = string> extends Result {
   item: U;
-  result: Result;
   positions: number[] | null;
 }
 
@@ -81,7 +80,7 @@ export class Fzf<U> {
   private runesList: Rune[][];
   private items: U[];
   private readonly opts: Options<U>;
-  private cache: Record<query, FzfResultItem<U>[]> = {};
+  private cache: Record<query, FzfResultEntry<U>[]> = {};
   private algoFn: AlgoFn;
 
   constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
@@ -91,7 +90,7 @@ export class Fzf<U> {
     this.algoFn = this.opts.algo === "v2" ? fuzzyMatchV2 : fuzzyMatchV1;
   }
 
-  find = (query: string): FzfResultItem<U>[] => {
+  find = (query: string): FzfResultEntry<U>[] => {
     let caseSensitive = false;
     switch (this.opts.casing) {
       case "smart-case":
@@ -126,13 +125,13 @@ export class Fzf<U> {
         true,
         slab
       );
-      return { item: this.items[index], result: match[0], positions: match[1] };
+      return { item: this.items[index], ...match[0], positions: match[1] };
     };
-    const thresholdFilter = (v: FzfResultItem<U>) => v.result.score !== 0;
+    const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
 
-    const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
-      b.result.score - a.result.score;
+    const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
+      b.score - a.score;
     result.sort(descScoreSorter);
 
     if (Number.isFinite(this.opts.maxResultItems)) {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { HighlightChars } from "../components/highlight-chars";
-import { Fzf, FzfResultItem } from "../lib/main";
+import { Fzf, FzfResultEntry } from "../lib/main";
 
 interface Stuff {
   id: string;
@@ -23,7 +23,7 @@ const fzf = new Fzf(list, {
 export function Custom() {
   const [input, setInput] = useState("");
 
-  const [entries, setEntries] = useState<FzfResultItem<Stuff>[]>([]);
+  const [entries, setEntries] = useState<FzfResultEntry<Stuff>[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
@@ -57,7 +57,7 @@ export function Custom() {
                   highlightIndices={entry.positions ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.result.score}
+                  {entry.score}
                 </span>
               </li>
             ))}

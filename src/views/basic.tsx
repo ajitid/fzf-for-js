@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultItem } from "../lib/main";
+import { Fzf, FzfResultEntry } from "../lib/main";
 import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
@@ -15,7 +15,7 @@ let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
 export function Basic() {
   const [input, setInput] = useState("");
 
-  const [entries, setEntries] = useState<FzfResultItem[]>([]);
+  const [entries, setEntries] = useState<FzfResultEntry[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
@@ -98,7 +98,7 @@ export function Basic() {
                   highlightIndices={entry.positions ?? []}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.result.score}
+                  {entry.score}
                 </span>
               </li>
             ))}
