@@ -93,7 +93,34 @@ export class Fzf<U> {
     this.algoFn = this.opts.algo === "v2" ? fuzzyMatchV2 : fuzzyMatchV1;
   }
 
-  find = (query: string): FzfResultEntry<U>[] => {
+  find(query: string): FzfResultEntry<U>[] {
+    if (this.opts.cache) {
+      const cachedResult = this.cache[query];
+      if (cachedResult !== undefined) {
+        return cachedResult;
+      }
+    }
+
+    // needs to be changed ------------
+    let result = this.basicMatch(query);
+    // -------------------------------------
+    const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
+    result = result.filter(thresholdFilter);
+
+    const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
+      b.score - a.score;
+    result.sort(descScoreSorter);
+
+    if (Number.isFinite(this.opts.maxResultItems)) {
+      result = result.slice(0, this.opts.maxResultItems);
+    }
+
+    if (this.opts.cache) this.cache[query] = result;
+
+    return result;
+  }
+
+  basicMatch(query: string) {
     let caseSensitive = false;
     switch (this.opts.casing) {
       case "smart-case":
@@ -110,14 +137,6 @@ export class Fzf<U> {
         break;
     }
 
-    if (this.opts.cache) {
-      const cachedResult = this.cache[query];
-      if (cachedResult !== undefined) {
-        return cachedResult;
-      }
-    }
-
-    // needs to be changed ------------
     let runes = strToRunes(query);
     if (this.opts.normalize) {
       runes = runes.map(normalizeRune);
@@ -135,20 +154,8 @@ export class Fzf<U> {
       );
       return { item: this.items[index], ...match[0], positions: match[1] };
     };
-    // -------------------------------------
-    const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
-    let result = this.runesList.map(getResult).filter(thresholdFilter);
 
-    const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
-      b.score - a.score;
-    result.sort(descScoreSorter);
-
-    if (Number.isFinite(this.opts.maxResultItems)) {
-      result = result.slice(0, this.opts.maxResultItems);
-    }
-
-    if (this.opts.cache) this.cache[query] = result;
-
+    let result = this.runesList.map(getResult);
     return result;
-  };
+  }
 }
