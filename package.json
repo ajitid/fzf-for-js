@@ -23,7 +23,7 @@
   "scripts": {
     "dev": "vite -c vite-for-docs.config.ts",
     "build": "npm run build:modules && npm run build:types",
-    "build:modules": "tsc && vite build",
+    "build:modules": "tsc && vite build && vite build -c vite-legacy.config.ts",
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
