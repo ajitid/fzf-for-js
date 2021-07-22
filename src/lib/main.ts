@@ -130,13 +130,7 @@ export class Fzf<U> {
         true,
         slab
       );
-      return {
-        item: this.items[index],
-        positions: match[1],
-        start: match[0].start,
-        end: match[0].end,
-        score: match[0].score,
-      };
+      return { item: this.items[index], ...match[0], positions: match[1] };
     };
     const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
