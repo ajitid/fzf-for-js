@@ -28,7 +28,9 @@ const writeFile = (verMajor, verMinor) => {
     { silent: true }
   ).stdout;
 
-  shell.ShellString(fileContent).to(`src/docs/views/old-docs/${verStr}.mdx`);
+  if (fileContent !== "") {
+    shell.ShellString(fileContent).to(`src/docs/views/old-docs/${verStr}.mdx`);
+  }
 };
 
 for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
