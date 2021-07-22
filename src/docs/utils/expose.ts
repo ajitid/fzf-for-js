@@ -1,5 +1,5 @@
 import GitInfo from "react-git-info/macro";
-import { version as newestVersion } from "../../package.json";
+import { version as newestVersion } from "../../../package.json";
 
 function loadScript(
   filePath: string,
