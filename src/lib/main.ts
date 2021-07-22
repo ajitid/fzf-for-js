@@ -9,7 +9,11 @@ import type { Result } from "./algo";
 import { Slab, slab } from "./slab";
 import { normalizeRune } from "./normalize";
 import { Casing } from "./types";
-import { buildPatternForExtendedSearch, termTypeMap } from "./pattern";
+import {
+  buildPatternForExtendedSearch,
+  TermType,
+  termTypeMap,
+} from "./pattern";
 import { Int32 } from "./numerics";
 
 interface Options<U> {
@@ -241,14 +245,14 @@ function v2stuff(
     prefixLength: number;
   }[] = [
     {
-      text: text,
+      text,
       prefixLength: 0,
     },
   ];
 
   const offsets: Offset[] = [];
   let totalScore = 0;
-  const allPos = [];
+  const allPos: number[] = [];
 
   for (const termSet of pattern.termSets) {
     let offset: Offset = [0, 0];
@@ -257,14 +261,14 @@ function v2stuff(
 
     for (const term of termSet) {
       let algoFn = termTypeMap[term.typ];
-      if (fuzzyAlgo === "v1") {
+      if (term.typ === TermType.Fuzzy && fuzzyAlgo === "v1") {
         algoFn = fuzzyMatchV1;
       }
       const [off, score, pos] = iter(
         algoFn,
         input,
         term.caseSensitive,
-        // TODO doesn't normalize still come from this.opts??
+        // TODO doesn't normalize still should come from this.opts??
         term.normalize,
         term.text,
         slab
