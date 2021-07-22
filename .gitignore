@@ -4,4 +4,4 @@ dist
 dist-ssr
 *.local
 
-src/views/old-docs/*
+src/docs/views/old-docs/*
