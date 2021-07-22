@@ -1,4 +1,4 @@
-import { normalizeRunes } from "./normalize";
+import { normalizeRune } from "./normalize";
 import { Rune, runesToStr, strToRunes } from "./runes";
 import { Casing } from "./types";
 
@@ -45,10 +45,11 @@ function parseTerms(
     const caseSensitive =
       caseMode === "case-sensitive" ||
       (caseMode === "smart-case" && text !== lowerText);
+
     // TODO double conversion here, could be simplified
     const normalizeTerm =
       normalize &&
-      lowerText === runesToStr(normalizeRunes(strToRunes(lowerText)));
+      lowerText === runesToStr(strToRunes(lowerText).map(normalizeRune));
 
     if (!caseSensitive) {
       text = lowerText;
@@ -99,7 +100,7 @@ function parseTerms(
       }
       let textRunes = strToRunes(text);
       if (normalizeTerm) {
-        textRunes = normalizeRunes(textRunes);
+        textRunes = textRunes.map(normalizeRune);
       }
 
       set.push({
