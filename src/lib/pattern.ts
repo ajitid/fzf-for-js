@@ -26,7 +26,7 @@ export const termTypeMap = {
 };
 
 interface Term {
-  typ: number;
+  typ: TermType;
   inv: boolean;
   text: Rune[];
   caseSensitive: boolean;

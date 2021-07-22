@@ -6,10 +6,15 @@ import { Rune, strToRunes } from "./runes";
   and https://github.com/microsoft/TypeScript/issues/9944.
 */
 import type { Result } from "./algo";
-import { slab } from "./slab";
+import { Slab, slab } from "./slab";
 import { normalizeRune } from "./normalize";
 import { Casing } from "./types";
-import { buildPatternForExtendedSearch } from "./pattern";
+import {
+  buildPatternForExtendedSearch,
+  TermType,
+  termTypeMap,
+} from "./pattern";
+import { Int32 } from "./numerics";
 
 interface Options<U> {
   /**
@@ -81,6 +86,14 @@ type OptionsTuple<U> = U extends string
   ? [options?: Partial<Options<U>>]
   : [options: Partial<Options<U>> & { selector: Options<U>["selector"] }];
 
+interface Token {
+  text: Rune[];
+  prefixLength: Int32;
+}
+
+// this is [int32, int32] in golang code
+type Offset = [number, number];
+
 export class Fzf<U> {
   private runesList: Rune[][];
   private items: U[];
@@ -96,14 +109,82 @@ export class Fzf<U> {
   }
 
   find(query: string): FzfResultEntry<U>[] {
-    // needs to be changed ------------
     let result: FzfResultEntry<U>[] = [];
+
     if (this.opts.normalize) {
-      // result =
+      const pattern = buildPatternForExtendedSearch(
+        true,
+        this.opts.casing,
+        this.opts.normalize,
+        query
+      );
+
+      // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
+      // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
+      const input: {
+        text: Rune[];
+        prefixLength: 0;
+      }[] = [];
+
+      const offsets: Offset[] = [];
+      let totalScore = 0;
+      const allPos = [];
+
+      for (const termSet of pattern.termSets) {
+        let offset: Offset = [0, 0];
+        let currentScore = 0;
+        let matched = false;
+
+        for (const term of termSet) {
+          let algoFn = termTypeMap[term.typ];
+          if (this.opts.algo === "v1") {
+            algoFn = fuzzyMatchV1;
+          }
+          const [off, score, pos] = iter(
+            algoFn,
+            input,
+            term.caseSensitive,
+            // TODO doesn't normalize still come from this.opts??
+            term.normalize,
+            term.text,
+            slab
+          );
+
+          const sidx = off[0];
+          if (sidx >= 0) {
+            if (term.inv) {
+              continue;
+            }
+
+            offset = off;
+            currentScore = score;
+            matched = true;
+
+            if (pos !== null) {
+              allPos.push(...pos);
+            } else {
+              for (let idx = off[0]; idx < off[1]; ++idx) {
+                // idx is typecasted to int
+                allPos.push(idx);
+              }
+            }
+            break;
+          } else if (term.inv) {
+            offset = [0, 0];
+            currentScore = 0;
+            matched = true;
+            continue;
+          }
+        }
+        if (matched) {
+          offsets.push(offset);
+          totalScore += currentScore;
+        }
+      }
+      // offsets, totalScore, allPos
     } else {
       result = this.basicMatch(query);
     }
-    // -------------------------------------
 
     const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
     result = result.filter(thresholdFilter);
@@ -157,4 +238,38 @@ export class Fzf<U> {
     let result = this.runesList.map(getResult);
     return result;
   }
+}
+
+function iter(
+  pfun: AlgoFn,
+  tokens: Token[],
+  caseSensitive: boolean,
+  normalize: boolean,
+  pattern: Rune[],
+  slab: Slab
+): [Offset, number, number[] | null] {
+  for (const part of tokens) {
+    const [res, pos] = pfun(
+      caseSensitive,
+      normalize,
+      true,
+      part.text,
+      pattern,
+      true,
+      slab
+    );
+    if (res.start >= 0) {
+      // res.start and res.end were typecasted to int32 here
+      const sidx = res.start + part.prefixLength;
+      const eidx = res.end + part.prefixLength;
+      if (pos !== null) {
+        for (let i = 0; i < pos.length; ++i) {
+          // part.prefixLength is typecasted to int here
+          pos[i] += part.prefixLength;
+        }
+      }
+      return [[sidx, eidx], res.score, pos];
+    }
+  }
+  return [[-1, -1], 0, null];
 }
