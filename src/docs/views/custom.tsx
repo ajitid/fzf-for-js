@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { HighlightChars } from "../components/highlight-chars";
-import { Fzf, FzfResultEntry } from "../lib/main";
+import { Fzf, FzfResultEntry } from "../../lib/main";
 
 interface Stuff {
   id: string;

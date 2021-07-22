@@ -4,9 +4,9 @@ const currVerStr = require("../package.json").version;
 const currVerMajor = parseInt(currVerStr.split(".")[0], 10);
 const currVerMinor = parseInt(currVerStr.split(".")[1], 10);
 
-shell.rm("-r", "src/views/old-docs");
-shell.mkdir("src/views/old-docs");
-shell.touch("src/views/old-docs/.gitkeep");
+shell.rm("-r", "src/docs/views/old-docs");
+shell.mkdir("src/docs/views/old-docs");
+shell.touch("src/docs/views/old-docs/.gitkeep");
 
 const writeFile = (verMajor, verMinor) => {
   const nextCommitHash = shell
@@ -24,11 +24,11 @@ const writeFile = (verMajor, verMinor) => {
   )["version"];
 
   const fileContent = shell.exec(
-    `git show ${nextCommitHash}^:./src/views/docs.mdx`,
+    `git show ${nextCommitHash}^:./src/docs/views/docs.mdx`,
     { silent: true }
   ).stdout;
 
-  shell.ShellString(fileContent).to(`src/views/old-docs/${verStr}.mdx`);
+  shell.ShellString(fileContent).to(`src/docs/views/old-docs/${verStr}.mdx`);
 };
 
 for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
