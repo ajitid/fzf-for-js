@@ -54,6 +54,7 @@ interface Options<U> {
    * @defaultValue "v2"
    */
   algo: "v1" | "v2";
+  extended: boolean;
   // TODO we need different sort metric
   // sort: boolean;
 }
@@ -65,6 +66,7 @@ const defaultOpts: Options<any> = {
   casing: "smart-case",
   normalize: true,
   algo: "v2",
+  extended: false,
 };
 
 export interface FzfResultEntry<U = string> extends Result {
@@ -95,7 +97,12 @@ export class Fzf<U> {
 
   find(query: string): FzfResultEntry<U>[] {
     // needs to be changed ------------
-    let result = this.basicMatch(query);
+    let result: FzfResultEntry<U>[] = [];
+    if (this.opts.normalize) {
+      // result =
+    } else {
+      result = this.basicMatch(query);
+    }
     // -------------------------------------
 
     const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
