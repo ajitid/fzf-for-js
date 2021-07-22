@@ -108,28 +108,7 @@ export class Fzf<U> {
     let result: FzfResultEntry<U>[] = [];
 
     if (this.opts.extended) {
-      const pattern = buildPatternForExtendedSearch(
-        true,
-        this.opts.casing,
-        this.opts.normalize,
-        query
-      );
-      for (const [idx, runes] of this.runesList.entries()) {
-        const stuff = v2stuff(runes, pattern, this.opts.algo);
-        let sidx = -1,
-          eidx = -1;
-        if (stuff.offsets.length > 0) {
-          sidx = stuff.offsets[0][0];
-          eidx = stuff.offsets[0][1];
-        }
-        result.push({
-          score: stuff.totalScore,
-          item: this.items[idx],
-          positions: stuff.allPos,
-          start: sidx,
-          end: eidx,
-        });
-      }
+      result = this.extendedMatch(query);
     } else {
       result = this.basicMatch(query);
     }
@@ -143,6 +122,34 @@ export class Fzf<U> {
 
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
+    }
+
+    return result;
+  }
+
+  extendedMatch(query: string) {
+    const pattern = buildPatternForExtendedSearch(
+      true,
+      this.opts.casing,
+      this.opts.normalize,
+      query
+    );
+    let result: FzfResultEntry<U>[] = [];
+    for (const [idx, runes] of this.runesList.entries()) {
+      const stuff = v2stuff(runes, pattern, this.opts.algo);
+      let sidx = -1,
+        eidx = -1;
+      if (stuff.offsets.length > 0) {
+        sidx = stuff.offsets[0][0];
+        eidx = stuff.offsets[0][1];
+      }
+      result.push({
+        score: stuff.totalScore,
+        item: this.items[idx],
+        positions: stuff.allPos,
+        start: sidx,
+        end: eidx,
+      });
     }
 
     return result;
