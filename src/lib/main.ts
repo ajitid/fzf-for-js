@@ -94,16 +94,10 @@ export class Fzf<U> {
   }
 
   find(query: string): FzfResultEntry<U>[] {
-    if (this.opts.cache) {
-      const cachedResult = this.cache[query];
-      if (cachedResult !== undefined) {
-        return cachedResult;
-      }
-    }
-
     // needs to be changed ------------
     let result = this.basicMatch(query);
     // -------------------------------------
+
     const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
     result = result.filter(thresholdFilter);
 
@@ -114,8 +108,6 @@ export class Fzf<U> {
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
     }
-
-    if (this.opts.cache) this.cache[query] = result;
 
     return result;
   }
