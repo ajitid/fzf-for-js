@@ -41,6 +41,8 @@ export function buildPatternForExtendedSearch(
   normalize: boolean,
   str: string
 ) {
+  // TODO Implement caching here and below.
+  // cacheable is received from caller of this fn
   let cacheable = true;
 
   str = str.trimLeft();
@@ -78,6 +80,7 @@ export function buildPatternForExtendedSearch(
       }
 
       if (
+        !cacheable ||
         idx > 0 ||
         term.inv ||
         (fuzzy && term.typ !== TermType.Fuzzy) ||
@@ -100,12 +103,14 @@ export function buildPatternForExtendedSearch(
     //
     // there is also buildCacheKey https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/pattern.go#L261
     // which i believe has a different purpose
+
     str,
     // ^ this in junegunn/fzf is `text: []rune(asString)`
 
     termSets,
     sortable,
     cacheable,
+    fuzzy,
   };
 }
 
@@ -197,7 +202,7 @@ function parseTerms(
         inv,
         text: textRunes,
         caseSensitive,
-        normalize,
+        normalize: normalizeTerm,
       });
       switchSet = true;
     }

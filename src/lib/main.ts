@@ -117,6 +117,7 @@ export class Fzf<U> {
       }
     }
 
+    // needs to be changed ------------
     let runes = strToRunes(query);
     if (this.opts.normalize) {
       runes = runes.map(normalizeRune);
@@ -134,6 +135,7 @@ export class Fzf<U> {
       );
       return { item: this.items[index], ...match[0], positions: match[1] };
     };
+    // -------------------------------------
     const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
 
