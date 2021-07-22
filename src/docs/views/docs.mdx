@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
+
 # FZF for JavaScript (Preview)
 
 <span className="docs-hidden"><i>If you are reading this file on GitHub, we'll suggest to read it on <a href="https://fzf.netlify.app">documentation website</a> instead.</i></span>
 
-[Demo](basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+<Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
 
 [FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
 
@@ -98,7 +100,7 @@ const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.po
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
-Find a [working example](basic) for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
+Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/main/src/views/basic.tsx).
 
 ### Notes
 
