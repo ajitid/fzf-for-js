@@ -62,6 +62,32 @@ interface Options<U> {
    * @defaultValue false
    */
   extended: boolean;
+  /*
+   *
+   */
+  tiebreakers: Tiebreaker<U>[];
+}
+
+type Tiebreaker<U> = (
+  a: FzfResultEntry<U>,
+  b: FzfResultEntry<U>,
+  selector: (v: U) => string
+) => number;
+
+function byLengthAsc<U>(
+  a: FzfResultEntry<U>,
+  b: FzfResultEntry<U>,
+  selector: (v: U) => string
+): number {
+  return selector(a.item).length - selector(b.item).length;
+}
+
+function byStartAsc<U>(
+  a: FzfResultEntry<U>,
+  b: FzfResultEntry<U>,
+  selector: (v: U) => string
+): number {
+  return a.start - b.start;
 }
 
 const defaultOpts: Options<any> = {
@@ -71,6 +97,8 @@ const defaultOpts: Options<any> = {
   normalize: true,
   algo: "v2",
   extended: false,
+  // tiebreakers: [byLengthAsc, byStartAsc],
+  tiebreakers: [],
 };
 
 export interface FzfResultEntry<U = string> extends Result {
@@ -128,6 +156,15 @@ export class Fzf<U> {
     const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
       b.score - a.score;
     result.sort(descScoreSorter);
+
+    for (const tiebreaker of this.opts.tiebreakers) {
+      result.sort((a, b) => {
+        if (a.score === b.score) {
+          return tiebreaker(a, b, this.opts.selector);
+        }
+        return 0;
+      });
+    }
 
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
