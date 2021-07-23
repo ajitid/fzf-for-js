@@ -18,12 +18,6 @@ import { Int32 } from "./numerics";
 
 interface Options<U> {
   /**
-   * Cache the results for the queries that you'll make.
-   *
-   * @defaultValue false
-   */
-  cache: boolean;
-  /**
    * If `maxResultItems` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
    *
@@ -65,7 +59,6 @@ interface Options<U> {
 }
 
 const defaultOpts: Options<any> = {
-  cache: false,
   maxResultItems: Infinity,
   selector: (v) => v,
   casing: "smart-case",
@@ -78,8 +71,6 @@ export interface FzfResultEntry<U = string> extends Result {
   item: U;
   positions: number[] | null;
 }
-
-type query = string;
 
 // from https://stackoverflow.com/a/52318137/7683365
 type OptionsTuple<U> = U extends string
@@ -98,7 +89,6 @@ export class Fzf<U> {
   private runesList: Rune[][];
   private items: U[];
   private readonly opts: Options<U>;
-  private cache: Record<query, FzfResultEntry<U>[]> = {};
   private algoFn: AlgoFn;
 
   constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
