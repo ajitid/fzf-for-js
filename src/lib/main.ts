@@ -141,6 +141,11 @@ export class Fzf<U> {
     let result: FzfResultEntry<U>[] = [];
     for (const [idx, runes] of this.runesList.entries()) {
       const stuff = v2stuff(runes, pattern, this.opts.algo);
+      if (stuff.offsets.length !== pattern.termSets.length) continue;
+      // TODO to implement Tiebreaker (see ajitid/fzf-for-js #2) for both extended and basic match
+      // see this fn
+      // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L323
+
       let sidx = -1,
         eidx = -1;
       if (stuff.offsets.length > 0) {
