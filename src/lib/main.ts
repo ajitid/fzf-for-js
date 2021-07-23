@@ -121,9 +121,6 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    const thresholdFilter = (v: FzfResultEntry<U>) => v.score !== 0;
-    result = result.filter(thresholdFilter);
-
     const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
       b.score - a.score;
     result.sort(descScoreSorter);
@@ -216,7 +213,7 @@ export class Fzf<U> {
       return { item: this.items[index], ...match[0], positions };
     };
 
-    let result = this.runesList.map(getResult);
+    let result = this.runesList.map(getResult).filter((r) => r.start >= 0);
     return result;
   }
 }
