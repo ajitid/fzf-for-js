@@ -203,7 +203,17 @@ export class Fzf<U> {
         true,
         slab
       );
-      return { item: this.items[index], ...match[0], positions: match[1] };
+
+      let positions: null | number[] = match[1];
+      // for exact match, we don't get positions array back, so we'll fill it in by ourselves
+      if (this.opts.algo === null) {
+        positions = [];
+        for (let i = match[0].start; i < match[0].end; ++i) {
+          positions.push(i);
+        }
+      }
+
+      return { item: this.items[index], ...match[0], positions };
     };
 
     let result = this.runesList.map(getResult);
