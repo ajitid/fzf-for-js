@@ -53,9 +53,14 @@ interface Options<U> {
    * @defaultValue "v2"
    */
   algo: "v1" | "v2";
+  /*
+   * If true, you can add special patterns to narrow down your search.
+   * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
+   * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
+   *
+   * @defaultValue false
+   */
   extended: boolean;
-  // TODO we need different sort metric
-  // sort: boolean;
 }
 
 const defaultOpts: Options<any> = {
