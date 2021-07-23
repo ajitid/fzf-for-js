@@ -290,7 +290,6 @@ function computeExtendedSearch(
         algoFn,
         input,
         term.caseSensitive,
-        // TODO doesn't normalize still should come from this.opts??
         term.normalize,
         term.text,
         slab
