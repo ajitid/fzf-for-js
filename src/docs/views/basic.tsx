@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultEntry } from "../../lib/main";
+import { Fzf, FzfResultEntry, FzfOptions } from "../../lib/main";
 import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
-const options = {
+const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
   maxResultItems: 32,
 };

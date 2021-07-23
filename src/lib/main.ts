@@ -83,6 +83,10 @@ type OptionsTuple<U> = U extends string
   ? [options?: Partial<Options<U>>]
   : [options: Partial<Options<U>> & { selector: Options<U>["selector"] }];
 
+export type FzfOptions<U = string> = U extends string
+  ? Partial<Options<U>>
+  : Partial<Options<U>> & { selector: Options<U>["selector"] };
+
 interface Token {
   text: Rune[];
   prefixLength: Int32;
