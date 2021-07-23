@@ -1,4 +1,4 @@
-import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn } from "./algo";
+import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { Rune, strToRunes } from "./runes";
 /*
   `Result` type needs to be imported otherwise TS will complain while generating types.
@@ -49,10 +49,11 @@ interface Options<U> {
   /*
    * Fuzzy algo to choose. Each algo has their own advantages, see here:
    * https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5
+   * If asssigned `null`, an exact match will be made instead of a fuzzy one.
    *
    * @defaultValue "v2"
    */
-  algo: "v1" | "v2";
+  algo: "v1" | "v2" | null;
   /*
    * If true, you can add special patterns to narrow down your search.
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
@@ -100,7 +101,15 @@ export class Fzf<U> {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
     this.runesList = list.map((item) => strToRunes(this.opts.selector(item)));
-    this.algoFn = this.opts.algo === "v2" ? fuzzyMatchV2 : fuzzyMatchV1;
+    this.algoFn = exactMatchNaive;
+    switch (this.opts.algo) {
+      case "v2":
+        this.algoFn = fuzzyMatchV2;
+        break;
+      case "v1":
+        this.algoFn = fuzzyMatchV1;
+        break;
+    }
   }
 
   find(query: string): FzfResultEntry<U>[] {
@@ -128,14 +137,14 @@ export class Fzf<U> {
 
   extendedMatch(query: string) {
     const pattern = buildPatternForExtendedSearch(
-      true,
+      Boolean(this.opts.algo),
       this.opts.casing,
       this.opts.normalize,
       query
     );
     let result: FzfResultEntry<U>[] = [];
     for (const [idx, runes] of this.runesList.entries()) {
-      const stuff = v2stuff(runes, pattern, this.opts.algo);
+      const stuff = v2stuff(runes, pattern, this.algoFn);
       if (stuff.offsets.length !== pattern.termSets.length) continue;
       // TODO to implement Tiebreaker (see ajitid/fzf-for-js #2) for both extended and basic match
       // see this fn
@@ -236,7 +245,7 @@ function iter(
 function v2stuff(
   text: Rune[],
   pattern: ReturnType<typeof buildPatternForExtendedSearch>,
-  fuzzyAlgo: "v1" | "v2"
+  fuzzyAlgo: AlgoFn
 ) {
   // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
   // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
@@ -261,8 +270,8 @@ function v2stuff(
 
     for (const term of termSet) {
       let algoFn = termTypeMap[term.typ];
-      if (term.typ === TermType.Fuzzy && fuzzyAlgo === "v1") {
-        algoFn = fuzzyMatchV1;
+      if (term.typ === TermType.Fuzzy) {
+        algoFn = fuzzyAlgo;
       }
       const [off, score, pos] = iter(
         algoFn,

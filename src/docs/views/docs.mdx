@@ -117,7 +117,7 @@ Find a <Link to="basic">working example</Link> for this and its [sourcecode](htt
 - `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
 - `normalize?` - boolean, defaults to `true` - If true, FZF will try to remove diacritics from list items. This is useful if the list contains items with diacritics but you want to query with plain A-Z letters. For example, Zoë will be converted to Zoe.
-- `algo` - string, defaults to `"v2"`, accepts `"v1" | "v2"` - Select which version of fuzzy algo you want to use. Refer to [this explanation](https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5) to see the differences.
+- `algo` - string, defaults to `"v2"`, accepts `"v1" | "v2" | null` - Select which version of fuzzy algo you want to use. Refer to [this explanation](https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5) to see the differences. If asssigned `null`, an exact match will be made instead of a fuzzy one.
 - `extended` - boolean, defaults to `false` - If true, you can add special patterns to narrow down your search. To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax). For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
 
 ### `fzf.find(query)`
