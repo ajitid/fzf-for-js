@@ -144,22 +144,25 @@ export class Fzf<U> {
     );
     let result: FzfResultEntry<U>[] = [];
     for (const [idx, runes] of this.runesList.entries()) {
-      const stuff = v2stuff(runes, pattern, this.algoFn);
-      if (stuff.offsets.length !== pattern.termSets.length) continue;
+      const match = computeExtendedSearch(runes, pattern, this.algoFn);
+      if (match.offsets.length !== pattern.termSets.length) continue;
       // TODO to implement Tiebreaker (see ajitid/fzf-for-js #2) for both extended and basic match
       // see this fn
       // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L323
 
       let sidx = -1,
         eidx = -1;
-      if (stuff.offsets.length > 0) {
-        sidx = stuff.offsets[0][0];
-        eidx = stuff.offsets[0][1];
+      if (match.offsets.length > 0) {
+        // FIXME offset calulation for min and max needs to be fixed when we'll introduce Tiebreaker
+        // as sidx and eidx needs to be calculated from whole offsets list element not alone from the first element.
+        // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/result.go#L25
+        sidx = match.offsets[0][0];
+        eidx = match.offsets[0][1];
       }
       result.push({
-        score: stuff.totalScore,
+        score: match.totalScore,
         item: this.items[idx],
-        positions: stuff.allPos,
+        positions: match.allPos,
         start: sidx,
         end: eidx,
       });
@@ -209,7 +212,7 @@ export class Fzf<U> {
 }
 
 function iter(
-  pfun: AlgoFn,
+  algoFn: AlgoFn,
   tokens: Token[],
   caseSensitive: boolean,
   normalize: boolean,
@@ -217,7 +220,7 @@ function iter(
   slab: Slab
 ): [Offset, number, number[] | null] {
   for (const part of tokens) {
-    const [res, pos] = pfun(
+    const [res, pos] = algoFn(
       caseSensitive,
       normalize,
       true,
@@ -242,7 +245,7 @@ function iter(
   return [[-1, -1], 0, null];
 }
 
-function v2stuff(
+function computeExtendedSearch(
   text: Rune[],
   pattern: ReturnType<typeof buildPatternForExtendedSearch>,
   fuzzyAlgo: AlgoFn
