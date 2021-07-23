@@ -107,7 +107,7 @@ export class Fzf<U> {
   find(query: string): FzfResultEntry<U>[] {
     let result: FzfResultEntry<U>[] = [];
 
-    if (this.opts.normalize) {
+    if (this.opts.extended) {
       const pattern = buildPatternForExtendedSearch(
         true,
         this.opts.casing,
