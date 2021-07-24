@@ -1,20 +1,13 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { Rune, strToRunes } from "./runes";
-/*
-  `Result` type needs to be imported otherwise TS will complain while generating types.
-  See https://github.com/microsoft/TypeScript/issues/5711
-  and https://github.com/microsoft/TypeScript/issues/9944.
-*/
-import type { Result } from "./algo";
-import { Slab, slab } from "./slab";
+import { slab } from "./slab";
 import { normalizeRune } from "./normalize";
-import { Casing } from "./types";
-import {
-  buildPatternForExtendedSearch,
-  TermType,
-  termTypeMap,
-} from "./pattern";
-import { Int32 } from "./numerics";
+import { Casing, FzfResultEntry, Tiebreaker } from "./types";
+import { buildPatternForExtendedSearch } from "./pattern";
+import { computeExtendedSearch } from "./extended";
+
+export { tiebreakers } from "./tiebreakers";
+export type { Tiebreaker, FzfResultEntry } from "./types";
 
 interface Options<U> {
   /**
@@ -62,6 +55,31 @@ interface Options<U> {
    * @defaultValue false
    */
   extended: boolean;
+  /*
+   * A list of functions that act as fallback and help to
+   * sort result entries when the score between two entries is tied.
+   *
+   * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+   * compare function with an added third argument which is `selector`.
+   *
+   * @defaultValue []
+   *
+   * @example
+   * ```js
+   * function byLengthAsc(a, b, selector) {
+   *   return selector(a.item).length - selector(b.item).length;
+   * }
+   *
+   * const fzf = new Fzf(list, { tiebreakers: [byLengthAsc] })
+   * ```
+   * This will result in following result entries having same score sorted like this:
+   *    FROM                TO
+   * axaa                axaa
+   * bxbbbb              bxbbbb
+   * cxcccccccccc        dxddddddd
+   * dxddddddd           cxcccccccccc
+   */
+  tiebreakers: Tiebreaker<U>[];
 }
 
 const defaultOpts: Options<any> = {
@@ -71,12 +89,10 @@ const defaultOpts: Options<any> = {
   normalize: true,
   algo: "v2",
   extended: false,
+  // example:
+  // tiebreakers: [byLengthAsc, byStartAsc],
+  tiebreakers: [],
 };
-
-export interface FzfResultEntry<U = string> extends Result {
-  item: U;
-  positions: number[] | null;
-}
 
 // from https://stackoverflow.com/a/52318137/7683365
 type OptionsTuple<U> = U extends string
@@ -86,14 +102,6 @@ type OptionsTuple<U> = U extends string
 export type FzfOptions<U = string> = U extends string
   ? Partial<Options<U>>
   : Partial<Options<U>> & { selector: Options<U>["selector"] };
-
-interface Token {
-  text: Rune[];
-  prefixLength: Int32;
-}
-
-// this is [int32, int32] in golang code
-type Offset = [number, number];
 
 export class Fzf<U> {
   private runesList: Rune[][];
@@ -129,6 +137,15 @@ export class Fzf<U> {
       b.score - a.score;
     result.sort(descScoreSorter);
 
+    for (const tiebreaker of this.opts.tiebreakers) {
+      result.sort((a, b) => {
+        if (a.score === b.score) {
+          return tiebreaker(a, b, this.opts.selector);
+        }
+        return 0;
+      });
+    }
+
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
     }
@@ -147,9 +164,6 @@ export class Fzf<U> {
     for (const [idx, runes] of this.runesList.entries()) {
       const match = computeExtendedSearch(runes, pattern, this.algoFn);
       if (match.offsets.length !== pattern.termSets.length) continue;
-      // TODO to implement Tiebreaker (see ajitid/fzf-for-js #2) for both extended and basic match
-      // see this fn
-      // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L323
 
       let sidx = -1,
         eidx = -1;
@@ -220,113 +234,4 @@ export class Fzf<U> {
     let result = this.runesList.map(getResult).filter((r) => r.start >= 0);
     return result;
   }
-}
-
-function iter(
-  algoFn: AlgoFn,
-  tokens: Token[],
-  caseSensitive: boolean,
-  normalize: boolean,
-  pattern: Rune[],
-  slab: Slab
-): [Offset, number, number[] | null] {
-  for (const part of tokens) {
-    const [res, pos] = algoFn(
-      caseSensitive,
-      normalize,
-      true,
-      part.text,
-      pattern,
-      true,
-      slab
-    );
-    if (res.start >= 0) {
-      // res.start and res.end were typecasted to int32 here
-      const sidx = res.start + part.prefixLength;
-      const eidx = res.end + part.prefixLength;
-      if (pos !== null) {
-        for (let i = 0; i < pos.length; ++i) {
-          // part.prefixLength is typecasted to int here
-          pos[i] += part.prefixLength;
-        }
-      }
-      return [[sidx, eidx], res.score, pos];
-    }
-  }
-  return [[-1, -1], 0, null];
-}
-
-function computeExtendedSearch(
-  text: Rune[],
-  pattern: ReturnType<typeof buildPatternForExtendedSearch>,
-  fuzzyAlgo: AlgoFn
-) {
-  // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
-  // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
-  const input: {
-    text: Rune[];
-    prefixLength: number;
-  }[] = [
-    {
-      text,
-      prefixLength: 0,
-    },
-  ];
-
-  const offsets: Offset[] = [];
-  let totalScore = 0;
-  const allPos: number[] = [];
-
-  for (const termSet of pattern.termSets) {
-    let offset: Offset = [0, 0];
-    let currentScore = 0;
-    let matched = false;
-
-    for (const term of termSet) {
-      let algoFn = termTypeMap[term.typ];
-      if (term.typ === TermType.Fuzzy) {
-        algoFn = fuzzyAlgo;
-      }
-      const [off, score, pos] = iter(
-        algoFn,
-        input,
-        term.caseSensitive,
-        term.normalize,
-        term.text,
-        slab
-      );
-
-      const sidx = off[0];
-      if (sidx >= 0) {
-        if (term.inv) {
-          continue;
-        }
-
-        offset = off;
-        currentScore = score;
-        matched = true;
-
-        if (pos !== null) {
-          allPos.push(...pos);
-        } else {
-          for (let idx = off[0]; idx < off[1]; ++idx) {
-            // idx is typecasted to int
-            allPos.push(idx);
-          }
-        }
-        break;
-      } else if (term.inv) {
-        offset = [0, 0];
-        currentScore = 0;
-        matched = true;
-        continue;
-      }
-    }
-    if (matched) {
-      offsets.push(offset);
-      totalScore += currentScore;
-    }
-  }
-
-  return { offsets, totalScore, allPos };
 }
