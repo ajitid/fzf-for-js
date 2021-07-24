@@ -95,9 +95,6 @@ export function buildPatternForExtendedSearch(
   }
 
   return {
-    // case sensitive will always remain true for extended match
-    // caseSensitive: true,
-
     // this modified str can be used as cache as pattern cache
     // see https://github.com/junegunn/fzf/blob/7191ebb615f5d6ebbf51d598d8ec853a65e2274d/src/pattern.go#L100
     //

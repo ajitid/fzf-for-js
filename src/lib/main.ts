@@ -168,9 +168,6 @@ export class Fzf<U> {
       let sidx = -1,
         eidx = -1;
       if (match.allPos.length > 0) {
-        // FIXME offset calulation for min and max needs to be fixed when we'll introduce Tiebreaker
-        // as sidx and eidx needs to be calculated from whole offsets list element not alone from the first element.
-        // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/result.go#L25
         sidx = Math.min(...match.allPos);
         eidx = Math.max(...match.allPos) + 1;
       }
