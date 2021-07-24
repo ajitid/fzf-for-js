@@ -59,8 +59,8 @@ interface Options<U> {
    * A list of functions that act as fallback and help to
    * sort result entries when the score between two entries is tied.
    *
-   * Consider a tiebreaker to be a [JS array sort fn](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-   * just with an extra third argument passed which is `selector`.
+   * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+   * compare function with an added third argument which is `selector`.
    *
    * @defaultValue []
    *
@@ -164,9 +164,6 @@ export class Fzf<U> {
     for (const [idx, runes] of this.runesList.entries()) {
       const match = computeExtendedSearch(runes, pattern, this.algoFn);
       if (match.offsets.length !== pattern.termSets.length) continue;
-      // TODO to implement Tiebreaker (see ajitid/fzf-for-js #2) for both extended and basic match
-      // see this fn
-      // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L323
 
       let sidx = -1,
         eidx = -1;
