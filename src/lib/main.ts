@@ -153,7 +153,7 @@ export class Fzf<U> {
     return result;
   }
 
-  extendedMatch(query: string) {
+  private extendedMatch(query: string) {
     const pattern = buildPatternForExtendedSearch(
       Boolean(this.opts.algo),
       this.opts.casing,
@@ -183,7 +183,7 @@ export class Fzf<U> {
     return result;
   }
 
-  basicMatch(query: string) {
+  private basicMatch(query: string) {
     let caseSensitive = false;
     switch (this.opts.casing) {
       case "smart-case":
