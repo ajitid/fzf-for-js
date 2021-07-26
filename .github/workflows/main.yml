@@ -29,3 +29,8 @@ jobs:
 
       - name: Run tests
         run: npm run test:cov
+
+      - name: Upload coverage to coveralls.io
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
