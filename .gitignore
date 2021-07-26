@@ -1,7 +1,17 @@
+# Inherited from Vite
 node_modules
 .DS_Store
 dist
 dist-ssr
 *.local
 
-src/docs/views/old-docs/*
+# IDEs and editors
+.exrc
+.vscode
+.idea
+
+# Coverage report generated using Jest + Istanbul
+coverage
+
+# Old docs generated on build
+src/docs/views/old-docs
