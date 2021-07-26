@@ -37,7 +37,7 @@ console.log('ranking is:')
 entries.forEach(entry => console.log(entry.item)) // lisp kotlin elixir
 ```
 
-For more ways to use this library, [visit documentation](https://fzf.netlify.app/).
+→ For more ways to use this library, [visit documentation](https://fzf.netlify.app/).
 
 ## Motivation
 
