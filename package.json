@@ -27,7 +27,9 @@
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
-    "test": "jest src",
+    "test": "jest",
+    "test:watch": "jest --watch -o",
+    "test:cov": "jest --coverage",
     "fill-with-old-docs": "node scripts/fill-with-old-docs.js"
   },
   "===== BUILD =====": "",
