@@ -1,4 +1,8 @@
-import { buildPatternForExtendedSearch, TermType } from "./pattern";
+import { equalMatch, exactMatchNaive } from "../algo";
+import { buildPatternForExtendedSearch, TermType } from "../pattern";
+import { strToRunes } from "../runes";
+
+import "jest-expect-message";
 
 // from junegunn/fzf's TestParseTermsExtended
 test("buildPatternForExtendedSearch for fuzzy match", () => {
@@ -96,3 +100,67 @@ test("buildPatternForExtendedSearch for empty string", () => {
   );
   expect(terms.length).toBe(0);
 });
+
+test("exact match", () => {
+  const pattern = buildPatternForExtendedSearch(
+    true,
+    "smart-case",
+    false,
+    "abc"
+  );
+
+  const [result, positions] = exactMatchNaive(
+    true,
+    false,
+    true,
+    strToRunes("aabbcc abc"),
+    pattern.termSets[0][0].text,
+    true,
+    null
+  );
+  expect(result.start).toBe(7);
+  expect(result.end).toBe(10);
+  expect(positions).toBe(null);
+});
+
+test("equal match", () => {
+  const pattern = buildPatternForExtendedSearch(
+    true,
+    "smart-case",
+    false,
+    "^AbC$"
+  );
+
+  const match = (str: string, sidxExpected: number, eidxExpected: number) => {
+    const textRunes = strToRunes(str);
+    const [result, positions] = equalMatch(
+      true,
+      false,
+      true,
+      textRunes,
+      pattern.termSets[0][0].text,
+      true,
+      null
+    );
+
+    const fail = `Failed for "${str}". See error stack to trace the function (object) call.`;
+    expect(result.start, fail).toBe(sidxExpected);
+    expect(result.end, fail).toBe(eidxExpected);
+    expect(positions, fail).toBe(null);
+  };
+
+  match("ABC", -1, -1);
+  match("AbC", 0, 3);
+  match("AbC  ", 0, 3);
+  match(" AbC ", 1, 4);
+  match("  AbC", 2, 5);
+});
+
+/*
+We aren't doing junegunn/fzf TestCaseSensitivity checks as we aren't building a pattern for
+basic match and for extende matches, case sensitivity remains true.
+
+There is one for Transform (--nth) which we don't have for JS implementation so that is skipped.
+
+We aren't doing any caching for now so those are skipped too.
+*/
