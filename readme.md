@@ -1,6 +1,7 @@
 # FZF for JavaScript (Preview)
 
-[![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
+[![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ajitid/fzf-for-js/badge.svg?branch=dev)](https://coveralls.io/github/ajitid/fzf-for-js?branch=dev)
 [![Docs deployment status](https://img.shields.io/netlify/e4324b0d-d5b2-4139-a688-e58f32a5af6b?label=Docs&logo=netlify)](https://app.netlify.com/sites/fzf/deploys)
 
 [//]: # "Image, text and counter/assist image needs to follow this order to be correctly aligned"
