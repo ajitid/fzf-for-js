@@ -14,8 +14,8 @@ import {
   prefixMatch,
   suffixMatch,
   equalMatch,
-} from "./algo";
-import { strToRunes } from "./runes";
+} from "../algo";
+import { strToRunes } from "../runes";
 
 import "jest-expect-message";
 
