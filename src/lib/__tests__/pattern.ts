@@ -164,3 +164,26 @@ There is one for Transform (--nth) which we don't have for JS implementation so 
 
 We aren't doing any caching for now so those are skipped too.
 */
+
+test("tab representations are preserved on transformed string", () => {
+  const match = (inputStr: string, toMatchStr: string) => {
+    expect(
+      buildPatternForExtendedSearch(false, "smart-case", false, inputStr).str
+    ).toBe(toMatchStr);
+  };
+
+  match(" AA bb       ", "AA bb");
+  match(" AA bb\\       ", "AA bb\\ ");
+  match(" AA bb    \\    \\   ", "AA bb    \\    \\ ");
+  match(" AA \\  bb \\   ", "AA \\  bb \\ ");
+
+  const pattern = buildPatternForExtendedSearch(
+    false,
+    "smart-case",
+    false,
+    "a\\ b\\ "
+  );
+  const recvText = pattern.termSets[0][0].text;
+  expect(recvText[3]).toBe(32);
+  expect(recvText[3]).toBe(32);
+});

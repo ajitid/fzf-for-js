@@ -9,7 +9,7 @@ import { computeExtendedSearch } from "./extended";
 export { tiebreakers } from "./tiebreakers";
 export type { Tiebreaker, FzfResultEntry } from "./types";
 
-interface Options<U> {
+export interface Options<U> {
   /**
    * If `maxResultItems` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
@@ -60,14 +60,14 @@ interface Options<U> {
    * sort result entries when the score between two entries is tied.
    *
    * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-   * compare function with an added third argument which is `selector`.
+   * compare function with an added third argument which is this `options` itself.
    *
    * @defaultValue []
    *
    * @example
    * ```js
-   * function byLengthAsc(a, b, selector) {
-   *   return selector(a.item).length - selector(b.item).length;
+   * function byLengthAsc(a, b, options) {
+   *   return options.selector(a.item).length - options.selector(b.item).length;
    * }
    *
    * const fzf = new Fzf(list, { tiebreakers: [byLengthAsc] })
@@ -140,7 +140,7 @@ export class Fzf<U> {
     for (const tiebreaker of this.opts.tiebreakers) {
       result.sort((a, b) => {
         if (a.score === b.score) {
-          return tiebreaker(a, b, this.opts.selector);
+          return tiebreaker(a, b, this.opts);
         }
         return 0;
       });
