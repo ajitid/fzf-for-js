@@ -1,4 +1,5 @@
 import type { Result } from "./algo";
+import type { Options } from "./main";
 
 export type Casing = "smart-case" | "case-sensitive" | "case-insensitive";
 
@@ -10,5 +11,5 @@ export interface FzfResultEntry<U = string> extends Result {
 export type Tiebreaker<U> = (
   a: FzfResultEntry<U>,
   b: FzfResultEntry<U>,
-  selector: (v: U) => string
+  options: Options<U>
 ) => number;
