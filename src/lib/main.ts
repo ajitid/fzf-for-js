@@ -149,10 +149,6 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
-      b.score - a.score;
-    result.sort(descScoreSorter);
-
     for (const tiebreaker of this.opts.tiebreakers) {
       result.sort((a, b) => {
         if (a.score === b.score) {
@@ -163,7 +159,7 @@ export class Fzf<U> {
     }
 
     if (Number.isFinite(this.opts.maxResultItems)) {
-      result = result.slice(0, this.opts.maxResultItems);
+      result.splice(this.opts.maxResultItems);
     }
 
     return result;
@@ -176,7 +172,9 @@ export class Fzf<U> {
       this.opts.normalize,
       query
     );
-    let result: FzfResultItem<U>[] = [];
+
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
     for (const [idx, runes] of this.runesList.entries()) {
       const match = computeExtendedSearch(
         runes,
@@ -192,13 +190,31 @@ export class Fzf<U> {
         sidx = Math.min(...match.allPos);
         eidx = Math.max(...match.allPos) + 1;
       }
-      result.push({
-        score: match.totalScore,
+
+      const totalScore = match.totalScore;
+      if (scoreMap[totalScore] === undefined) {
+        scoreMap[totalScore] = [];
+      }
+      scoreMap[totalScore].push({
+        score: totalScore,
         item: this.items[idx],
         positions: match.allPos,
         start: sidx,
         end: eidx,
       });
+    }
+
+    const scoresInDesc = Object.keys(scoreMap)
+      .map((v) => parseInt(v, 10))
+      .sort((a, b) => b - a);
+
+    const result: FzfResultItem<U>[] = [];
+
+    for (const score of scoresInDesc) {
+      result.push(...scoreMap[score]);
+      if (result.length >= this.opts.maxResultItems) {
+        break;
+      }
     }
 
     return result;
@@ -249,7 +265,32 @@ export class Fzf<U> {
       return { item: this.items[index], ...match[0], positions };
     };
 
-    let result = this.runesList.map(getResult).filter((r) => r.start >= 0);
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    this.runesList.forEach((v, i) => {
+      const r = getResult(v, i);
+      if (r.start === -1) return;
+
+      const score = r.score;
+      if (scoreMap[score] === undefined) {
+        scoreMap[score] = [];
+      }
+      scoreMap[score].push(r);
+    });
+
+    const scoresInDesc = Object.keys(scoreMap)
+      .map((v) => parseInt(v, 10))
+      .sort((a, b) => b - a);
+
+    const result: FzfResultItem<U>[] = [];
+
+    for (const score of scoresInDesc) {
+      result.push(...scoreMap[score]);
+      if (result.length >= this.opts.maxResultItems) {
+        break;
+      }
+    }
+
     return result;
   }
 }
