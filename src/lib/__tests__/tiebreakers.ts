@@ -1,5 +1,4 @@
-import { Fzf } from "../main";
-import { tiebreakers } from "../tiebreakers";
+import { Fzf, tiebreakers } from "../main";
 
 test("byLengthAsc", () => {
   const list = ["aaaaa", "caaaaaaaa", "baaaaa"];
