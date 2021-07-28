@@ -11,12 +11,12 @@ export type { Tiebreaker, FzfResultItem } from "./types";
 
 export interface Options<U> {
   /**
-   * If `maxResultItems` is 32, top 32 items that matches your query will be returned.
+   * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
    *
    * @defaultValue Infinity
    */
-  maxResultItems: number;
+  limit: number;
   /**
    * For each item in the list, target a specific property of the item to search for.
    */
@@ -62,6 +62,8 @@ export interface Options<U> {
    * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
    * compare function with an added third argument which is this `options` itself.
    *
+   * Note that tiebreakers cannot be used if `sort=false`.
+   *
    * @defaultValue []
    *
    * @example
@@ -81,6 +83,14 @@ export interface Options<U> {
    */
   tiebreakers: Tiebreaker<U>[];
   /*
+   * If `true`, result items will be sorted in descending order by their score.
+   * If `false`, result won't be sorted and tiebreakers won't affect the sort
+   * order either.
+   *
+   * @defaultValue true
+   */
+  sort: boolean;
+  /*
    * If `false`, matching will be done from backwards.
    *
    * @defaultValue true
@@ -98,7 +108,7 @@ export interface Options<U> {
 }
 
 const defaultOpts: Options<any> = {
-  maxResultItems: Infinity,
+  limit: Infinity,
   selector: (v) => v,
   casing: "smart-case",
   normalize: true,
@@ -107,17 +117,28 @@ const defaultOpts: Options<any> = {
   // example:
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
+  sort: true,
   forward: true,
 };
 
+type SortAttrs<U> =
+  | {
+      sort?: true;
+      tiebreakers?: Options<U>["tiebreakers"];
+    }
+  | { sort: false };
+
+type OptsToUse<U> = Omit<Partial<Options<U>>, "sort" | "tiebreakers"> &
+  SortAttrs<U>;
+
 // from https://stackoverflow.com/a/52318137/7683365
 type OptionsTuple<U> = U extends string
-  ? [options?: Partial<Options<U>>]
-  : [options: Partial<Options<U>> & { selector: Options<U>["selector"] }];
+  ? [options?: OptsToUse<U>]
+  : [options: OptsToUse<U> & { selector: Options<U>["selector"] }];
 
 export type FzfOptions<U = string> = U extends string
-  ? Partial<Options<U>>
-  : Partial<Options<U>> & { selector: Options<U>["selector"] };
+  ? OptsToUse<U>
+  : OptsToUse<U> & { selector: Options<U>["selector"] };
 
 export class Fzf<U> {
   private runesList: Rune[][];
@@ -149,21 +170,19 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
-      b.score - a.score;
-    result.sort(descScoreSorter);
-
-    for (const tiebreaker of this.opts.tiebreakers) {
-      result.sort((a, b) => {
-        if (a.score === b.score) {
-          return tiebreaker(a, b, this.opts);
-        }
-        return 0;
-      });
+    if (this.opts.sort) {
+      for (const tiebreaker of this.opts.tiebreakers) {
+        result.sort((a, b) => {
+          if (a.score === b.score) {
+            return tiebreaker(a, b, this.opts);
+          }
+          return 0;
+        });
+      }
     }
 
-    if (Number.isFinite(this.opts.maxResultItems)) {
-      result = result.slice(0, this.opts.maxResultItems);
+    if (Number.isFinite(this.opts.limit)) {
+      result.splice(this.opts.limit);
     }
 
     return result;
@@ -176,7 +195,9 @@ export class Fzf<U> {
       this.opts.normalize,
       query
     );
-    let result: FzfResultItem<U>[] = [];
+
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
     for (const [idx, runes] of this.runesList.entries()) {
       const match = computeExtendedSearch(
         runes,
@@ -192,7 +213,12 @@ export class Fzf<U> {
         sidx = Math.min(...match.allPos);
         eidx = Math.max(...match.allPos) + 1;
       }
-      result.push({
+
+      const scoreKey = this.opts.sort ? match.totalScore : 0;
+      if (scoreMap[scoreKey] === undefined) {
+        scoreMap[scoreKey] = [];
+      }
+      scoreMap[scoreKey].push({
         score: match.totalScore,
         item: this.items[idx],
         positions: match.allPos,
@@ -201,7 +227,7 @@ export class Fzf<U> {
       });
     }
 
-    return result;
+    return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
   }
 
   private basicMatch(query: string) {
@@ -249,7 +275,39 @@ export class Fzf<U> {
       return { item: this.items[index], ...match[0], positions };
     };
 
-    let result = this.runesList.map(getResult).filter((r) => r.start >= 0);
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    this.runesList.forEach((v, i) => {
+      const r = getResult(v, i);
+      if (r.start === -1) return;
+
+      const scoreKey = this.opts.sort ? r.score : 0;
+      if (scoreMap[scoreKey] === undefined) {
+        scoreMap[scoreKey] = [];
+      }
+      scoreMap[scoreKey].push(r);
+    });
+
+    return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
+  }
+
+  private static getResultFromScoreMap<T>(
+    scoreMap: Record<number, FzfResultItem<T>[]>,
+    limit: number
+  ): FzfResultItem<T>[] {
+    const scoresInDesc = Object.keys(scoreMap)
+      .map((v) => parseInt(v, 10))
+      .sort((a, b) => b - a);
+
+    const result: FzfResultItem<T>[] = [];
+
+    for (const score of scoresInDesc) {
+      result.push(...scoreMap[score]);
+      if (result.length >= limit) {
+        break;
+      }
+    }
+
     return result;
   }
 }

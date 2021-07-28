@@ -1,3 +1,5 @@
+import "jest-expect-message";
+
 import {
   AlgoFn,
   BONUS_CAMEL_123,
@@ -17,8 +19,6 @@ import {
 } from "../algo";
 import { strToRunes } from "../runes";
 import { slab, Slab } from "../slab";
-
-import "jest-expect-message";
 
 function assertMatch(
   algo: AlgoFn,
