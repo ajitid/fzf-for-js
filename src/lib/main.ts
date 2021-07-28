@@ -95,6 +95,39 @@ export interface Options<U> {
    * present in the path.
    */
   forward: boolean;
+  /*
+   * Sorting mechanism to use. Assign `null` if sorting is not required.
+   *
+   * @default An object that defines sorting results by score in descending
+   * order.
+   *
+   * @example
+   *
+   * ```js
+   * const list = ['xyzabc', 'abcdef', 'mno']
+   *
+   * let fzf = new Fzf(list, {
+   *  // This sort object is the default:
+   *  sort: {
+   *    order: 'desc',
+   *    on: v => v.score
+   *  }
+   * })
+   * let result = fzf.find('abc').map(v => v.item)
+   * console.log(result.join(', ')) // abcdef, xyzabc
+   *
+   * fzf = new Fzf(list, { sort: null })
+   * result = fzf.find('abc').map(v => v.item)
+   * console.log(result.join(', ')) // xyzabc, abcdef
+   * ```
+   *
+   * Assigning `sort=null` is useful if you want fuzzy capabilities but don't
+   * want FZF to mess with the order of items that you've defined in the list.
+   */
+  sort: {
+    order: "asc" | "desc";
+    on: (v: FzfResultEntry<U>) => number;
+  } | null;
 }
 
 const defaultOpts: Options<any> = {
@@ -108,6 +141,10 @@ const defaultOpts: Options<any> = {
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
   forward: true,
+  sort: {
+    order: "desc",
+    on: (v) => v.score,
+  },
 };
 
 // from https://stackoverflow.com/a/52318137/7683365
@@ -149,9 +186,15 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
-      b.score - a.score;
-    result.sort(descScoreSorter);
+    const sort = this.opts.sort;
+    if (sort !== null) {
+      const sorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) => {
+        let diff = sort.on(b) - sort.on(a);
+        if (sort.order === "asc") diff *= -1;
+        return diff;
+      };
+      result.sort(sorter);
+    }
 
     for (const tiebreaker of this.opts.tiebreakers) {
       result.sort((a, b) => {
