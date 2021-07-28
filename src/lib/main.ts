@@ -83,7 +83,7 @@ export interface Options<U> {
   /*
    * If `true`, result items will be sorted in descending order by their score.
    * If `false`, result won't be sorted and tiebreakers won't affect the sort
-   * order too.
+   * order either.
    *
    * @defaultValue true
    */
