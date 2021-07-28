@@ -1,15 +1,15 @@
 import type { Options } from "./main";
-import type { FzfResultEntry } from "./types";
+import type { FzfResultItem } from "./types";
 
 function byLengthAsc<U>(
-  a: FzfResultEntry<U>,
-  b: FzfResultEntry<U>,
+  a: FzfResultItem<U>,
+  b: FzfResultItem<U>,
   opts: Options<U>
 ): number {
   return opts.selector(a.item).length - opts.selector(b.item).length;
 }
 
-function byStartAsc<U>(a: FzfResultEntry<U>, b: FzfResultEntry<U>): number {
+function byStartAsc<U>(a: FzfResultItem<U>, b: FzfResultItem<U>): number {
   return a.start - b.start;
 }
 

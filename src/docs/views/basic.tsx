@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultEntry, FzfOptions } from "../../lib/main";
+import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
 import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
@@ -15,7 +15,7 @@ let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
 export function Basic() {
   const [input, setInput] = useState("");
 
-  const [entries, setEntries] = useState<FzfResultEntry[]>([]);
+  const [entries, setEntries] = useState<FzfResultItem[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);
