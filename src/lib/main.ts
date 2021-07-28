@@ -81,6 +81,14 @@ export interface Options<U> {
    */
   tiebreakers: Tiebreaker<U>[];
   /*
+   * If `true`, result items will be sorted in descending order by their score.
+   * If `false`, result won't be sorted and tiebreakers won't affect the sort
+   * order too.
+   *
+   * @defaultValue true
+   */
+  sort: boolean;
+  /*
    * If `false`, matching will be done from backwards.
    *
    * @defaultValue true
@@ -95,9 +103,6 @@ export interface Options<U> {
    * present in the path.
    */
   forward: boolean;
-  /*
-   */
-  sort: boolean;
 }
 
 const defaultOpts: Options<any> = {
@@ -110,8 +115,8 @@ const defaultOpts: Options<any> = {
   // example:
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
-  forward: true,
   sort: true,
+  forward: true,
 };
 
 type SortAttrs<U> =
