@@ -114,14 +114,24 @@ const defaultOpts: Options<any> = {
   sort: true,
 };
 
+type SortAttrs<U> =
+  | {
+      sort?: true;
+      tiebreakers?: Options<U>["tiebreakers"];
+    }
+  | { sort: false };
+
+type OptsToUse<U> = Omit<Partial<Options<U>>, "sort" | "tiebreakers"> &
+  SortAttrs<U>;
+
 // from https://stackoverflow.com/a/52318137/7683365
 type OptionsTuple<U> = U extends string
-  ? [options?: Partial<Options<U>>]
-  : [options: Partial<Options<U>> & { selector: Options<U>["selector"] }];
+  ? [options?: OptsToUse<U>]
+  : [options: OptsToUse<U> & { selector: Options<U>["selector"] }];
 
 export type FzfOptions<U = string> = U extends string
-  ? Partial<Options<U>>
-  : Partial<Options<U>> & { selector: Options<U>["selector"] };
+  ? OptsToUse<U>
+  : OptsToUse<U> & { selector: Options<U>["selector"] };
 
 export class Fzf<U> {
   private runesList: Rune[][];
@@ -153,13 +163,15 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    for (const tiebreaker of this.opts.tiebreakers) {
-      result.sort((a, b) => {
-        if (a.score === b.score) {
-          return tiebreaker(a, b, this.opts);
-        }
-        return 0;
-      });
+    if (this.opts.sort) {
+      for (const tiebreaker of this.opts.tiebreakers) {
+        result.sort((a, b) => {
+          if (a.score === b.score) {
+            return tiebreaker(a, b, this.opts);
+          }
+          return 0;
+        });
+      }
     }
 
     if (Number.isFinite(this.opts.limit)) {
