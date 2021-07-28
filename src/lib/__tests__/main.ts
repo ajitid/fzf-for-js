@@ -1,3 +1,5 @@
+import "jest-expect-message";
+
 import { Fzf } from "../main";
 
 test("filtering in extended match", () => {
@@ -59,7 +61,11 @@ test("limit", () => {
   const list = ["aabb", "AAbb", "ccaa"];
 
   let fzf = new Fzf(list, { limit: 1, casing: "case-insensitive" });
-  const entries = fzf.find("aa");
+  let entries = fzf.find("aa");
+  expect(entries.length).toBe(1);
+
+  fzf = new Fzf(list, { limit: 1, casing: "case-insensitive", extended: true });
+  entries = fzf.find("aa");
   expect(entries.length).toBe(1);
 });
 
@@ -100,4 +106,38 @@ test("forward", () => {
   fzf = new Fzf(list, { forward: false, extended: true });
   positions = fzf.find("re")[0].positions;
   expect(new Set(positions)).toMatchObject(new Set([10, 11]));
+});
+
+test("sort", () => {
+  const list = [
+    "go",
+    "javascript",
+    "python",
+    "rust",
+    "swift",
+    "kotlin",
+    "elixir",
+    "java",
+    "lisp",
+    "v",
+    "zig",
+    "nim",
+    "rescript",
+    "d",
+    "haskell",
+  ];
+
+  for (const extended of [true, false]) {
+    for (const sort of [true, false]) {
+      const fzf = new Fzf(list, { extended, sort });
+      const expected = sort ? "lisp, kotlin, elixir" : "kotlin, elixir, lisp";
+      expect(
+        fzf
+          .find("li")
+          .map((v) => v.item)
+          .join(", "),
+        `failed on extended=${extended}, sort=${sort}`
+      ).toBe(expected);
+    }
+  }
 });
