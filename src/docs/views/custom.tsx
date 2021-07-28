@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { HighlightChars } from "../components/highlight-chars";
-import { Fzf, FzfResultEntry } from "../../lib/main";
+import { Fzf, FzfResultItem } from "../../lib/main";
 
 interface Stuff {
   id: string;
@@ -23,7 +23,7 @@ const fzf = new Fzf(list, {
 export function Custom() {
   const [input, setInput] = useState("");
 
-  const [entries, setEntries] = useState<FzfResultEntry<Stuff>[]>([]);
+  const [entries, setEntries] = useState<FzfResultItem<Stuff>[]>([]);
 
   const handleInputChange = (input: string) => {
     setInput(input);

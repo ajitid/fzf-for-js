@@ -2,12 +2,12 @@ import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { Rune, strToRunes } from "./runes";
 import { slab } from "./slab";
 import { normalizeRune } from "./normalize";
-import { Casing, FzfResultEntry, Tiebreaker } from "./types";
+import { Casing, FzfResultItem, Tiebreaker } from "./types";
 import { buildPatternForExtendedSearch } from "./pattern";
 import { computeExtendedSearch } from "./extended";
 
 export { tiebreakers } from "./tiebreakers";
-export type { Tiebreaker, FzfResultEntry } from "./types";
+export type { Tiebreaker, FzfResultItem } from "./types";
 
 export interface Options<U> {
   /**
@@ -140,8 +140,8 @@ export class Fzf<U> {
     }
   }
 
-  find(query: string): FzfResultEntry<U>[] {
-    let result: FzfResultEntry<U>[] = [];
+  find(query: string): FzfResultItem<U>[] {
+    let result: FzfResultItem<U>[] = [];
 
     if (this.opts.extended) {
       result = this.extendedMatch(query);
@@ -149,7 +149,7 @@ export class Fzf<U> {
       result = this.basicMatch(query);
     }
 
-    const descScoreSorter = (a: FzfResultEntry<U>, b: FzfResultEntry<U>) =>
+    const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
       b.score - a.score;
     result.sort(descScoreSorter);
 
@@ -176,7 +176,7 @@ export class Fzf<U> {
       this.opts.normalize,
       query
     );
-    let result: FzfResultEntry<U>[] = [];
+    let result: FzfResultItem<U>[] = [];
     for (const [idx, runes] of this.runesList.entries()) {
       const match = computeExtendedSearch(
         runes,
