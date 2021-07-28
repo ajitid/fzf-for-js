@@ -62,6 +62,8 @@ export interface Options<U> {
    * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
    * compare function with an added third argument which is this `options` itself.
    *
+   * Note that tiebreakers cannot be used if `sort=false`.
+   *
    * @defaultValue []
    *
    * @example
