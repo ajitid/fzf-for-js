@@ -80,6 +80,21 @@ export interface Options<U> {
    * dxddddddd           cxcccccccccc
    */
   tiebreakers: Tiebreaker<U>[];
+  /*
+   * If `false`, matching will be done from backwards.
+   *
+   * @defaultValue true
+   *
+   * @example
+   * /breeds/pyrenees when queried with "re"
+   * with forward=true  : /b**re**eds/pyrenees
+   * with forward=false : /breeds/py**re**nees
+   *
+   * Doing forward=false is useful, for example, if one needs to match a file
+   * path and they prefer querying for the file name over directory names
+   * present in the path.
+   */
+  forward: boolean;
 }
 
 const defaultOpts: Options<any> = {
@@ -92,6 +107,7 @@ const defaultOpts: Options<any> = {
   // example:
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
+  forward: true,
 };
 
 // from https://stackoverflow.com/a/52318137/7683365
@@ -162,7 +178,12 @@ export class Fzf<U> {
     );
     let result: FzfResultEntry<U>[] = [];
     for (const [idx, runes] of this.runesList.entries()) {
-      const match = computeExtendedSearch(runes, pattern, this.algoFn);
+      const match = computeExtendedSearch(
+        runes,
+        pattern,
+        this.algoFn,
+        this.opts.forward
+      );
       if (match.offsets.length !== pattern.termSets.length) continue;
 
       let sidx = -1,
@@ -209,7 +230,7 @@ export class Fzf<U> {
       const match = this.algoFn(
         caseSensitive,
         this.opts.normalize,
-        true,
+        this.opts.forward,
         item,
         runes,
         true,

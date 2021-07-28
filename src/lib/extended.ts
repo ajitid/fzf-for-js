@@ -21,6 +21,7 @@ function iter(
   tokens: Token[],
   caseSensitive: boolean,
   normalize: boolean,
+  forward: boolean,
   pattern: Rune[],
   slab: Slab
 ): [Offset, number, number[] | null] {
@@ -28,7 +29,7 @@ function iter(
     const [res, pos] = algoFn(
       caseSensitive,
       normalize,
-      true,
+      forward,
       part.text,
       pattern,
       true,
@@ -53,7 +54,8 @@ function iter(
 export function computeExtendedSearch(
   text: Rune[],
   pattern: ReturnType<typeof buildPatternForExtendedSearch>,
-  fuzzyAlgo: AlgoFn
+  fuzzyAlgo: AlgoFn,
+  forward: boolean
 ) {
   // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
   // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
@@ -86,6 +88,7 @@ export function computeExtendedSearch(
         input,
         term.caseSensitive,
         term.normalize,
+        forward,
         term.text,
         slab
       );
