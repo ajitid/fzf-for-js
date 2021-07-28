@@ -11,12 +11,12 @@ export type { Tiebreaker, FzfResultItem } from "./types";
 
 export interface Options<U> {
   /**
-   * If `maxResultItems` is 32, top 32 items that matches your query will be returned.
+   * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
    *
    * @defaultValue Infinity
    */
-  maxResultItems: number;
+  limit: number;
   /**
    * For each item in the list, target a specific property of the item to search for.
    */
@@ -98,7 +98,7 @@ export interface Options<U> {
 }
 
 const defaultOpts: Options<any> = {
-  maxResultItems: Infinity,
+  limit: Infinity,
   selector: (v) => v,
   casing: "smart-case",
   normalize: true,
@@ -158,8 +158,8 @@ export class Fzf<U> {
       });
     }
 
-    if (Number.isFinite(this.opts.maxResultItems)) {
-      result.splice(this.opts.maxResultItems);
+    if (Number.isFinite(this.opts.limit)) {
+      result.splice(this.opts.limit);
     }
 
     return result;
@@ -212,7 +212,7 @@ export class Fzf<U> {
 
     for (const score of scoresInDesc) {
       result.push(...scoreMap[score]);
-      if (result.length >= this.opts.maxResultItems) {
+      if (result.length >= this.opts.limit) {
         break;
       }
     }
@@ -286,7 +286,7 @@ export class Fzf<U> {
 
     for (const score of scoresInDesc) {
       result.push(...scoreMap[score]);
-      if (result.length >= this.opts.maxResultItems) {
+      if (result.length >= this.opts.limit) {
         break;
       }
     }

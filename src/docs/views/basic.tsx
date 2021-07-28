@@ -7,7 +7,7 @@ import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
 const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
-  maxResultItems: 32,
+  limit: 32,
 };
 
 let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });

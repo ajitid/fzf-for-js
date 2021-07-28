@@ -55,10 +55,10 @@ test("basic match + exact", () => {
   expect(new Set(entries[0].positions)).toMatchObject(new Set([0, 1, 2]));
 });
 
-test("maxResultItems", () => {
+test("limit", () => {
   const list = ["aabb", "AAbb", "ccaa"];
 
-  let fzf = new Fzf(list, { maxResultItems: 1, casing: "case-insensitive" });
+  let fzf = new Fzf(list, { limit: 1, casing: "case-insensitive" });
   const entries = fzf.find("aa");
   expect(entries.length).toBe(1);
 });

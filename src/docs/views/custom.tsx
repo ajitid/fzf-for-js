@@ -17,7 +17,7 @@ const list: Stuff[] = [
 
 const fzf = new Fzf(list, {
   selector: (v) => v.displayName,
-  maxResultItems: 32,
+  limit: 32,
 });
 
 export function Custom() {
