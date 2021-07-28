@@ -227,20 +227,7 @@ export class Fzf<U> {
       });
     }
 
-    const scoresInDesc = Object.keys(scoreMap)
-      .map((v) => parseInt(v, 10))
-      .sort((a, b) => b - a);
-
-    const result: FzfResultItem<U>[] = [];
-
-    for (const score of scoresInDesc) {
-      result.push(...scoreMap[score]);
-      if (result.length >= this.opts.limit) {
-        break;
-      }
-    }
-
-    return result;
+    return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
   }
 
   private basicMatch(query: string) {
@@ -301,15 +288,22 @@ export class Fzf<U> {
       scoreMap[scoreKey].push(r);
     });
 
+    return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
+  }
+
+  private static getResultFromScoreMap<T>(
+    scoreMap: Record<number, FzfResultItem<T>[]>,
+    limit: number
+  ): FzfResultItem<T>[] {
     const scoresInDesc = Object.keys(scoreMap)
       .map((v) => parseInt(v, 10))
       .sort((a, b) => b - a);
 
-    const result: FzfResultItem<U>[] = [];
+    const result: FzfResultItem<T>[] = [];
 
     for (const score of scoresInDesc) {
       result.push(...scoreMap[score]);
-      if (result.length >= this.opts.limit) {
+      if (result.length >= limit) {
         break;
       }
     }
