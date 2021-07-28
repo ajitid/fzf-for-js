@@ -95,6 +95,9 @@ export interface Options<U> {
    * present in the path.
    */
   forward: boolean;
+  /*
+   */
+  sort: boolean;
 }
 
 const defaultOpts: Options<any> = {
@@ -108,6 +111,7 @@ const defaultOpts: Options<any> = {
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
   forward: true,
+  sort: true,
 };
 
 // from https://stackoverflow.com/a/52318137/7683365
@@ -191,12 +195,12 @@ export class Fzf<U> {
         eidx = Math.max(...match.allPos) + 1;
       }
 
-      const totalScore = match.totalScore;
+      const totalScore = this.opts.sort ? match.totalScore : 0;
       if (scoreMap[totalScore] === undefined) {
         scoreMap[totalScore] = [];
       }
       scoreMap[totalScore].push({
-        score: totalScore,
+        score: match.totalScore,
         item: this.items[idx],
         positions: match.allPos,
         start: sidx,
@@ -271,7 +275,7 @@ export class Fzf<U> {
       const r = getResult(v, i);
       if (r.start === -1) return;
 
-      const score = r.score;
+      const score = this.opts.sort ? r.score : 0;
       if (scoreMap[score] === undefined) {
         scoreMap[score] = [];
       }
