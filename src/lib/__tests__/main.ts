@@ -81,3 +81,23 @@ test("normalization", () => {
   expect(entries.length).toBe(1);
   expect(entries[0].item).toBe("papier-mâché");
 });
+
+test("forward", () => {
+  const list = ["/breeds/pyrenees"];
+
+  let fzf = new Fzf(list, { forward: true });
+  let positions = fzf.find("re")[0].positions;
+  expect(new Set(positions)).toMatchObject(new Set([2, 3]));
+
+  fzf = new Fzf(list, { forward: true, extended: true });
+  positions = fzf.find("re")[0].positions;
+  expect(new Set(positions)).toMatchObject(new Set([2, 3]));
+
+  fzf = new Fzf(list, { forward: false });
+  positions = fzf.find("re")[0].positions;
+  expect(new Set(positions)).toMatchObject(new Set([10, 11]));
+
+  fzf = new Fzf(list, { forward: false, extended: true });
+  positions = fzf.find("re")[0].positions;
+  expect(new Set(positions)).toMatchObject(new Set([10, 11]));
+});
