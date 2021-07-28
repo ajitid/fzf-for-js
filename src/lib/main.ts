@@ -212,11 +212,11 @@ export class Fzf<U> {
         eidx = Math.max(...match.allPos) + 1;
       }
 
-      const totalScore = this.opts.sort ? match.totalScore : 0;
-      if (scoreMap[totalScore] === undefined) {
-        scoreMap[totalScore] = [];
+      const scoreKey = this.opts.sort ? match.totalScore : 0;
+      if (scoreMap[scoreKey] === undefined) {
+        scoreMap[scoreKey] = [];
       }
-      scoreMap[totalScore].push({
+      scoreMap[scoreKey].push({
         score: match.totalScore,
         item: this.items[idx],
         positions: match.allPos,
@@ -292,11 +292,11 @@ export class Fzf<U> {
       const r = getResult(v, i);
       if (r.start === -1) return;
 
-      const score = this.opts.sort ? r.score : 0;
-      if (scoreMap[score] === undefined) {
-        scoreMap[score] = [];
+      const scoreKey = this.opts.sort ? r.score : 0;
+      if (scoreMap[scoreKey] === undefined) {
+        scoreMap[scoreKey] = [];
       }
-      scoreMap[score].push(r);
+      scoreMap[scoreKey].push(r);
     });
 
     const scoresInDesc = Object.keys(scoreMap)
