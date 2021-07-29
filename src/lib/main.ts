@@ -279,16 +279,16 @@ export class Fzf<U> {
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-    this.runesList.forEach((v, i) => {
-      const r = getResult(v, i);
-      if (r.start === -1) return;
+    for (let i = 0, len = this.runesList.length; i < len; ++i) {
+      const r = getResult(this.runesList[i], i);
+      if (r.start === -1) continue;
 
       const scoreKey = this.opts.sort ? r.score : 0;
       if (scoreMap[scoreKey] === undefined) {
         scoreMap[scoreKey] = [];
       }
       scoreMap[scoreKey].push(r);
-    });
+    }
 
     return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
   }
