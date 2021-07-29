@@ -288,9 +288,23 @@ export class Fzf<U> {
         let queryIdx = 0;
         while (itemIdx < v.length) {
           if (queryIdx === runes.length) break;
-          if (runes[queryIdx] === v[itemIdx]) {
+
+          let lhs = runes[queryIdx];
+          let rhs = v[itemIdx];
+
+          if (this.opts.normalize) {
+            lhs = normalizeRune(lhs);
+            rhs = normalizeRune(rhs);
+          }
+          if (!caseSensitive) {
+            lhs = String.fromCodePoint(lhs).toLowerCase().codePointAt(0)!;
+            rhs = String.fromCodePoint(rhs).toLowerCase().codePointAt(0)!;
+          }
+
+          if (lhs === rhs) {
             ++queryIdx;
           }
+
           ++itemIdx;
         }
         if (queryIdx < runes.length) continue;
