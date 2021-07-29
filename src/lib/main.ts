@@ -162,6 +162,8 @@ export class Fzf<U> {
   }
 
   find(query: string): FzfResultItem<U>[] {
+    if (query === "") return [];
+
     let result: FzfResultItem<U>[] = [];
 
     if (this.opts.extended) {
