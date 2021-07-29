@@ -280,7 +280,23 @@ export class Fzf<U> {
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
     for (let i = 0, len = this.runesList.length; i < len; ++i) {
-      const r = getResult(this.runesList[i], i);
+      const v = this.runesList[i];
+      if (runes.length > v.length) continue;
+
+      {
+        let itemIdx = 0;
+        let queryIdx = 0;
+        while (itemIdx < v.length) {
+          if (queryIdx === runes.length) break;
+          if (runes[queryIdx] === v[itemIdx]) {
+            ++queryIdx;
+          }
+          ++itemIdx;
+        }
+        if (queryIdx < runes.length) continue;
+      }
+
+      const r = getResult(v, i);
       if (r.start === -1) continue;
 
       const scoreKey = this.opts.sort ? r.score : 0;
