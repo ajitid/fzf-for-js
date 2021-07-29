@@ -289,15 +289,13 @@ export class Fzf<U> {
         while (itemIdx < v.length) {
           if (queryIdx === runes.length) break;
 
-          let lhs = runes[queryIdx];
+          let lhs = runes[queryIdx]; // query already has appropriate normalize and casing values
           let rhs = v[itemIdx];
 
           if (this.opts.normalize) {
-            lhs = normalizeRune(lhs);
             rhs = normalizeRune(rhs);
           }
           if (!caseSensitive) {
-            lhs = String.fromCodePoint(lhs).toLowerCase().codePointAt(0)!;
             rhs = String.fromCodePoint(rhs).toLowerCase().codePointAt(0)!;
           }
 
