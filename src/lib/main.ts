@@ -247,23 +247,30 @@ export class Fzf<U> {
         break;
     }
 
-    let runes = strToRunes(query);
+    let queryRunes = strToRunes(query);
     if (this.opts.normalize) {
-      runes = runes.map(normalizeRune);
+      queryRunes = queryRunes.map(normalizeRune);
     }
 
-    const getResult = (item: Rune[], index: number) => {
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    for (let i = 0, len = this.runesList.length; i < len; ++i) {
+      const itemRunes = this.runesList[i];
+      if (queryRunes.length > itemRunes.length) continue;
+
       const match = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         this.opts.forward,
-        item,
-        runes,
+        itemRunes,
+        queryRunes,
         true,
         slab
       );
 
-      let positions: null | number[] = match[1];
+      if (match[0].start === -1) continue;
+
+      let positions = match[1];
       // for exact match, we don't get positions array back, so we'll fill it in by ourselves
       if (this.opts.algo === null) {
         positions = [];
@@ -272,21 +279,16 @@ export class Fzf<U> {
         }
       }
 
-      return { item: this.items[index], ...match[0], positions };
-    };
-
-    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
-
-    this.runesList.forEach((v, i) => {
-      const r = getResult(v, i);
-      if (r.start === -1) return;
-
-      const scoreKey = this.opts.sort ? r.score : 0;
+      const scoreKey = this.opts.sort ? match[0].score : 0;
       if (scoreMap[scoreKey] === undefined) {
         scoreMap[scoreKey] = [];
       }
-      scoreMap[scoreKey].push(r);
-    });
+      scoreMap[scoreKey].push({
+        item: this.items[i],
+        ...match[0],
+        positions,
+      });
+    }
 
     return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
   }

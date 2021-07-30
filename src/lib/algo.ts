@@ -6,7 +6,7 @@ import { normalizeRune } from "./normalize";
 import { Slab } from "./slab";
 import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
 import { Rune, runesToStr } from "./runes";
-import { whitespacesAtEnd, whitespacesAtStart } from "./char";
+import { isWhitespace, whitespacesAtEnd, whitespacesAtStart } from "./char";
 
 const DEBUG = false;
 
@@ -867,8 +867,7 @@ export const prefixMatch: AlgoFn = (
   }
 
   let trimmedLen = 0;
-  // check if pattern[0] is not a whitespace
-  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[0])) {
     trimmedLen = whitespacesAtStart(text);
   }
 
@@ -919,8 +918,9 @@ export const suffixMatch: AlgoFn = (
 
   if (
     pattern.length === 0 ||
-    String.fromCodePoint(pattern[pattern.length - 1]).match(/\s/) ===
-      null /* last el in pattern is not a space */
+    !isWhitespace(
+      pattern[pattern.length - 1]
+    ) /* last el in pattern is not a space */
   ) {
     trimmedLen -= whitespacesAtEnd(text);
   }
@@ -981,13 +981,12 @@ export const equalMatch: AlgoFn = (
   }
 
   let trimmedLen = 0;
-  // check if first el in pattern is not a whitespace
-  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[0])) {
     trimmedLen = whitespacesAtStart(text);
   }
 
   let trimmedEndLen = 0;
-  if (String.fromCodePoint(pattern[lenPattern - 1]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[lenPattern - 1])) {
     trimmedEndLen = whitespacesAtEnd(text);
   }
 
