@@ -249,24 +249,30 @@ export class Fzf<U> {
         break;
     }
 
-    let runes = strToRunes(query);
+    let queryRunes = strToRunes(query);
     if (this.opts.normalize) {
-      runes = runes.map(normalizeRune);
+      queryRunes = queryRunes.map(normalizeRune);
     }
 
-    const getResult = (item: Rune[], index: number) => {
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    for (let i = 0, len = this.runesList.length; i < len; ++i) {
+      const itemRunes = this.runesList[i];
+      if (queryRunes.length > itemRunes.length) continue;
+
       const match = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         this.opts.forward,
-        item,
-        runes,
+        itemRunes,
+        queryRunes,
         true,
         slab
       );
 
-      let positions: null | number[] = match[1];
-      // for exact match, we don't get positions array back, so we'll fill it in by ourselves
+      if (match[0].start === -1) continue;
+
+      let positions = match[1];
       if (this.opts.algo === null) {
         positions = [];
         for (let i = match[0].start; i < match[0].end; ++i) {
@@ -274,57 +280,15 @@ export class Fzf<U> {
         }
       }
 
-      return { item: this.items[index], ...match[0], positions };
-    };
-
-    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
-
-    for (let i = 0, len = this.runesList.length; i < len; ++i) {
-      const v = this.runesList[i];
-      if (runes.length > v.length) continue;
-
-      {
-        /*
-          As for basic match, characters in query are matched sequentially in
-          the text that we are looking in, so with this block we are trying to
-          reduce search space by early returning if all characters in the query
-          aren't present in the text that we are trying to match.
-         */
-        let itemIdx = 0;
-        let queryIdx = 0;
-        while (itemIdx < v.length) {
-          // all chars in the query are present in the text, so don't look further
-          if (queryIdx === runes.length) break;
-
-          let lhs = runes[queryIdx];
-          let rhs = v[itemIdx];
-
-          // query already has appropriate normalize and casing values
-          // so we won't transform `lhs`
-          if (this.opts.normalize) {
-            rhs = normalizeRune(rhs);
-          }
-          if (!caseSensitive) {
-            rhs = String.fromCodePoint(rhs).toLowerCase().codePointAt(0)!;
-          }
-
-          if (lhs === rhs) {
-            ++queryIdx;
-          }
-
-          ++itemIdx;
-        }
-        if (queryIdx < runes.length) continue;
-      }
-
-      const r = getResult(v, i);
-      if (r.start === -1) continue;
-
-      const scoreKey = this.opts.sort ? r.score : 0;
+      const scoreKey = this.opts.sort ? match[0].score : 0;
       if (scoreMap[scoreKey] === undefined) {
         scoreMap[scoreKey] = [];
       }
-      scoreMap[scoreKey].push(r);
+      scoreMap[scoreKey].push({
+        item: this.items[i],
+        ...match[0],
+        positions,
+      });
     }
 
     return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
