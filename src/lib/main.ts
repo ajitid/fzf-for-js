@@ -284,14 +284,23 @@ export class Fzf<U> {
       if (runes.length > v.length) continue;
 
       {
+        /*
+          As for basic match, characters in query are matched sequentially in
+          the text that we are looking in, so with this block we are trying to
+          reduce search space by early returning if all characters in the query
+          aren't present in the text that we are trying to match.
+         */
         let itemIdx = 0;
         let queryIdx = 0;
         while (itemIdx < v.length) {
+          // all chars in the query are present in the text, so don't look further
           if (queryIdx === runes.length) break;
 
-          let lhs = runes[queryIdx]; // query already has appropriate normalize and casing values
+          let lhs = runes[queryIdx];
           let rhs = v[itemIdx];
 
+          // query already has appropriate normalize and casing values
+          // so we won't transform `lhs`
           if (this.opts.normalize) {
             rhs = normalizeRune(rhs);
           }
