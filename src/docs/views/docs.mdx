@@ -102,6 +102,17 @@ const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.po
 
 Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/stable-releases/src/docs/views/basic.tsx).
 
+### Making it behave like FZF CLI
+
+This library has different defaults compared to FZF CLI. Get a behaviour similar to CLI with these options:
+
+```js
+const fzf = new Fzf(list, {
+  extended: true,
+  tiebreakers: [ tiebreakers.byLengthAsc ] // `tiebreakers` is available from the library
+})
+```
+
 ### Notes
 
 - If the list is modified after you've initialized FZF using `const fzf = new Fzf(list)` and you want to query using `fzf.find()` after this modification, we strongly suggest you to re-initialize FZF before you make any query. This is suggested because FZF makes some calculations when it is initialized, and these calculations could become outdated because of the modification made.
