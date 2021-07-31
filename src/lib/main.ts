@@ -3,7 +3,10 @@ import { Rune, strToRunes } from "./runes";
 import { slab } from "./slab";
 import { normalizeRune } from "./normalize";
 import { Casing, FzfResultItem, Tiebreaker } from "./types";
-import { buildPatternForExtendedSearch } from "./pattern";
+import {
+  buildPatternForExtendedSearch,
+  buildRunesForBasicMatch,
+} from "./pattern";
 import { computeExtendedSearch } from "./extended";
 
 export { tiebreakers } from "./tiebreakers";
@@ -231,26 +234,11 @@ export class Fzf<U> {
   }
 
   private basicMatch(query: string) {
-    let caseSensitive = false;
-    switch (this.opts.casing) {
-      case "smart-case":
-        if (query.toLowerCase() !== query) {
-          caseSensitive = true;
-        }
-        break;
-      case "case-sensitive":
-        caseSensitive = true;
-        break;
-      case "case-insensitive":
-        query = query.toLowerCase();
-        caseSensitive = false;
-        break;
-    }
-
-    let queryRunes = strToRunes(query);
-    if (this.opts.normalize) {
-      queryRunes = queryRunes.map(normalizeRune);
-    }
+    const { queryRunes, caseSensitive } = buildRunesForBasicMatch(
+      query,
+      this.opts.casing,
+      this.opts.normalize
+    );
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
