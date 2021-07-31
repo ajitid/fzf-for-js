@@ -49,7 +49,7 @@
   "sideEffects": false,
   "===== DEPS =====": "",
   "devDependencies": {
-    "@mdx-js/mdx": "^2.0.0-next.9",
+    "@mdx-js/mdx": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "@tailwindcss/typography": "^0.4.1",
     "@types/jest": "^26.0.24",

@@ -1,5 +1,4 @@
-import type { Options } from "./main";
-import type { FzfResultItem } from "./types";
+import type { FzfResultItem, Options } from "./types";
 
 function byLengthAsc<U>(
   a: FzfResultItem<U>,

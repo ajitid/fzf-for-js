@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 <span className="docs-hidden"><i>If you are reading this file on GitHub, we'll suggest to read it on <a href="https://fzf.netlify.app">documentation website</a> instead.</i></span>
 
-<Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+<Link to="basic">Demo</Link> · <a href="https://github.com/ajitid/fzf-for-js">GitHub</a> · <a href="https://www.npmjs.com/package/fzf">NPM</a>
 
 [FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
 
@@ -100,7 +100,89 @@ const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.po
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
-Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/stable-releases/src/docs/views/basic.tsx).
+Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/cef80a74368893c55ebb8f056c9193a47ce19822/src/docs/views/basic.tsx#L96-L99).
+
+### Tiebreakers
+
+When we try to match "an" with Thane, Anandnagar, Tripura, Anandpur, Bangalore and Sangam we'll get:
+
+<div><b>An</b>andnagar</div>
+<div><b>An</b>andpur</div>
+<div>Th<b>an</b>e</div>
+<div>B<b>an</b>galore</div>
+<div>S<b>an</b>gam</div>
+
+Anandnagar and Anandpur are ranked above the others as their "an" got matched at the very start of those strings. Rest of the three contains "an" somewhere in them so they bear the same rank. This ranking is decided by a `score` that FZF calculates for each string.
+
+But what if we prefer to have shorter strings appear first? Well here is when a tiebreaker comes in:
+
+```js
+import { Fzf, tiebreakers } from 'fzf'
+
+// ...
+
+const fzf = new Fzf(list, {
+  tiebreakers: [tiebreakers.byLengthAsc]
+})
+```
+
+Now the result will be:
+
+| Default (only score) | Score with `byLengthAsc` tiebreaker |
+| ---                  | ---                                 |
+| Anandnagar           | Anandpur                            |
+| Anandpur             | Anandnagar                          |
+| Thane                | Thane                               |
+| Bangalore            | Sangam                              |
+| Sangam               | Bangalore                           |
+
+Note that a tiebreaker is only applied if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
+
+#### Disabling sorter
+
+FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism too:
+
+```js
+const fzf = new Fzf(list, {
+  sort: false
+})
+```
+
+When sorting is turned off, tiebreakers won't affect the sorting order either.
+
+### Usage with TypeScript
+
+The following code shows a descriptive usage with types. TypeScript can infer these types most of the time for you, so you wouldn't ever need to write them by hand. But for the cases when you do, these are the types you would use:
+
+```ts
+import { Fzf, FzfResultItem, FzfOptions  } from 'fzf'
+
+interface Fruit {
+  id: string
+  name: string
+}
+
+const fruits: Fruit[] = [ /* ... */ ]
+
+const options: FzfOptions<Fruit> = {
+  selector: v => v.name
+}
+
+const fzf = new Fzf<Fruit>(fruits, options)
+
+const results: FzfResultItem<Fruit>[] = fzf.find('ppya') // gives you back a papaya!
+```
+
+### Making it behave like FZF CLI
+
+This library has different defaults compared to FZF CLI. Get a behaviour similar to CLI with these options:
+
+```js
+const fzf = new Fzf(list, {
+  extended: true,
+  tiebreakers: [ tiebreakers.byLengthAsc ] // `tiebreakers` is available from the library
+})
+```
 
 ### Notes
 
@@ -118,10 +200,10 @@ Find a <Link to="basic">working example</Link> for this and its [sourcecode](htt
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
 - `normalize?` - boolean, defaults to `true` - If true, FZF will try to remove diacritics from list items. This is useful if the list contains items with diacritics but you want to query with plain A-Z letters. For example, Zoë will be converted to Zoe.
 - `tiebreakers` - array, defaults to `[]` - A list of functions that decide sort order when the score is tied between two result entries. A tiebreaker is nothing but a compare function like the one you find in [JS Array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) with an added third argument which is this `options` itself. First and second arguments are result entries that you receive from `fzf.find`. Note that tiebreakers can't be used if `sort=false`.
-- `sort` - boolean, defaults to `true` - If `true` result items will be sorted in descending order by their score. Otherwise, result won't be sorted and tiebreakers won't be applied either.
+- `sort` - boolean, defaults to `true` - If true, result items will be sorted in descending order by their score. Otherwise, result won't be sorted and tiebreakers won't be applied either.
 - `algo` - string, defaults to `"v2"`, accepts `"v1" | "v2" | null` - Select which version of fuzzy algo you want to use. Refer to [this explanation](https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5) to see the differences. If asssigned `null`, an exact match will be made instead of a fuzzy one.
 - `extended` - boolean, defaults to `false` - If true, you can add special patterns to narrow down your search. To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax). For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
-- `forward` - boolean, defaults to `true` - If false, items will be matched from backwards. So for example, "/breeds/pyrenees" when queried with "re" will result in "/b<b>re</b>eds/pyrenees" but with forward=false it will result in "/breeds/py<b>re</b>nees". Turning forward false is useful, for example, when one needs to match a file path and they prefer matching file name over the directory names it is in.
+- `forward` - boolean, defaults to `true` - If false, items will be matched from backwards. So if we query "/breeds/pyrenees" with "re" it will result in "/b<b>re</b>eds/pyrenees" but with forward=false it will result in "/breeds/py<b>re</b>nees".
 
 ### `fzf.find(query)`
 
