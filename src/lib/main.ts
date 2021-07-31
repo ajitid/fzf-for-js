@@ -1,10 +1,12 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { Rune, strToRunes } from "./runes";
 import { slab } from "./slab";
-import { normalizeRune } from "./normalize";
 import { Casing, FzfResultItem, Tiebreaker } from "./types";
-import { buildPatternForExtendedSearch } from "./pattern";
-import { computeExtendedSearch } from "./extended";
+import {
+  buildPatternForExtendedMatch,
+  buildRunesForBasicMatch,
+} from "./pattern";
+import { computeExtendedMatch } from "./extended";
 
 export { tiebreakers } from "./tiebreakers";
 export type { Tiebreaker, FzfResultItem } from "./types";
@@ -189,7 +191,7 @@ export class Fzf<U> {
   }
 
   private extendedMatch(query: string) {
-    const pattern = buildPatternForExtendedSearch(
+    const pattern = buildPatternForExtendedMatch(
       Boolean(this.opts.algo),
       this.opts.casing,
       this.opts.normalize,
@@ -199,7 +201,7 @@ export class Fzf<U> {
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
     for (const [idx, runes] of this.runesList.entries()) {
-      const match = computeExtendedSearch(
+      const match = computeExtendedMatch(
         runes,
         pattern,
         this.algoFn,
@@ -231,26 +233,11 @@ export class Fzf<U> {
   }
 
   private basicMatch(query: string) {
-    let caseSensitive = false;
-    switch (this.opts.casing) {
-      case "smart-case":
-        if (query.toLowerCase() !== query) {
-          caseSensitive = true;
-        }
-        break;
-      case "case-sensitive":
-        caseSensitive = true;
-        break;
-      case "case-insensitive":
-        query = query.toLowerCase();
-        caseSensitive = false;
-        break;
-    }
-
-    let queryRunes = strToRunes(query);
-    if (this.opts.normalize) {
-      queryRunes = queryRunes.map(normalizeRune);
-    }
+    const { queryRunes, caseSensitive } = buildRunesForBasicMatch(
+      query,
+      this.opts.casing,
+      this.opts.normalize
+    );
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
@@ -258,7 +245,7 @@ export class Fzf<U> {
       const itemRunes = this.runesList[i];
       if (queryRunes.length > itemRunes.length) continue;
 
-      const match = this.algoFn(
+      let [match, positions] = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         this.opts.forward,
@@ -267,25 +254,23 @@ export class Fzf<U> {
         true,
         slab
       );
+      if (match.start === -1) continue;
 
-      if (match[0].start === -1) continue;
-
-      let positions = match[1];
-      // for exact match, we don't get positions array back, so we'll fill it in by ourselves
+      // we don't get positions array back for exact match, so we'll fill it by ourselves
       if (this.opts.algo === null) {
         positions = [];
-        for (let i = match[0].start; i < match[0].end; ++i) {
-          positions.push(i);
+        for (let pos = match.start; pos < match.end; ++pos) {
+          positions.push(pos);
         }
       }
 
-      const scoreKey = this.opts.sort ? match[0].score : 0;
+      const scoreKey = this.opts.sort ? match.score : 0;
       if (scoreMap[scoreKey] === undefined) {
         scoreMap[scoreKey] = [];
       }
       scoreMap[scoreKey].push({
         item: this.items[i],
-        ...match[0],
+        ...match,
         positions,
       });
     }

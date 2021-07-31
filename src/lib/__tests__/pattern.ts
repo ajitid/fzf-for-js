@@ -1,12 +1,12 @@
 import { equalMatch, exactMatchNaive } from "../algo";
-import { buildPatternForExtendedSearch, TermType } from "../pattern";
+import { buildPatternForExtendedMatch, TermType } from "../pattern";
 import { strToRunes } from "../runes";
 
 import "jest-expect-message";
 
 // from junegunn/fzf's TestParseTermsExtended
-test("buildPatternForExtendedSearch for fuzzy match", () => {
-  const { termSets: terms } = buildPatternForExtendedSearch(
+test("buildPatternForExtendedMatch for fuzzy match", () => {
+  const { termSets: terms } = buildPatternForExtendedMatch(
     true,
     "smart-case",
     false,
@@ -53,8 +53,8 @@ test("buildPatternForExtendedSearch for fuzzy match", () => {
 });
 
 // from junegunn/fzf's TestParseTermsExtendedExact
-test("buildPatternForExtendedSearch for exact match", () => {
-  const { termSets: terms } = buildPatternForExtendedSearch(
+test("buildPatternForExtendedMatch for exact match", () => {
+  const { termSets: terms } = buildPatternForExtendedMatch(
     false,
     "smart-case",
     false,
@@ -91,8 +91,8 @@ test("buildPatternForExtendedSearch for exact match", () => {
   expect(terms[7][0].text.length).toBe(3);
 });
 
-test("buildPatternForExtendedSearch for empty string", () => {
-  const { termSets: terms } = buildPatternForExtendedSearch(
+test("buildPatternForExtendedMatch for empty string", () => {
+  const { termSets: terms } = buildPatternForExtendedMatch(
     true,
     "smart-case",
     false,
@@ -102,7 +102,7 @@ test("buildPatternForExtendedSearch for empty string", () => {
 });
 
 test("exact match", () => {
-  const pattern = buildPatternForExtendedSearch(
+  const pattern = buildPatternForExtendedMatch(
     true,
     "smart-case",
     false,
@@ -124,7 +124,7 @@ test("exact match", () => {
 });
 
 test("equal match", () => {
-  const pattern = buildPatternForExtendedSearch(
+  const pattern = buildPatternForExtendedMatch(
     true,
     "smart-case",
     false,
@@ -157,18 +157,19 @@ test("equal match", () => {
 });
 
 /*
-We aren't doing junegunn/fzf TestCaseSensitivity checks as we aren't building a pattern for
-basic match and for extende matches, case sensitivity remains true.
-
-There is one for Transform (--nth) which we don't have for JS implementation so that is skipped.
-
-We aren't doing any caching for now so those are skipped too.
+Above tests are from junegunn/fzf, but:
+- We aren't doing junegunn/fzf TestCaseSensitivity checks as we aren't building
+  a pattern for basic match and for extende matches, case sensitivity remains
+  true.
+- There is one for Transform (--nth) which we don't have for JS implementation
+  so that is skipped.
+- We aren't doing any caching for now so those are skipped too.
 */
 
 test("tab representations are preserved on transformed string", () => {
   const match = (inputStr: string, toMatchStr: string) => {
     expect(
-      buildPatternForExtendedSearch(false, "smart-case", false, inputStr).str
+      buildPatternForExtendedMatch(false, "smart-case", false, inputStr).str
     ).toBe(toMatchStr);
   };
 
@@ -177,7 +178,7 @@ test("tab representations are preserved on transformed string", () => {
   match(" AA bb    \\    \\   ", "AA bb    \\    \\ ");
   match(" AA \\  bb \\   ", "AA \\  bb \\ ");
 
-  const pattern = buildPatternForExtendedSearch(
+  const pattern = buildPatternForExtendedMatch(
     false,
     "smart-case",
     false,

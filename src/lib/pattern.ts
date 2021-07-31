@@ -35,7 +35,7 @@ interface Term {
 
 type TermSet = Term[];
 
-export function buildPatternForExtendedSearch(
+export function buildPatternForExtendedMatch(
   fuzzy: boolean,
   caseMode: Casing,
   normalize: boolean,
@@ -211,3 +211,36 @@ function parseTerms(
 
   return sets;
 }
+
+export const buildRunesForBasicMatch = (
+  query: string,
+  casing: Casing,
+  normalize: boolean
+) => {
+  let caseSensitive = false;
+
+  switch (casing) {
+    case "smart-case":
+      if (query.toLowerCase() !== query) {
+        caseSensitive = true;
+      }
+      break;
+    case "case-sensitive":
+      caseSensitive = true;
+      break;
+    case "case-insensitive":
+      query = query.toLowerCase();
+      caseSensitive = false;
+      break;
+  }
+
+  let queryRunes = strToRunes(query);
+  if (normalize) {
+    queryRunes = queryRunes.map(normalizeRune);
+  }
+
+  return {
+    queryRunes,
+    caseSensitive,
+  };
+};
