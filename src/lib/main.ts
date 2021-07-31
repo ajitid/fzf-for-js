@@ -246,7 +246,7 @@ export class Fzf<U> {
       const itemRunes = this.runesList[i];
       if (queryRunes.length > itemRunes.length) continue;
 
-      const match = this.algoFn(
+      let [match, positions] = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         this.opts.forward,
@@ -255,25 +255,23 @@ export class Fzf<U> {
         true,
         slab
       );
+      if (match.start === -1) continue;
 
-      if (match[0].start === -1) continue;
-
-      let positions = match[1];
       // for exact match, we don't get positions array back, so we'll fill it in by ourselves
       if (this.opts.algo === null) {
         positions = [];
-        for (let i = match[0].start; i < match[0].end; ++i) {
+        for (let i = match.start; i < match.end; ++i) {
           positions.push(i);
         }
       }
 
-      const scoreKey = this.opts.sort ? match[0].score : 0;
+      const scoreKey = this.opts.sort ? match.score : 0;
       if (scoreMap[scoreKey] === undefined) {
         scoreMap[scoreKey] = [];
       }
       scoreMap[scoreKey].push({
         item: this.items[i],
-        ...match[0],
+        ...match,
         positions,
       });
     }
