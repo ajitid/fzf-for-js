@@ -11,7 +11,7 @@ import { computeExtendedMatch } from "./extended";
 export { tiebreakers } from "./tiebreakers";
 export type { Tiebreaker, FzfResultItem } from "./types";
 
-export interface Options<U> {
+interface Options<U> {
   /**
    * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
