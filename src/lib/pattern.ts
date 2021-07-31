@@ -35,7 +35,7 @@ interface Term {
 
 type TermSet = Term[];
 
-export function buildPatternForExtendedSearch(
+export function buildPatternForExtendedMatch(
   fuzzy: boolean,
   caseMode: Casing,
   normalize: boolean,

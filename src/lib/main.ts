@@ -1,13 +1,12 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { Rune, strToRunes } from "./runes";
 import { slab } from "./slab";
-import { normalizeRune } from "./normalize";
 import { Casing, FzfResultItem, Tiebreaker } from "./types";
 import {
-  buildPatternForExtendedSearch,
+  buildPatternForExtendedMatch,
   buildRunesForBasicMatch,
 } from "./pattern";
-import { computeExtendedSearch } from "./extended";
+import { computeExtendedMatch } from "./extended";
 
 export { tiebreakers } from "./tiebreakers";
 export type { Tiebreaker, FzfResultItem } from "./types";
@@ -192,7 +191,7 @@ export class Fzf<U> {
   }
 
   private extendedMatch(query: string) {
-    const pattern = buildPatternForExtendedSearch(
+    const pattern = buildPatternForExtendedMatch(
       Boolean(this.opts.algo),
       this.opts.casing,
       this.opts.normalize,
@@ -202,7 +201,7 @@ export class Fzf<U> {
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
     for (const [idx, runes] of this.runesList.entries()) {
-      const match = computeExtendedSearch(
+      const match = computeExtendedMatch(
         runes,
         pattern,
         this.algoFn,

@@ -1,10 +1,6 @@
 import { AlgoFn } from "./algo";
 import { Int32 } from "./numerics";
-import {
-  buildPatternForExtendedSearch,
-  TermType,
-  termTypeMap,
-} from "./pattern";
+import { buildPatternForExtendedMatch, TermType, termTypeMap } from "./pattern";
 import { Rune } from "./runes";
 import { slab, Slab } from "./slab";
 
@@ -51,9 +47,9 @@ function iter(
   return [[-1, -1], 0, null];
 }
 
-export function computeExtendedSearch(
+export function computeExtendedMatch(
   text: Rune[],
-  pattern: ReturnType<typeof buildPatternForExtendedSearch>,
+  pattern: ReturnType<typeof buildPatternForExtendedMatch>,
   fuzzyAlgo: AlgoFn,
   forward: boolean
 ) {
