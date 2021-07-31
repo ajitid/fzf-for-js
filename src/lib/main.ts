@@ -257,7 +257,7 @@ export class Fzf<U> {
       );
       if (match.start === -1) continue;
 
-      // for exact match, we don't get positions array back, so we'll fill it in by ourselves
+      // we don't get positions array back for exact match, so we'll fill it by ourselves
       if (this.opts.algo === null) {
         positions = [];
         for (let i = match.start; i < match.end; ++i) {
