@@ -102,6 +102,29 @@ const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.po
 
 Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/stable-releases/src/docs/views/basic.tsx).
 
+### Usage with TypeScript
+
+The following code shows a descriptive usage with types. TypeScript can infer these types most of the time for you, so you wouldn't ever need to write them by hand. But for the cases when you do, these are the types you would use:
+
+```ts
+import { Fzf, FzfResultItem, FzfOptions  } from 'fzf'
+
+interface Fruit {
+  id: string
+  name: string
+}
+
+const fruits: Fruit[] = [ /* ... */ ]
+
+const options: FzfOptions<Fruit> = {
+  selector: v => v.name
+}
+
+const fzf = new Fzf<Fruit>(fruits, options)
+
+const results: FzfResultItem<Fruit>[] = fzf.find('ppya') // gives you back a papaya!
+```
+
 ### Making it behave like FZF CLI
 
 This library has different defaults compared to FZF CLI. Get a behaviour similar to CLI with these options:
