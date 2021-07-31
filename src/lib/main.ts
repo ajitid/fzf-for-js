@@ -38,7 +38,7 @@ export interface Options<U> {
    * Zoë →  Zoe
    * blessèd →  blessed
    *
-   * @defaultValue false
+   * @defaultValue true
    */
   normalize: boolean;
   /*
