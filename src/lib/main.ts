@@ -200,3 +200,37 @@ export class Fzf<U> {
     return result;
   }
 }
+
+export function fzfOne(query: string, text: string): FzfResultItem;
+export function fzfOne(query: string): (text: string) => FzfResultItem;
+
+export function fzfOne(
+  query: string,
+  text?: string
+): FzfResultItem | ((text: string) => FzfResultItem) {
+  let caseSensitive = false;
+  // smartcase
+  if (query.toLowerCase() !== query) {
+    caseSensitive = true;
+  }
+
+  const queryRunes = strToRunes(query);
+
+  const resolve = (text: string) => {
+    const textRunes = strToRunes(text);
+
+    const match = fuzzyMatchV2(
+      caseSensitive,
+      false,
+      false,
+      textRunes,
+      queryRunes,
+      true,
+      slab
+    );
+    return { item: text, ...match[0], positions: match[1] };
+  };
+
+  if (text === undefined) return resolve;
+  return resolve(text);
+}
