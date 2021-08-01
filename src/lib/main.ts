@@ -53,7 +53,9 @@ export class Fzf<U> {
   constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
-    this.runesList = list.map((item) => strToRunes(this.opts.selector(item)));
+    this.runesList = list.map((item) =>
+      strToRunes(this.opts.selector(item).normalize())
+    );
     this.algoFn = exactMatchNaive;
     switch (this.opts.algo) {
       case "v2":
@@ -66,6 +68,8 @@ export class Fzf<U> {
   }
 
   find(query: string): FzfResultItem<U>[] {
+    query = query.normalize();
+
     let result: FzfResultItem<U>[] = [];
 
     if (this.opts.extended) {
