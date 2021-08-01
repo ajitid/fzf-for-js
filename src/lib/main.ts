@@ -44,8 +44,12 @@ interface Options<U> {
    * @defaultValue false
    */
   normalize: boolean;
-  // TODO we need different sort metric
-  // sort: boolean;
+  /*
+   * If true, FZF will sort result items in descending by score.
+   *
+   * @defaultValue true
+   */
+  sort: boolean;
 }
 
 const defaultOpts: Options<any> = {
@@ -54,6 +58,7 @@ const defaultOpts: Options<any> = {
   selector: (v) => v,
   casing: "smart-case",
   normalize: false,
+  sort: true,
 };
 
 export interface FzfResultItem<U = string> {
@@ -121,9 +126,11 @@ export class Fzf<U> {
     const thresholdFilter = (v: FzfResultItem<U>) => v.result.score !== 0;
     let result = this.runesList.map(getResult).filter(thresholdFilter);
 
-    const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
-      b.result.score - a.result.score;
-    result.sort(descScoreSorter);
+    if (this.opts.sort) {
+      const descScoreSorter = (a: FzfResultItem<U>, b: FzfResultItem<U>) =>
+        b.result.score - a.result.score;
+      result.sort(descScoreSorter);
+    }
 
     if (Number.isFinite(this.opts.maxResultItems)) {
       result = result.slice(0, this.opts.maxResultItems);
