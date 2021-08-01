@@ -186,73 +186,69 @@ const normalized: Record<number, string> = {
   0x209c: "t",
   0x2184: "c",
 
-  ["Ắ".codePointAt(0)!]: "A",
-  ["Ấ".codePointAt(0)!]: "A",
-  ["Ằ".codePointAt(0)!]: "A",
-  ["Ầ".codePointAt(0)!]: "A",
-  ["Ẳ".codePointAt(0)!]: "A",
-  ["Ẩ".codePointAt(0)!]: "A",
-  ["Ẵ".codePointAt(0)!]: "A",
-  ["Ẫ".codePointAt(0)!]: "A",
-  ["Ặ".codePointAt(0)!]: "A",
-  ["Ậ".codePointAt(0)!]: "A",
+  7844: "A", // Ấ
+  7845: "a", // ấ
+  7846: "A", // Ầ
+  7847: "a", // ầ
+  7848: "A", // Ẩ
+  7849: "a", // ẩ
+  7850: "A", // Ẫ
+  7851: "a", // ẫ
+  7852: "A", // Ậ
+  7853: "a", // ậ
+  7854: "A", // Ắ
+  7855: "a", // ắ
+  7856: "A", // Ằ
+  7857: "a", // ằ
+  7858: "A", // Ẳ
+  7859: "a", // ẳ
+  7860: "A", // Ẵ
+  7861: "a", // ẵ
+  7862: "A", // Ặ
+  7863: "a", // ặ
 
-  ["ắ".codePointAt(0)!]: "a",
-  ["ấ".codePointAt(0)!]: "a",
-  ["ằ".codePointAt(0)!]: "a",
-  ["ầ".codePointAt(0)!]: "a",
-  ["ẳ".codePointAt(0)!]: "a",
-  ["ẩ".codePointAt(0)!]: "a",
-  ["ẵ".codePointAt(0)!]: "a",
-  ["ẫ".codePointAt(0)!]: "a",
-  ["ặ".codePointAt(0)!]: "a",
-  ["ậ".codePointAt(0)!]: "a",
+  7870: "E", // Ế
+  7871: "e", // ế
+  7872: "E", // Ề
+  7873: "e", // ề
+  7874: "E", // Ể
+  7875: "e", // ể
+  7876: "E", // Ễ
+  7877: "e", // ễ
+  7878: "E", // Ệ
+  7879: "e", // ệ
 
-  ["Ế".codePointAt(0)!]: "E",
-  ["Ề".codePointAt(0)!]: "E",
-  ["Ể".codePointAt(0)!]: "E",
-  ["Ễ".codePointAt(0)!]: "E",
-  ["Ệ".codePointAt(0)!]: "E",
+  7888: "O", // Ố
+  7889: "o", // ố
+  7890: "O", // Ồ
+  7891: "o", // ồ
+  7892: "O", // Ổ
+  7893: "o", // ổ
+  7894: "O", // Ỗ
+  7895: "o", // ỗ
+  7896: "O", // Ộ
+  7897: "o", // ộ
+  7898: "O", // Ớ
+  7899: "o", // ớ
+  7900: "O", // Ờ
+  7901: "o", // ờ
+  7902: "O", // Ở
+  7903: "o", // ở
+  7904: "O", // Ỡ
+  7905: "o", // ỡ
+  7906: "O", // Ợ
+  7907: "o", // ợ
 
-  ["ế".codePointAt(0)!]: "e",
-  ["ề".codePointAt(0)!]: "e",
-  ["ể".codePointAt(0)!]: "e",
-  ["ễ".codePointAt(0)!]: "e",
-  ["ệ".codePointAt(0)!]: "e",
-
-  ["Ố".codePointAt(0)!]: "O",
-  ["Ớ".codePointAt(0)!]: "O",
-  ["Ồ".codePointAt(0)!]: "O",
-  ["Ờ".codePointAt(0)!]: "O",
-  ["Ổ".codePointAt(0)!]: "O",
-  ["Ở".codePointAt(0)!]: "O",
-  ["Ỗ".codePointAt(0)!]: "O",
-  ["Ỡ".codePointAt(0)!]: "O",
-  ["Ộ".codePointAt(0)!]: "O",
-  ["Ợ".codePointAt(0)!]: "O",
-
-  ["ố".codePointAt(0)!]: "o",
-  ["ớ".codePointAt(0)!]: "o",
-  ["ồ".codePointAt(0)!]: "o",
-  ["ờ".codePointAt(0)!]: "o",
-  ["ổ".codePointAt(0)!]: "o",
-  ["ở".codePointAt(0)!]: "o",
-  ["ỗ".codePointAt(0)!]: "o",
-  ["ỡ".codePointAt(0)!]: "o",
-  ["ộ".codePointAt(0)!]: "o",
-  ["ợ".codePointAt(0)!]: "o",
-
-  ["Ứ".codePointAt(0)!]: "U",
-  ["Ừ".codePointAt(0)!]: "U",
-  ["Ử".codePointAt(0)!]: "U",
-  ["Ữ".codePointAt(0)!]: "U",
-  ["Ự".codePointAt(0)!]: "U",
-
-  ["ứ".codePointAt(0)!]: "u",
-  ["ừ".codePointAt(0)!]: "u",
-  ["ử".codePointAt(0)!]: "u",
-  ["ữ".codePointAt(0)!]: "u",
-  ["ự".codePointAt(0)!]: "u",
+  7912: "U", // Ứ
+  7913: "u", // ứ
+  7914: "U", // Ừ
+  7915: "u", // ừ
+  7916: "U", // Ử
+  7917: "u", // ử
+  7918: "U", // Ữ
+  7919: "u", // ữ
+  7920: "U", // Ự
+  7921: "u", // ự
 };
 
 for (let i = "\u0300".codePointAt(0)!; i <= "\u036F".codePointAt(0)!; ++i) {
