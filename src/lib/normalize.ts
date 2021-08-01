@@ -188,10 +188,10 @@ const normalized: Record<number, string> = {
 };
 
 for (let i = "\u0300".codePointAt(0)!; i <= "\u036F".codePointAt(0)!; ++i) {
+  const diacritic = String.fromCodePoint(i);
+
   for (const asciiChar of "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") {
-    const withDiacritic = (asciiChar + String.fromCodePoint(i)).normalize(
-      "NFC"
-    );
+    const withDiacritic = (asciiChar + diacritic).normalize();
     const withDiacriticCodePoint = withDiacritic.codePointAt(0)!;
     if (withDiacriticCodePoint > 126) {
       normalized[withDiacriticCodePoint] = asciiChar;
