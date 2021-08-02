@@ -1,4 +1,4 @@
-import React, { forwardRef, isValidElement, version } from "react";
+import React, { forwardRef, isValidElement } from "react";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -109,19 +109,19 @@ export function App() {
         <Router>
           <Routes>
             <Route path="/">
-              <Navigate to="current" replace />
+              <Navigate to="versions/latest" replace />
             </Route>
-            <Route path="current/*" element={<AppRoutes />} />
+            <Route path="versions/latest/*" element={<AppRoutes />} />
             <Route path="*" element={<div>not found</div>} />
             <Route
-              path="docs/versions"
+              path="versions"
               element={<DocsVersions versions={docsVersions} />}
             />
             {oldDocs.map((v) => {
               return (
                 <Route
                   key={v.version}
-                  path={`docs/versions/${v.version.replaceAll(".", "-")}/*`}
+                  path={`versions/${v.version.replaceAll(".", "-")}/*`}
                   element={
                     <React.Suspense
                       fallback={
