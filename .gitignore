@@ -14,4 +14,4 @@ dist-ssr
 coverage
 
 # Old docs generated on build
-src/docs/views/old-docs
+src/docs/old-docs
