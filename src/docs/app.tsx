@@ -121,7 +121,7 @@ export function App() {
               return (
                 <Route
                   key={v.version}
-                  path={`docs/versions/${v.version.replaceAll(".", "-")}`}
+                  path={`docs/versions/${v.version.replaceAll(".", "-")}/*`}
                   element={
                     <React.Suspense
                       fallback={

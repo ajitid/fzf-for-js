@@ -30,10 +30,8 @@ const writeFile = (verMajor, verMinor) => {
       .stdout
   )["version"];
 
-  shell.mkdir("src/docs/old-docs/" + verStr);
-
   shell.exec(
-    `git --work-tree=src/docs/old-docs/${verStr} checkout ${nextCommitHash}^ -- src`
+    `git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`
   );
 };
 
