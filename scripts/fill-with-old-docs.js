@@ -8,35 +8,12 @@ shell.rm("-r", "src/docs/old-docs");
 shell.mkdir("src/docs/old-docs");
 shell.touch("src/docs/old-docs/.gitkeep");
 
-const writeFileLegacy = (verMajor, verMinor) => {
-  const nextCommitHash = shell
-    .exec(
-      `git log -S '"version": "${verMajor}.${verMinor}' --oneline -n 1 --branches HEAD -- package.json`,
-      {
-        silent: true,
-      }
-    )
-    .stdout.split(" ")[0];
-
-  const verStr = JSON.parse(
-    shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true })
-      .stdout
-  )["version"];
-
-  const fileContent = shell.exec(
-    `git show ${nextCommitHash}^:./src/docs/views/docs.mdx`,
-    { silent: true }
-  ).stdout;
-
-  if (fileContent !== "") {
-    shell.ShellString(fileContent).to(`src/docs/views/old-docs/${verStr}.mdx`);
-  }
-};
-
 const writeFile = (verMajor, verMinor) => {
   if (verMajor === 0 && verMinor <= 3) {
-    console.log("nope won't write it", verMajor, verMinor);
-    // writeFileLegacy(verMajor, verMinor);
+    console.log(
+      `v${verMajor}.${verMinor} is incompatible with the current docs structure. Skipping...`
+    );
+    return;
   }
 
   const nextCommitHash = shell
