@@ -7,7 +7,7 @@ import pkg from '../../../package.json'
 
 <div className="flex justify-between flex-wrap">
   <div><Link to="basic">Demo</Link> · <a href="https://github.com/ajitid/fzf-for-js">GitHub</a> · <a href="https://www.npmjs.com/package/fzf">NPM</a></div>
-  <div>Viewing for v{pkg.version} (<Link to="/versions">see others</Link>)</div>
+  <div>Viewing for v{pkg.version} (<Link to="/docs">see others</Link>)</div>
 </div>
 
 [FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.

@@ -34,6 +34,12 @@ const writeFile = (verMajor, verMinor) => {
     `git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`,
     { silent: true }
   );
+
+  shell.rm(
+    "-r",
+    `src/docs/old-docs/${verStr}/vite*`,
+    `src/docs/old-docs/${verStr}/src/docs/typings`
+  );
 };
 
 for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
