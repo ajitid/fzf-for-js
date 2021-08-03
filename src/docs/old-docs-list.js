@@ -2,7 +2,7 @@ const path = require("path");
 const glob = require("glob");
 
 let fileVersions = glob
-  .sync("./src/docs/views/old-docs/*.mdx")
-  .map((v) => path.parse(v).name);
+  .sync("./src/docs/old-docs/*/")
+  .map((v) => path.parse(v).base);
 
 module.exports = { fileVersions };
