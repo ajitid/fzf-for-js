@@ -31,7 +31,8 @@ const writeFile = (verMajor, verMinor) => {
   )["version"];
 
   shell.exec(
-    `git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`
+    `git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`,
+    { silent: true }
   );
 };
 
