@@ -109,19 +109,19 @@ export function App() {
         <Router>
           <Routes>
             <Route path="/">
-              <Navigate to="versions/latest" replace />
+              <Navigate to="docs/latest" replace />
             </Route>
-            <Route path="versions/latest/*" element={<AppRoutes />} />
+            <Route path="docs/latest/*" element={<AppRoutes />} />
             <Route path="*" element={<div>not found</div>} />
             <Route
-              path="versions"
+              path="docs"
               element={<DocsVersions versions={docsVersions} />}
             />
             {oldDocs.map((v) => {
               return (
                 <Route
                   key={v.version}
-                  path={`versions/${v.version.replaceAll(".", "-")}/*`}
+                  path={`docs/${v.version.replaceAll(".", "-")}/*`}
                   element={
                     <React.Suspense
                       fallback={
