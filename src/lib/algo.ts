@@ -849,7 +849,7 @@ export const exactMatchNaive: AlgoFn = (
       eidx = lenRunes - (bestPos - lenPattern + 1);
     }
 
-    const [score] = calculateScore(
+    const res = calculateScore(
       caseSensitive,
       normalize,
       text,
@@ -858,7 +858,7 @@ export const exactMatchNaive: AlgoFn = (
       eidx,
       false
     );
-    return [{ start: sidx, end: eidx, score }, null];
+    return [{ start: sidx, end: eidx, score: res[0] }, null];
   }
 
   return [{ start: -1, end: -1, score: 0 }, null];
@@ -886,7 +886,13 @@ export const prefixMatch: AlgoFn = (
     return [{ start: -1, end: -1, score: 0 }, null];
   }
 
-  for (const [index, r] of pattern.entries()) {
+  for (
+    let index = 0, patternLen = pattern.length;
+    index < patternLen;
+    ++index
+  ) {
+    const r = pattern[index];
+
     let rune = text[trimmedLen + index];
 
     if (!caseSensitive) {
@@ -903,7 +909,7 @@ export const prefixMatch: AlgoFn = (
   }
 
   const lenPattern = pattern.length;
-  const [score] = calculateScore(
+  const res = calculateScore(
     caseSensitive,
     normalize,
     text,
@@ -912,7 +918,10 @@ export const prefixMatch: AlgoFn = (
     trimmedLen + lenPattern,
     false
   );
-  return [{ start: trimmedLen, end: trimmedLen + lenPattern, score }, null];
+  return [
+    { start: trimmedLen, end: trimmedLen + lenPattern, score: res[0] },
+    null,
+  ];
 };
 
 export const suffixMatch: AlgoFn = (
@@ -946,7 +955,13 @@ export const suffixMatch: AlgoFn = (
     return [{ start: -1, end: -1, score: 0 }, null];
   }
 
-  for (const [index, r] of pattern.entries()) {
+  for (
+    let index = 0, patternLen = pattern.length;
+    index < patternLen;
+    ++index
+  ) {
+    const r = pattern[index];
+
     let rune = text[index + diff];
 
     if (!caseSensitive) {
@@ -965,7 +980,7 @@ export const suffixMatch: AlgoFn = (
   const lenPattern = pattern.length;
   const sidx = trimmedLen - lenPattern;
   const eidx = trimmedLen;
-  const [score] = calculateScore(
+  const res = calculateScore(
     caseSensitive,
     normalize,
     text,
@@ -974,7 +989,7 @@ export const suffixMatch: AlgoFn = (
     eidx,
     false
   );
-  return [{ start: sidx, end: eidx, score }, null];
+  return [{ start: sidx, end: eidx, score: res[0] }, null];
 };
 
 export const equalMatch: AlgoFn = (
@@ -1009,7 +1024,9 @@ export const equalMatch: AlgoFn = (
   if (normalize) {
     const runes = text;
 
-    for (const [idx, pchar] of pattern.entries()) {
+    for (let idx = 0, patternLen = pattern.length; idx < patternLen; ++idx) {
+      const pchar = pattern[idx];
+
       let rune = runes[trimmedLen + idx];
 
       if (!caseSensitive) {
