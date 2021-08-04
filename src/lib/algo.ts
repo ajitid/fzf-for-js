@@ -320,11 +320,17 @@ export const fuzzyMatchV2: AlgoFn = (
     C0: Int16Array | null = null,
     B: Int16Array | null = null,
     F: Int32Array | null = null;
-  [offset16, H0] = alloc16(offset16, slab, N);
-  [offset16, C0] = alloc16(offset16, slab, N);
-  [offset16, B] = alloc16(offset16, slab, N);
-  [offset32, F] = alloc32(offset32, slab, M);
-  const [, T] = alloc32(offset32, slab, N);
+
+  let res16 = alloc16(offset16, slab, N);
+  (offset16 = res16[0]), (H0 = res16[1]);
+  res16 = alloc16(offset16, slab, N);
+  (offset16 = res16[0]), (C0 = res16[1]);
+  res16 = alloc16(offset16, slab, N);
+  (offset16 = res16[0]), (B = res16[1]);
+  let res32 = alloc32(offset32, slab, M);
+  (offset32 = res32[0]), (F = res32[1]);
+  res32 = alloc32(offset32, slab, N);
+  const T = res32[1];
 
   for (let i = 0; i < T.length; i++) {
     T[i] = input[i];
@@ -345,7 +351,9 @@ export const fuzzyMatchV2: AlgoFn = (
     C0sub = C0.subarray(idx).subarray(0, Tsub.length),
     Bsub = B.subarray(idx).subarray(0, Tsub.length);
 
-  for (let [off, char] of Tsub.entries()) {
+  for (let off = 0, TsubLen = Tsub.length; off < TsubLen; ++off) {
+    let char = Tsub[off];
+
     let charClass: Char | null = null;
 
     if (char <= MAX_ASCII) {
@@ -437,7 +445,8 @@ export const fuzzyMatchV2: AlgoFn = (
     }
   }
 
-  let [, C] = alloc16(offset16, slab, width * M);
+  res16 = alloc16(offset16, slab, width * M);
+  const C = res16[1];
   {
     const toCopy = C0.subarray(f0, lastIdx + 1);
     for (let i = 0, toCopyLen = toCopy.length; i < toCopyLen; ++i) {
