@@ -41,8 +41,6 @@ export function buildPatternForExtendedMatch(
   normalize: boolean,
   str: string
 ) {
-  // TODO Implement caching here and below.
-  // cacheable is received from caller of this fn
   let cacheable = true;
 
   str = str.trimLeft();
@@ -105,12 +103,28 @@ export function buildPatternForExtendedMatch(
 
     str,
     // ^ this in junegunn/fzf is `text: []rune(asString)`
-
     termSets,
     sortable,
     cacheable,
+    cacheKey: buildCacheKey(termSets, fuzzy),
     fuzzy,
   };
+}
+
+function buildCacheKey(termSets: TermSet[], fuzzy: boolean) {
+  const cacheableTerms: string[] = [];
+
+  for (const termSet of termSets) {
+    if (
+      termSet.length === 1 &&
+      !termSet[0].inv &&
+      (fuzzy || termSet[0].typ === TermType.Exact)
+    ) {
+      cacheableTerms.push(runesToStr(termSet[0].text));
+    }
+  }
+
+  return cacheableTerms.join("\t");
 }
 
 function parseTerms(
