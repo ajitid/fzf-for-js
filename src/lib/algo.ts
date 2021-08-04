@@ -432,23 +432,24 @@ export const fuzzyMatchV2: AlgoFn = (
   [offset16, H] = alloc16(offset16, slab, width * M);
   {
     const toCopy = H0.subarray(f0, lastIdx + 1);
-    for (const [i, v] of toCopy.entries()) {
-      H[i] = v;
+    for (let i = 0, toCopyLen = toCopy.length; i < toCopyLen; ++i) {
+      H[i] = toCopy[i];
     }
   }
 
   let [, C] = alloc16(offset16, slab, width * M);
   {
     const toCopy = C0.subarray(f0, lastIdx + 1);
-    for (const [i, v] of toCopy.entries()) {
-      C[i] = v;
+    for (let i = 0, toCopyLen = toCopy.length; i < toCopyLen; ++i) {
+      C[i] = toCopy[i];
     }
   }
 
   const Fsub = F.subarray(1);
   const Psub = pattern.subarray(1).subarray(0, Fsub.length);
 
-  for (const [off, f] of Fsub.entries()) {
+  for (let off = 0, FsubLen = Fsub.length; off < FsubLen; ++off) {
+    const f = Fsub[off];
     // int32 -> int conversion needed in other lang for `f` to use
 
     let inGap = false;
@@ -464,7 +465,9 @@ export const fuzzyMatchV2: AlgoFn = (
       Hleft = H.subarray(row + f - f0 - 1).subarray(0, Tsub.length);
     Hleft[0] = 0;
 
-    for (const [off, char] of Tsub.entries()) {
+    for (let off = 0, TsubLen = Tsub.length; off < TsubLen; ++off) {
+      const char = Tsub[off];
+
       const col = off + f;
       let s1: Int16Array[0] = 0,
         s2: Int16Array[0] = 0,
@@ -733,7 +736,7 @@ export const fuzzyMatchV1: AlgoFn = (
       eidx = lenRunes - sidxTemp;
     }
 
-    const [score, pos] = calculateScore(
+    const res = calculateScore(
       caseSensitive,
       normalize,
       text,
@@ -742,6 +745,8 @@ export const fuzzyMatchV1: AlgoFn = (
       eidx,
       withPos
     );
+    const score = res[0],
+      pos = res[1];
     return [{ start: sidx, end: eidx, score }, pos];
   }
 

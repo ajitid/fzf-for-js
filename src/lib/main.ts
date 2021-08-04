@@ -106,7 +106,13 @@ export class Fzf<U> {
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-    for (const [idx, runes] of this.runesList.entries()) {
+    for (
+      let idx = 0, runesListLength = this.runesList.length;
+      idx < runesListLength;
+      ++idx
+    ) {
+      const runes = this.runesList[idx];
+
       const match = computeExtendedMatch(
         runes,
         pattern,
@@ -151,7 +157,7 @@ export class Fzf<U> {
       const itemRunes = this.runesList[i];
       if (queryRunes.length > itemRunes.length) continue;
 
-      let [match, positions] = this.algoFn(
+      const res = this.algoFn(
         caseSensitive,
         this.opts.normalize,
         this.opts.forward,
@@ -160,6 +166,9 @@ export class Fzf<U> {
         true,
         slab
       );
+      let match = res[0],
+        positions = res[1];
+
       if (match.start === -1) continue;
 
       // we don't get positions array back for exact match, so we'll fill it by ourselves
