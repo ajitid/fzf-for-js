@@ -74,7 +74,9 @@ export function buildPatternForExtendedMatch(
   termSets = parseTerms(fuzzy, caseMode, normalize, str);
 
   Loop: for (const termSet of termSets) {
-    for (const [idx, term] of termSet.entries()) {
+    for (let idx = 0, termSetLen = termSet.length; idx < termSetLen; ++idx) {
+      const term = termSet[idx];
+
       if (!term.inv) {
         sortable = true;
       }
