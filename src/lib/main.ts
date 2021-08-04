@@ -45,7 +45,7 @@ export type FzfOptions<U = string> = U extends string
   : OptsToUse<U> & { selector: Options<U>["selector"] };
 
 export class Fzf<U> {
-  private runesList: Rune[][];
+  private runesListMap: Map<string, { runes: Rune[]; index: number }[]>;
   private items: U[];
   private readonly opts: Options<U>;
   private algoFn: AlgoFn;
@@ -53,8 +53,15 @@ export class Fzf<U> {
   constructor(list: U[], ...optionsTuple: OptionsTuple<U>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
-    this.runesList = list.map((item) =>
-      strToRunes(this.opts.selector(item).normalize())
+    this.runesListMap = new Map();
+    this.runesListMap.set(
+      "",
+      list.map((item, index) => {
+        return {
+          runes: strToRunes(this.opts.selector(item).normalize()),
+          index,
+        };
+      })
     );
     this.algoFn = exactMatchNaive;
     switch (this.opts.algo) {
@@ -106,15 +113,10 @@ export class Fzf<U> {
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-    for (
-      let idx = 0, runesListLength = this.runesList.length;
-      idx < runesListLength;
-      ++idx
-    ) {
-      const runes = this.runesList[idx];
-
+    const fullRunesList = this.runesListMap.get("")!;
+    for (const v of fullRunesList) {
       const match = computeExtendedMatch(
-        runes,
+        v.runes,
         pattern,
         this.algoFn,
         this.opts.forward
@@ -134,7 +136,7 @@ export class Fzf<U> {
       }
       scoreMap[scoreKey].push({
         score: match.totalScore,
-        item: this.items[idx],
+        item: this.items[v.index],
         positions: match.allPos,
         start: sidx,
         end: eidx,
@@ -153,8 +155,9 @@ export class Fzf<U> {
 
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-    for (let i = 0, len = this.runesList.length; i < len; ++i) {
-      const itemRunes = this.runesList[i];
+    const fullRunesList = this.runesListMap.get("")!;
+    for (const v of fullRunesList) {
+      const itemRunes = v.runes;
       if (queryRunes.length > itemRunes.length) continue;
 
       const res = this.algoFn(
@@ -184,7 +187,7 @@ export class Fzf<U> {
         scoreMap[scoreKey] = [];
       }
       scoreMap[scoreKey].push({
-        item: this.items[i],
+        item: this.items[v.index],
         ...match,
         positions,
       });
