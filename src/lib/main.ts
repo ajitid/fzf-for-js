@@ -156,7 +156,12 @@ export class Fzf<U> {
     const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
     const fullRunesList = this.runesListMap.get("")!;
-    for (const v of fullRunesList) {
+    const runesListForPreviousQuery =
+      this.runesListMap.get(query.substring(0, query.length - 1)) ??
+      fullRunesList;
+    const runesListForCurrentQuery: { runes: Rune[]; index: number }[] = [];
+
+    for (const v of runesListForPreviousQuery) {
       const itemRunes = v.runes;
       if (queryRunes.length > itemRunes.length) continue;
 
@@ -173,6 +178,8 @@ export class Fzf<U> {
         positions = res[1];
 
       if (match.start === -1) continue;
+
+      runesListForCurrentQuery.push(v);
 
       // we don't get positions array back for exact match, so we'll fill it by ourselves
       if (this.opts.algo === null) {
@@ -192,6 +199,8 @@ export class Fzf<U> {
         positions,
       });
     }
+
+    this.runesListMap.set(query, runesListForCurrentQuery);
 
     return Fzf.getResultFromScoreMap(scoreMap, this.opts.limit);
   }
