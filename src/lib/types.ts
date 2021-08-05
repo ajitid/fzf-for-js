@@ -43,7 +43,7 @@ export interface Options<U> {
    * @defaultValue true
    */
   normalize: boolean;
-  /*
+  /**
    * Fuzzy algo to choose. Each algo has their own advantages, see here:
    * https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5
    * If asssigned `null`, an exact match will be made instead of a fuzzy one.
@@ -51,7 +51,7 @@ export interface Options<U> {
    * @defaultValue "v2"
    */
   algo: "v1" | "v2" | null;
-  /*
+  /**
    * If true, you can add special patterns to narrow down your search.
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
    * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
@@ -59,7 +59,7 @@ export interface Options<U> {
    * @defaultValue false
    */
   extended: boolean;
-  /*
+  /**
    * A list of functions that act as fallback and help to
    * sort result entries when the score between two entries is tied.
    *
@@ -86,7 +86,7 @@ export interface Options<U> {
    * dxddddddd           cxcccccccccc
    */
   tiebreakers: Tiebreaker<U>[];
-  /*
+  /**
    * If `true`, result items will be sorted in descending order by their score.
    * If `false`, result won't be sorted and tiebreakers won't affect the sort
    * order either.
@@ -94,7 +94,7 @@ export interface Options<U> {
    * @defaultValue true
    */
   sort: boolean;
-  /*
+  /**
    * If `false`, matching will be done from backwards.
    *
    * @defaultValue true
