@@ -6,7 +6,7 @@ import {
   suffixMatch,
 } from "./algo";
 import { normalizeRune } from "./normalize";
-import { Rune, runesToStr, strToRunes } from "./runes";
+import { runesToStr, strToRunes } from "./runes";
 import { Casing } from "./types";
 
 export enum TermType {
@@ -28,7 +28,7 @@ export const termTypeMap = {
 interface Term {
   typ: TermType;
   inv: boolean;
-  text: Rune[];
+  text: Int32Array;
   caseSensitive: boolean;
   normalize: boolean;
 }

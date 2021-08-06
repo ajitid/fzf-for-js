@@ -1,10 +1,9 @@
 import { AlgoFn } from "./algo";
 import { buildPatternForExtendedMatch, TermType, termTypeMap } from "./pattern";
-import { Rune } from "./runes";
 import { slab, Slab } from "./slab";
 
 interface Token {
-  text: Rune[];
+  text: Int32Array;
   prefixLength: Int32Array[0];
 }
 
@@ -17,7 +16,7 @@ function iter(
   caseSensitive: boolean,
   normalize: boolean,
   forward: boolean,
-  pattern: Rune[],
+  pattern: Int32Array,
   slab: Slab
 ): [Offset, number, number[] | null] {
   for (const part of tokens) {
@@ -47,7 +46,7 @@ function iter(
 }
 
 export function computeExtendedMatch(
-  text: Rune[],
+  text: Int32Array,
   pattern: ReturnType<typeof buildPatternForExtendedMatch>,
   fuzzyAlgo: AlgoFn,
   forward: boolean
@@ -55,7 +54,7 @@ export function computeExtendedMatch(
   // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
   // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
   const input: {
-    text: Rune[];
+    text: Int32Array;
     prefixLength: number;
   }[] = [
     {

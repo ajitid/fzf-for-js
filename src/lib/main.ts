@@ -1,5 +1,5 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
-import { Rune, strToRunes } from "./runes";
+import { strToRunes } from "./runes";
 import { slab } from "./slab";
 import type { FzfResultItem, Options } from "./types";
 import {
@@ -45,7 +45,7 @@ export type FzfOptions<U = string> = U extends string
   : OptsToUse<U> & { selector: Options<U>["selector"] };
 
 export class Fzf<U> {
-  private runesList: Rune[][];
+  private runesList: Int32Array[];
   private items: U[];
   private readonly opts: Options<U>;
   private algoFn: AlgoFn;

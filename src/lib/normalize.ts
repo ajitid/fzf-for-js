@@ -1,5 +1,3 @@
-import { Rune } from "./runes";
-
 const normalized: Record<number, string> = {
   0x00d8: "O",
   0x00df: "s",
@@ -214,7 +212,7 @@ for (const lowerChar of Object.keys(ranges)) {
   }
 }
 
-export function normalizeRune(rune: Rune): Rune {
+export function normalizeRune(rune: Int32Array[0]): Int32Array[0] {
   if (rune < 0x00c0 || rune > 0x2184) {
     return rune;
   }
