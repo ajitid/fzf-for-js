@@ -51,8 +51,6 @@ export function computeExtendedMatch(
   fuzzyAlgo: AlgoFn,
   forward: boolean
 ) {
-  // https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L354
-  // ^ TODO maybe this helps in caching by not calculating already calculated stuff but whatever
   const input: {
     text: Int32Array;
     prefixLength: number;
