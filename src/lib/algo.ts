@@ -72,7 +72,7 @@ function posArray(withPos: boolean, len: number) {
     //
     // {{ this is useless here, ignore: const pos = new Array(len).fill(0) }}
 
-    const pos = new Array();
+    const pos = new Array<number>();
     return pos;
   }
 
@@ -523,7 +523,7 @@ export const fuzzyMatchV2: AlgoFn = (
   // Phase 4. (Optional) Backtrace to find character positions
   const pos = posArray(withPos, M);
   let j = f0;
-  if (withPos) {
+  if (withPos && pos !== null) {
     let i = M - 1;
     j = maxScorePos;
     let preferMatch = true;
@@ -548,7 +548,7 @@ export const fuzzyMatchV2: AlgoFn = (
 
       if (s > s1 && (s > s2 || (s === s2 && preferMatch))) {
         // TODO `pos` needs a typeguard or something using `withPos`
-        pos!.push(j);
+        pos.push(j);
         if (i === 0) {
           break;
         }
@@ -605,9 +605,9 @@ function calculateScore(
     }
 
     if (rune === pattern[pidx]) {
-      if (withPos) {
+      if (withPos && pos !== null) {
         // TODO needs typeguard
-        pos?.push(idx);
+        pos.push(idx);
       }
 
       score += SCORE_MATCH;
