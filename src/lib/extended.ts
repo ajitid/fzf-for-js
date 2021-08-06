@@ -8,7 +8,7 @@ interface Token {
 }
 
 // this is [int32, int32] in golang code
-type Offset = [number, number];
+type Offset = [Int32Array[0], Int32Array[0]];
 
 function iter(
   algoFn: AlgoFn,
