@@ -194,7 +194,7 @@ function trySkip(
   char: Int32Array[0],
   from: number
 ): number {
-  let rest = input.slice(from);
+  let rest = input.subarray(from);
   let idx = rest.indexOf(char);
   if (idx === 0) {
     return from;
@@ -202,7 +202,7 @@ function trySkip(
 
   if (!caseSensitive && char >= SMALL_A_RUNE && char <= SMALL_Z_RUNE) {
     if (idx > 0) {
-      rest = rest.slice(0, idx);
+      rest = rest.subarray(0, idx);
     }
 
     // TODO I hope that I'm doing it right
@@ -446,10 +446,7 @@ export const fuzzyMatchV2: AlgoFn = (
   }
 
   const Fsub = F.subarray(1);
-  // TODO Psub too needs to needs to be subarray-ed not slice-d but
-  // it is only being used in one place and only to retrieve data so
-  // it is fine for now
-  const Psub = pattern.slice(1).slice(0, Fsub.length);
+  const Psub = pattern.subarray(1).subarray(0, Fsub.length);
 
   for (const [off, f] of Fsub.entries()) {
     // int32 -> int conversion needed in other lang for `f` to use
