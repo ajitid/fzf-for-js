@@ -1,8 +1,8 @@
-export type Int16 = Int16Array[0];
-export type Int32 = Int32Array[0];
+type Int16 = Int16Array[0];
+type Int32 = Int32Array[0];
 
 // for short, int, long naming convention https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
-export function toShort(number: number): Int16 {
+export function toShort(number: Int16): Int16 {
   /*
   // with this implementation, I don't think it does anything
   // as it is returning a number only, not int16
@@ -22,7 +22,7 @@ export function toInt(number: number): Int32 {
   */
   return number;
 }
-export function maxInt16(num1: number, num2: number) {
+export function maxInt16(num1: Int16, num2: Int16) {
   /*
   // with this implementation, I don't think it does anything
   // as it is returning a number only, not int16

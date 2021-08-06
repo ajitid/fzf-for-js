@@ -1,12 +1,11 @@
 import { AlgoFn } from "./algo";
-import { Int32 } from "./numerics";
 import { buildPatternForExtendedMatch, TermType, termTypeMap } from "./pattern";
 import { Rune } from "./runes";
 import { slab, Slab } from "./slab";
 
 interface Token {
   text: Rune[];
-  prefixLength: Int32;
+  prefixLength: Int32Array[0];
 }
 
 // this is [int32, int32] in golang code

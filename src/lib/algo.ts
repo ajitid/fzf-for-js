@@ -4,8 +4,8 @@
 
 import { normalizeRune } from "./normalize";
 import { Slab } from "./slab";
-import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
-import { Rune, runesToStr } from "./runes";
+import { toShort, toInt, maxInt16 } from "./numerics";
+import { runesToStr } from "./runes";
 import { isWhitespace, whitespacesAtEnd, whitespacesAtStart } from "./char";
 
 const DEBUG = false;
@@ -113,7 +113,7 @@ function alloc32(
 // this might led to creation of too many strings in string pool resulting in
 // huge garbage collection. JS can't parse it in terms of bytes so I might need to use
 // char array instead (which will technically be string array)
-function charClassOfAscii(rune: Rune): Char {
+function charClassOfAscii(rune: Int32Array[0]): Char {
   if (rune >= SMALL_A_RUNE && rune <= SMALL_Z_RUNE) {
     return Char.Lower;
   } else if (rune >= CAPITAL_A_RUNE && rune <= CAPITAL_Z_RUNE) {
@@ -125,7 +125,7 @@ function charClassOfAscii(rune: Rune): Char {
   }
 }
 
-function charClassOfNonAscii(rune: Rune): Char {
+function charClassOfNonAscii(rune: Int32Array[0]): Char {
   const char = String.fromCodePoint(rune);
 
   // checking whether it is a lowercase letter by checking whether converting
@@ -145,7 +145,7 @@ function charClassOfNonAscii(rune: Rune): Char {
   return Char.NonWord;
 }
 
-function charClassOf(rune: Rune): Char {
+function charClassOf(rune: Int32Array[0]): Char {
   if (rune <= MAX_ASCII) {
     return charClassOfAscii(rune);
   }
@@ -153,7 +153,7 @@ function charClassOf(rune: Rune): Char {
   return charClassOfNonAscii(rune);
 }
 
-function bonusFor(prevClass: Char, currClass: Char): Int16 {
+function bonusFor(prevClass: Char, currClass: Char): Int16Array[0] {
   if (prevClass === Char.NonWord && currClass !== Char.NonWord) {
     // word boundary
     return BONUS_BOUNDARY;
@@ -170,7 +170,7 @@ function bonusFor(prevClass: Char, currClass: Char): Int16 {
   return 0;
 }
 
-function bonusAt(input: Rune[], idx: number): Int16 {
+function bonusAt(input: Int32Array, idx: number): Int16Array[0] {
   if (idx === 0) {
     return BONUS_BOUNDARY;
   }
@@ -182,16 +182,16 @@ export type AlgoFn = (
   caseSensitive: boolean,
   normalize: boolean,
   forward: boolean,
-  input: Rune[],
-  pattern: Rune[],
+  input: Int32Array,
+  pattern: Int32Array,
   withPos: boolean,
   slab: Slab | null
 ) => [Result, number[] | null];
 
 function trySkip(
-  input: Rune[],
+  input: Int32Array,
   caseSensitive: boolean,
-  char: Rune,
+  char: Int32Array[0],
   from: number
 ): number {
   let rest = input.slice(from);
@@ -222,7 +222,7 @@ function trySkip(
   return from + idx;
 }
 
-function isAscii(runes: Rune[]) {
+function isAscii(runes: Int32Array) {
   for (const rune of runes) {
     if (rune >= 128) {
       return false;
@@ -233,8 +233,8 @@ function isAscii(runes: Rune[]) {
 }
 
 function asciiFuzzyIndex(
-  input: Rune[],
-  pattern: Rune[],
+  input: Int32Array,
+  pattern: Int32Array,
   caseSensitive: boolean
 ): number {
   /*
@@ -269,12 +269,12 @@ function asciiFuzzyIndex(
 }
 
 function debugV2(
-  T: Rune[],
-  pattern: Rune[],
-  F: Int32[],
+  T: Int32Array,
+  pattern: Int32Array,
+  F: Int32Array,
   lastIdx: number,
-  H: Int16[],
-  C: Int16[]
+  H: Int16Array,
+  C: Int16Array
 ) {
   // TODO
   console.error(" complete this!!!! ");
@@ -469,9 +469,9 @@ export const fuzzyMatchV2: AlgoFn = (
 
     for (const [off, char] of Tsub.entries()) {
       const col = off + f;
-      let s1: Int16 = 0,
-        s2: Int16 = 0,
-        consecutive: Int16 = 0;
+      let s1: Int16Array[0] = 0,
+        s2: Int16Array[0] = 0,
+        consecutive: Int16Array[0] = 0;
 
       if (inGap) {
         s2 = Hleft[off] + SCORE_GAP_EXTENTION;
@@ -533,8 +533,8 @@ export const fuzzyMatchV2: AlgoFn = (
         j0 = j - f0,
         s = H[I + j0];
 
-      let s1: Int16 = 0,
-        s2: Int16 = 0;
+      let s1: Int16Array[0] = 0,
+        s2: Int16Array[0] = 0;
 
       // F[i] needs to be casted to int in other lang
       if (i > 0 && j >= F[i]) {
@@ -569,8 +569,8 @@ export const fuzzyMatchV2: AlgoFn = (
 function calculateScore(
   caseSensitive: boolean,
   normalize: boolean,
-  text: Rune[],
-  pattern: Rune[],
+  text: Int32Array,
+  pattern: Int32Array,
   sidx: number,
   eidx: number,
   withPos: boolean
