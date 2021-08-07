@@ -54,7 +54,7 @@ test("basic match + exact", () => {
   const entries = fzf.find("aba");
   expect(entries.length).toBe(1);
   expect(entries[0].item).toBe("abacus");
-  expect(new Set(entries[0].positions)).toMatchObject(new Set([0, 1, 2]));
+  expect(entries[0].positions).toMatchObject(new Set([0, 1, 2]));
 });
 
 test("limit", () => {
@@ -93,19 +93,19 @@ test("forward", () => {
 
   let fzf = new Fzf(list, { forward: true });
   let positions = fzf.find("re")[0].positions;
-  expect(new Set(positions)).toMatchObject(new Set([2, 3]));
+  expect(positions).toMatchObject(new Set([2, 3]));
 
   fzf = new Fzf(list, { forward: true, extended: true });
   positions = fzf.find("re")[0].positions;
-  expect(new Set(positions)).toMatchObject(new Set([2, 3]));
+  expect(positions).toMatchObject(new Set([2, 3]));
 
   fzf = new Fzf(list, { forward: false });
   positions = fzf.find("re")[0].positions;
-  expect(new Set(positions)).toMatchObject(new Set([10, 11]));
+  expect(positions).toMatchObject(new Set([10, 11]));
 
   fzf = new Fzf(list, { forward: false, extended: true });
   positions = fzf.find("re")[0].positions;
-  expect(new Set(positions)).toMatchObject(new Set([10, 11]));
+  expect(positions).toMatchObject(new Set([10, 11]));
 });
 
 test("sort", () => {

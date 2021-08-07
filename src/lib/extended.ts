@@ -100,7 +100,7 @@ export function computeExtendedMatch(
         matched = true;
 
         if (pos !== null) {
-          pos.forEach(allPos.add);
+          pos.forEach((v) => allPos.add(v));
         } else {
           for (let idx = off[0]; idx < off[1]; ++idx) {
             // idx is typecasted to int

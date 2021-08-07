@@ -117,7 +117,7 @@ export class Fzf<U> {
 
       let sidx = -1,
         eidx = -1;
-      if (match.allPos.length > 0) {
+      if (match.allPos.size > 0) {
         sidx = Math.min(...match.allPos);
         eidx = Math.max(...match.allPos) + 1;
       }
