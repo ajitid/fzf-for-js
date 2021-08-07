@@ -51,7 +51,8 @@ enum Char {
   Number,
 }
 
-function posArray(withPos: boolean, len: number) {
+// named posArray in Go code
+function createPosSet(withPos: boolean) {
   if (withPos) {
     // TLDR; there is no easy way to do
     // ```
@@ -69,8 +70,7 @@ function posArray(withPos: boolean, len: number) {
     // will result in the push at the end of the capacity rather than
     // from the start of it (which happens in go using `append`).
 
-    const pos = new Array(len);
-    return pos;
+    return new Set<number>();
   }
 
   return null;
@@ -183,7 +183,7 @@ export type AlgoFn = (
   pattern: Rune[],
   withPos: boolean,
   slab: Slab | null
-) => [Result, number[] | null];
+) => [Result, Set<number> | null];
 
 function trySkip(
   input: Rune[],
@@ -288,7 +288,7 @@ export const fuzzyMatchV2: AlgoFn = (
 ) => {
   const M = pattern.length;
   if (M === 0) {
-    return [{ start: 0, end: 0, score: 0 }, posArray(withPos, M)];
+    return [{ start: 0, end: 0, score: 0 }, createPosSet(withPos)];
   }
 
   const N = input.length;
@@ -416,7 +416,8 @@ export const fuzzyMatchV2: AlgoFn = (
     if (!withPos) {
       return [result, null];
     }
-    const pos = [maxScorePos];
+    const pos = new Set<number>();
+    pos.add(maxScorePos);
     return [result, pos];
   }
 
@@ -518,8 +519,7 @@ export const fuzzyMatchV2: AlgoFn = (
   }
 
   // Phase 4. (Optional) Backtrace to find character positions
-  const pos = posArray(withPos, M);
-  let posIdx = 0;
+  const pos = createPosSet(withPos);
   let j = f0;
   if (withPos && pos !== null) {
     let i = M - 1;
@@ -545,8 +545,7 @@ export const fuzzyMatchV2: AlgoFn = (
       }
 
       if (s > s1 && (s > s2 || (s === s2 && preferMatch))) {
-        pos[posIdx] = j;
-        posIdx++;
+        pos.add(j);
 
         if (i === 0) {
           break;
@@ -573,15 +572,14 @@ function calculateScore(
   sidx: number,
   eidx: number,
   withPos: boolean
-): [number, number[] | null] {
+): [number, Set<number> | null] {
   let pidx = 0,
     score = 0,
     inGap = false,
     consecutive = 0,
     firstBonus = toShort(0);
 
-  const pos = posArray(withPos, pattern.length);
-  let posIdx = 0;
+  const pos = createPosSet(withPos);
   let prevCharClass = Char.NonWord;
 
   if (sidx > 0) {
@@ -606,8 +604,7 @@ function calculateScore(
 
     if (rune === pattern[pidx]) {
       if (withPos && pos !== null) {
-        pos[posIdx] = idx;
-        posIdx++;
+        pos.add(idx);
       }
 
       score += SCORE_MATCH;
