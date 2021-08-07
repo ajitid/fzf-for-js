@@ -95,7 +95,7 @@ export function Basic() {
               <li key={index} className="py-1">
                 <HighlightChars
                   str={entry.item}
-                  highlightIndices={entry.positions ?? []}
+                  highlightIndices={entry.positions ?? new Set()}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
                   {entry.score}

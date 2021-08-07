@@ -89,7 +89,7 @@ const HighlightChars = (props) => {
   const chars = props.str.split("");
 
   const nodes = chars.map((char, i) => {
-    if (props.highlightIndices.includes(i)) {
+    if (props.highlightIndices.has(i)) {
       return <b key={i}>{char}</b>;
     } else {
       return char;
@@ -100,7 +100,7 @@ const HighlightChars = (props) => {
 };
 
 // and can be used like so:
-const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions ?? []} />
+const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions ?? new Set()} />
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
@@ -225,5 +225,5 @@ Each `entry` contains:
 - `start` - number - Start index where the item is matched.
 - `end` - number - End index + 1 where the item is matched.
 - `score` - number - Higher the score, closest the item is matched to the query.
-- `positions` - Indices of the characters that were matched in the item.
+- `positions` - A set containing indices of the characters that were matched in the item.
 
