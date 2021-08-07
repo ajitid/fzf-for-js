@@ -68,11 +68,8 @@ function posArray(withPos: boolean, len: number) {
     // then all elements in the capacity will be `undefined` and a push
     // will result in the push at the end of the capacity rather than
     // from the start of it (which happens in go using `append`).
-    // So while we'll accept len as arg, we won't do anything with it.
-    //
-    // {{ this is useless here, ignore: const pos = new Array(len).fill(0) }}
 
-    const pos = new Array();
+    const pos = new Array(len);
     return pos;
   }
 
@@ -522,8 +519,9 @@ export const fuzzyMatchV2: AlgoFn = (
 
   // Phase 4. (Optional) Backtrace to find character positions
   const pos = posArray(withPos, M);
+  let posIdx = 0;
   let j = f0;
-  if (withPos) {
+  if (withPos && pos !== null) {
     let i = M - 1;
     j = maxScorePos;
     let preferMatch = true;
@@ -547,8 +545,9 @@ export const fuzzyMatchV2: AlgoFn = (
       }
 
       if (s > s1 && (s > s2 || (s === s2 && preferMatch))) {
-        // TODO `pos` needs a typeguard or something using `withPos`
-        pos!.push(j);
+        pos[posIdx] = j;
+        posIdx++;
+
         if (i === 0) {
           break;
         }
@@ -582,6 +581,7 @@ function calculateScore(
     firstBonus = toShort(0);
 
   const pos = posArray(withPos, pattern.length);
+  let posIdx = 0;
   let prevCharClass = Char.NonWord;
 
   if (sidx > 0) {
@@ -605,9 +605,9 @@ function calculateScore(
     }
 
     if (rune === pattern[pidx]) {
-      if (withPos) {
-        // TODO needs typeguard
-        pos?.push(idx);
+      if (withPos && pos !== null) {
+        pos[posIdx] = idx;
+        posIdx++;
       }
 
       score += SCORE_MATCH;
