@@ -20,7 +20,7 @@ function iter(
   forward: boolean,
   pattern: Rune[],
   slab: Slab
-): [Offset, number, number[] | null] {
+): [Offset, number, Set<number> | null] {
   for (const part of tokens) {
     const [res, pos] = algoFn(
       caseSensitive,
@@ -36,10 +36,10 @@ function iter(
       const sidx = res.start + part.prefixLength;
       const eidx = res.end + part.prefixLength;
       if (pos !== null) {
-        for (let i = 0; i < pos.length; ++i) {
-          // part.prefixLength is typecasted to int here
-          pos[i] += part.prefixLength;
-        }
+        const newPos = new Set<number>();
+        // part.prefixLength is typecasted to int here
+        pos.forEach((v) => newPos.add(part.prefixLength + v));
+        return [[sidx, eidx], res.score, newPos];
       }
       return [[sidx, eidx], res.score, pos];
     }
@@ -67,7 +67,7 @@ export function computeExtendedMatch(
 
   const offsets: Offset[] = [];
   let totalScore = 0;
-  const allPos: number[] = [];
+  const allPos = new Set<number>();
 
   for (const termSet of pattern.termSets) {
     let offset: Offset = [0, 0];
@@ -100,11 +100,11 @@ export function computeExtendedMatch(
         matched = true;
 
         if (pos !== null) {
-          allPos.push(...pos);
+          pos.forEach(allPos.add);
         } else {
           for (let idx = off[0]; idx < off[1]; ++idx) {
             // idx is typecasted to int
-            allPos.push(idx);
+            allPos.add(idx);
           }
         }
         break;
