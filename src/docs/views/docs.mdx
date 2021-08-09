@@ -89,7 +89,7 @@ const HighlightChars = (props) => {
   const chars = props.str.split("");
 
   const nodes = chars.map((char, i) => {
-    if (props.highlightIndices.has(i)) {
+    if (props.indices.has(i)) {
       return <b key={i}>{char}</b>;
     } else {
       return char;
@@ -100,7 +100,7 @@ const HighlightChars = (props) => {
 };
 
 // and can be used like so:
-const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions} />
+const reactElement = <HighlightChars str={entry.item} indices={entry.positions} />
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
