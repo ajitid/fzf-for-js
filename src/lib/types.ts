@@ -4,7 +4,7 @@ export type Casing = "smart-case" | "case-sensitive" | "case-insensitive";
 
 export interface FzfResultItem<U = string> extends Result {
   item: U;
-  positions: number[] | null;
+  positions: Set<number>;
 }
 
 export type Tiebreaker<U> = (

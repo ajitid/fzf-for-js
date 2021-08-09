@@ -117,7 +117,7 @@ export class Fzf<U> {
 
       let sidx = -1,
         eidx = -1;
-      if (match.allPos.length > 0) {
+      if (match.allPos.size > 0) {
         sidx = Math.min(...match.allPos);
         eidx = Math.max(...match.allPos) + 1;
       }
@@ -164,9 +164,9 @@ export class Fzf<U> {
 
       // we don't get positions array back for exact match, so we'll fill it by ourselves
       if (this.opts.algo === null) {
-        positions = new Array(match.end - match.start);
-        for (let pos = match.start; pos < match.end; ++pos) {
-          positions[pos - match.start] = pos;
+        positions = new Set();
+        for (let position = match.start; position < match.end; ++position) {
+          positions.add(position);
         }
       }
 
@@ -177,7 +177,7 @@ export class Fzf<U> {
       scoreMap[scoreKey].push({
         item: this.items[i],
         ...match,
-        positions,
+        positions: positions ?? new Set(),
       });
     }
 

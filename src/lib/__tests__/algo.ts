@@ -71,13 +71,12 @@ function assertMatch2(
   let start = 0,
     end = 0;
 
-  if (pos === null || pos.length === 0) {
+  if (pos === null || pos.size === 0) {
     start = res.start;
     end = res.end;
   } else {
-    pos.sort((a, b) => a - b);
-    start = pos[0];
-    end = pos[pos.length - 1] + 1;
+    start = Math.min(...pos.values());
+    end = Math.max(...pos.values()) + 1;
   }
 
   const msg = `INPUT ${input} :: PATTERN ${pattern} :: FORWARD ${forward}`;
