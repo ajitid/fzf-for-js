@@ -100,7 +100,7 @@ const HighlightChars = (props) => {
 };
 
 // and can be used like so:
-const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions ?? new Set()} />
+const reactElement = <HighlightChars str={entry.item} highlightIndices={entry.positions} />
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 

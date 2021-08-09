@@ -177,7 +177,7 @@ export class Fzf<U> {
       scoreMap[scoreKey].push({
         item: this.items[i],
         ...match,
-        positions,
+        positions: positions ?? new Set(),
       });
     }
 
