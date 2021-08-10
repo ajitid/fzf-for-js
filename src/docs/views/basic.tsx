@@ -93,10 +93,7 @@ export function Basic() {
           <ul>
             {entries.map((entry, index) => (
               <li key={index} className="py-1">
-                <HighlightChars
-                  str={entry.item}
-                  indices={entry.positions}
-                />
+                <HighlightChars str={entry.item} indices={entry.positions} />
                 <span className="text-sm pl-4 italic text-gray-400">
                   {entry.score}
                 </span>

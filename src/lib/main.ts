@@ -16,7 +16,7 @@ const defaultOpts: Options<any> = {
   selector: (v) => v,
   casing: "smart-case",
   normalize: true,
-  algo: "v2",
+  fuzzy: "v2",
   extended: false,
   // example:
   // tiebreakers: [byLengthAsc, byStartAsc],
@@ -57,7 +57,7 @@ export class Fzf<U> {
       strToRunes(this.opts.selector(item).normalize())
     );
     this.algoFn = exactMatchNaive;
-    switch (this.opts.algo) {
+    switch (this.opts.fuzzy) {
       case "v2":
         this.algoFn = fuzzyMatchV2;
         break;
@@ -98,7 +98,7 @@ export class Fzf<U> {
 
   private extendedMatch(query: string) {
     const pattern = buildPatternForExtendedMatch(
-      Boolean(this.opts.algo),
+      Boolean(this.opts.fuzzy),
       this.opts.casing,
       this.opts.normalize,
       query
@@ -163,7 +163,7 @@ export class Fzf<U> {
       if (match.start === -1) continue;
 
       // we don't get positions array back for exact match, so we'll fill it by ourselves
-      if (this.opts.algo === null) {
+      if (this.opts.fuzzy === false) {
         positions = new Set();
         for (let position = match.start; position < match.end; ++position) {
           positions.add(position);

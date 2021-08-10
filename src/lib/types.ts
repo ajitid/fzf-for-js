@@ -46,11 +46,11 @@ export interface Options<U> {
   /**
    * Fuzzy algo to choose. Each algo has their own advantages, see here:
    * https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5
-   * If asssigned `null`, an exact match will be made instead of a fuzzy one.
+   * If asssigned `false`, an exact match will be made instead of a fuzzy one.
    *
    * @defaultValue "v2"
    */
-  algo: "v1" | "v2" | null;
+  fuzzy: "v1" | "v2" | false;
   /**
    * If true, you can add special patterns to narrow down your search.
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
