@@ -1,14 +1,17 @@
 import "jest-expect-message";
 
 import { Fzf } from "../main";
+import { Options } from "../types";
 
 test("filtering in extended match", () => {
   const list = ["package.json", "package-lock.json", "yarn.lock"];
 
-  for (const algo of ["v2", "v1", null, undefined]) {
+  const algos: Options<unknown>["fuzzy"][] = ["v1", "v2", false];
+
+  for (const algo of [...algos, undefined]) {
     const fzf = new Fzf(list, {
       extended: true,
-      algo: algo as any,
+      fuzzy: algo,
     });
     let entries = fzf.find("!lock");
     expect(entries.length).toBe(1);
@@ -50,7 +53,7 @@ test("case sensitivity in basic match", () => {
 
 test("basic match + exact", () => {
   const list = ["cadabra", "abacus"];
-  const fzf = new Fzf(list, { algo: null });
+  const fzf = new Fzf(list, { fuzzy: false });
   const entries = fzf.find("aba");
   expect(entries.length).toBe(1);
   expect(entries[0].item).toBe("abacus");
