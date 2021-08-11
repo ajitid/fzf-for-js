@@ -21,6 +21,8 @@
   },
   "===== SCRIPTS =====": "",
   "scripts": {
+    "prepack": "node scripts/prepack.cjs",
+    "postpack": "node scripts/postpack.cjs",
     "dev": "vite -c vite-for-docs.config.ts",
     "build": "npm run build:modules && npm run build:types",
     "build:modules": "tsc && vite build && vite build -c vite-legacy.config.ts",
