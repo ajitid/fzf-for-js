@@ -1,4 +1,5 @@
 import type { Result } from "./algo";
+import type { Finder } from "./finder";
 
 export type Casing = "smart-case" | "case-sensitive" | "case-insensitive";
 
@@ -58,7 +59,7 @@ export interface Options<U> {
    *
    * @defaultValue false
    */
-  extended: boolean;
+  match: (this: Finder<U[]>, query: string) => FzfResultItem<U>[];
   /**
    * A list of functions that act as fallback and help to
    * sort result entries when the score between two entries is tied.

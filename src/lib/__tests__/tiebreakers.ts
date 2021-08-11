@@ -1,10 +1,10 @@
-import { Fzf, tiebreakers } from "../main";
+import { Fzf, byLengthAsc, byStartAsc } from "../main";
 
 test("byLengthAsc", () => {
   const list = ["aaaaa", "caaaaaaaa", "baaaaa"];
 
   const fzf = new Fzf(list, {
-    tiebreakers: [tiebreakers.byLengthAsc],
+    tiebreakers: [byLengthAsc],
   });
 
   expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject([
@@ -18,7 +18,7 @@ test("byStartAsc", () => {
   const list = ["aaaa", "ccaaaa", "baaa"];
 
   const fzf = new Fzf(list, {
-    tiebreakers: [tiebreakers.byStartAsc],
+    tiebreakers: [byStartAsc],
   });
 
   expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject([
