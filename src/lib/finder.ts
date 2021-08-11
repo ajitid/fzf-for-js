@@ -35,13 +35,6 @@ const defaultOpts: Options<any> = {
   forward: true,
 };
 
-/*
-  This is actual FZF. You might ask, why not directly use this rather than
-  creating a wrapper in `main` file? We aren't using this directly only because
-  its attributes are not private. And the reason for them not being private is
-  that we have an external function `match` to which we send `this` to. For
-  `match` to use attributes of FZF, the attributes have to remain non-private.
-*/
 export class Finder<L extends ReadonlyArray<any>> {
   runesList: Rune[][];
   items: L;
