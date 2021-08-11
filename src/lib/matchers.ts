@@ -7,7 +7,7 @@ import { computeExtendedMatch } from "./extended";
 import { Finder } from "./finder";
 import type { FzfResultItem } from "./types";
 
-export function basicMatch<U>(this: Finder<U[]>, query: string) {
+export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
     query,
     this.opts.casing,
@@ -53,7 +53,7 @@ export function basicMatch<U>(this: Finder<U[]>, query: string) {
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-export function extendedMatch<U>(this: Finder<U[]>, query: string) {
+export function extendedMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   const pattern = buildPatternForExtendedMatch(
     Boolean(this.opts.fuzzy),
     this.opts.casing,

@@ -42,7 +42,7 @@ const defaultOpts: Options<any> = {
   that we have an external function `match` to which we send `this` to. For
   `match` to use attributes of FZF, the attributes have to remain non-private.
 */
-export class Finder<L extends any[]> {
+export class Finder<L extends ReadonlyArray<any>> {
   runesList: Rune[][];
   items: L;
   readonly opts: Options<ArrayElement<L>>;

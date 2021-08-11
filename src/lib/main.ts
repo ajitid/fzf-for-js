@@ -10,7 +10,7 @@ export type FzfOptions<U = string> = U extends string
   ? OptsToUse<U>
   : OptsToUse<U> & { selector: Options<U>["selector"] };
 
-export class Fzf<L extends any[]> {
+export class Fzf<L extends ReadonlyArray<any>> {
   private finder: Finder<L>;
   find: Finder<L>["find"];
 
