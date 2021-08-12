@@ -39,7 +39,8 @@ export function buildPatternForExtendedMatch(
   fuzzy: boolean,
   caseMode: Casing,
   normalize: boolean,
-  str: string
+  str: string,
+  limitToFuzzy: boolean = false
 ) {
   // TODO Implement caching here and below.
   // cacheable is received from caller of this fn
@@ -71,7 +72,7 @@ export function buildPatternForExtendedMatch(
   let sortable = false;
   let termSets: TermSet[] = [];
 
-  termSets = parseTerms(fuzzy, caseMode, normalize, str);
+  termSets = parseTerms(fuzzy, caseMode, normalize, str, limitToFuzzy);
 
   Loop: for (const termSet of termSets) {
     for (const [idx, term] of termSet.entries()) {
@@ -115,7 +116,8 @@ function parseTerms(
   fuzzy: boolean,
   caseMode: Casing,
   normalize: boolean,
-  str: string
+  str: string,
+  limitToFuzzy: boolean
 ): TermSet[] {
   // <backslash><space> to a <tab>
   str = str.replaceAll("\\ ", "\t");
@@ -150,38 +152,40 @@ function parseTerms(
       typ = TermType.Exact;
     }
 
-    if (set.length > 0 && !afterBar && text === "|") {
-      switchSet = false;
-      afterBar = true;
-      continue;
-    }
-    afterBar = false;
+    if (!limitToFuzzy) {
+      if (set.length > 0 && !afterBar && text === "|") {
+        switchSet = false;
+        afterBar = true;
+        continue;
+      }
+      afterBar = false;
 
-    if (text.startsWith("!")) {
-      inv = true;
-      typ = TermType.Exact;
-      text = text.substring(1);
-    }
-
-    if (text !== "$" && text.endsWith("$")) {
-      typ = TermType.Suffix;
-      text = text.substring(0, text.length - 1);
-    }
-
-    if (text.startsWith("'")) {
-      if (fuzzy && !inv) {
+      if (text.startsWith("!")) {
+        inv = true;
         typ = TermType.Exact;
-      } else {
-        typ = TermType.Fuzzy;
+        text = text.substring(1);
       }
-      text = text.substring(1);
-    } else if (text.startsWith("^")) {
-      if (typ === TermType.Suffix) {
-        typ = TermType.Equal;
-      } else {
-        typ = TermType.Prefix;
+
+      if (text !== "$" && text.endsWith("$")) {
+        typ = TermType.Suffix;
+        text = text.substring(0, text.length - 1);
       }
-      text = text.substring(1);
+
+      if (text.startsWith("'")) {
+        if (fuzzy && !inv) {
+          typ = TermType.Exact;
+        } else {
+          typ = TermType.Fuzzy;
+        }
+        text = text.substring(1);
+      } else if (text.startsWith("^")) {
+        if (typ === TermType.Suffix) {
+          typ = TermType.Equal;
+        } else {
+          typ = TermType.Prefix;
+        }
+        text = text.substring(1);
+      }
     }
 
     if (text.length > 0) {

@@ -53,12 +53,17 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-export function extendedMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
+export function extendedMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string,
+  limitToFuzzy = false
+) {
   const pattern = buildPatternForExtendedMatch(
     Boolean(this.opts.fuzzy),
     this.opts.casing,
     this.opts.normalize,
-    query
+    query,
+    limitToFuzzy
   );
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
@@ -93,6 +98,10 @@ export function extendedMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) 
   }
 
   return getResultFromScoreMap(scoreMap, this.opts.limit);
+}
+
+export function smartMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
+  return extendedMatch.bind(this)(query, true) as FzfResultItem<U>[];
 }
 
 function getResultFromScoreMap<T>(
