@@ -1,7 +1,7 @@
 import "jest-expect-message";
 
 import { Fzf } from "../main";
-import { basicMatch, extendedMatch } from "../main";
+import { basicMatch, extendedMatch, smartMatch } from "../main";
 import { Options } from "../types";
 
 test("filtering in extended match", () => {
@@ -22,6 +22,21 @@ test("filtering in extended match", () => {
     expect(entries.length).toBe(1);
     expect(entries[0].item).toBe("yarn.lock");
   }
+});
+
+test("filtering in smart match", () => {
+  const list = ["Peter Parker", "April O'Neil"];
+
+  const fzf = new Fzf(list, {
+    match: smartMatch,
+  });
+  let entries = fzf.find("o'nl");
+  expect(entries.length).toBe(1);
+  expect(entries[0].item).toBe("April O'Neil");
+
+  entries = fzf.find("par pte");
+  expect(entries.length).toBe(1);
+  expect(entries[0].item).toBe("Peter Parker");
 });
 
 test("case sensitivity in basic match", () => {
@@ -135,7 +150,7 @@ test("sort", () => {
     "haskell",
   ];
 
-  for (const match of [basicMatch, extendedMatch]) {
+  for (const match of [basicMatch, smartMatch, extendedMatch]) {
     for (const sort of [true, false]) {
       const fzf = new Fzf(list, { match, sort });
       const expected = sort ? "lisp, kotlin, elixir" : "kotlin, elixir, lisp";
@@ -144,9 +159,7 @@ test("sort", () => {
           .find("li")
           .map((v) => v.item)
           .join(", "),
-        `failed on\n\tmatch type=${
-          match === basicMatch ? "basic" : "extended"
-        }\n\tsort=${sort}`
+        `failed on\n\tmatch type = ${match.name}\n\tsort = ${sort}`
       ).toBe(expected);
     }
   }
