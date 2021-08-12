@@ -1,7 +1,7 @@
 import "jest-expect-message";
 
 import { Fzf } from "../main";
-import { basicMatch, extendedMatch } from "../matchers";
+import { basicMatch, extendedMatch } from "../main";
 import { Options } from "../types";
 
 test("filtering in extended match", () => {

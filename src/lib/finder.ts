@@ -61,9 +61,8 @@ export class Finder<L extends ReadonlyArray<any>> {
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
     query = query.normalize();
 
-    let result: FzfResultItem<ArrayElement<L>>[] = [];
-
-    result = this.opts.match.bind(this)(query);
+    let result: FzfResultItem<ArrayElement<L>>[] =
+      this.opts.match.bind(this)(query);
 
     if (this.opts.sort) {
       for (const tiebreaker of this.opts.tiebreakers) {
