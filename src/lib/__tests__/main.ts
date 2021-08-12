@@ -1,7 +1,7 @@
 import "jest-expect-message";
 
 import { Fzf } from "../main";
-import { basicMatch, extendedMatch, smartMatch } from "../main";
+import { basicMatch, enhancedMatch, extendedMatch } from "../main";
 import { Options } from "../types";
 
 test("filtering in extended match", () => {
@@ -24,11 +24,11 @@ test("filtering in extended match", () => {
   }
 });
 
-test("filtering in smart match", () => {
+test("filtering in enhanced match", () => {
   const list = ["Peter Parker", "April O'Neil"];
 
   const fzf = new Fzf(list, {
-    match: smartMatch,
+    match: enhancedMatch,
   });
   let entries = fzf.find("o'nl");
   expect(entries.length).toBe(1);
@@ -150,7 +150,7 @@ test("sort", () => {
     "haskell",
   ];
 
-  for (const match of [basicMatch, smartMatch, extendedMatch]) {
+  for (const match of [basicMatch, enhancedMatch, extendedMatch]) {
     for (const sort of [true, false]) {
       const fzf = new Fzf(list, { match, sort });
       const expected = sort ? "lisp, kotlin, elixir" : "kotlin, elixir, lisp";

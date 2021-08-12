@@ -100,7 +100,10 @@ export function extendedMatch<U>(
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-export function smartMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
+export function enhancedMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string
+) {
   return extendedMatch.bind(this)(query, true) as FzfResultItem<U>[];
 }
 
