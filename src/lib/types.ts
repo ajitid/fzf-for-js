@@ -55,7 +55,7 @@ export interface Options<U> {
   /**
    * A function that is responsible for matching list items with the query.
    *
-   * We ship with two match functions - `basicMatch` and `extendedMatch`.
+   * We ship with three match functions - `basicMatch`, `smartMatch` and `extendedMatch`.
    *
    * If `extendedMatch` is used, you can add special patterns to narrow down your search.
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
