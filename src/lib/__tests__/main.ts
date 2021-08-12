@@ -1,16 +1,17 @@
 import "jest-expect-message";
 
 import { Fzf } from "../main";
+import { basicMatch, extendedMatch } from "../main";
 import { Options } from "../types";
 
 test("filtering in extended match", () => {
   const list = ["package.json", "package-lock.json", "yarn.lock"];
 
-  const algos: Options<unknown>["fuzzy"][] = ["v1", "v2", false];
+  const algos: Options<string>["fuzzy"][] = ["v1", "v2", false];
 
   for (const algo of [...algos, undefined]) {
     const fzf = new Fzf(list, {
-      extended: true,
+      match: extendedMatch,
       fuzzy: algo,
     });
     let entries = fzf.find("!lock");
@@ -67,7 +68,11 @@ test("limit", () => {
   let entries = fzf.find("aa");
   expect(entries.length).toBe(1);
 
-  fzf = new Fzf(list, { limit: 1, casing: "case-insensitive", extended: true });
+  fzf = new Fzf(list, {
+    limit: 1,
+    casing: "case-insensitive",
+    match: extendedMatch,
+  });
   entries = fzf.find("aa");
   expect(entries.length).toBe(1);
 });
@@ -98,7 +103,7 @@ test("forward", () => {
   let positions = fzf.find("re")[0].positions;
   expect(positions).toMatchObject(new Set([2, 3]));
 
-  fzf = new Fzf(list, { forward: true, extended: true });
+  fzf = new Fzf(list, { forward: true, match: extendedMatch });
   positions = fzf.find("re")[0].positions;
   expect(positions).toMatchObject(new Set([2, 3]));
 
@@ -106,7 +111,7 @@ test("forward", () => {
   positions = fzf.find("re")[0].positions;
   expect(positions).toMatchObject(new Set([10, 11]));
 
-  fzf = new Fzf(list, { forward: false, extended: true });
+  fzf = new Fzf(list, { forward: false, match: extendedMatch });
   positions = fzf.find("re")[0].positions;
   expect(positions).toMatchObject(new Set([10, 11]));
 });
@@ -130,16 +135,18 @@ test("sort", () => {
     "haskell",
   ];
 
-  for (const extended of [true, false]) {
+  for (const match of [basicMatch, extendedMatch]) {
     for (const sort of [true, false]) {
-      const fzf = new Fzf(list, { extended, sort });
+      const fzf = new Fzf(list, { match, sort });
       const expected = sort ? "lisp, kotlin, elixir" : "kotlin, elixir, lisp";
       expect(
         fzf
           .find("li")
           .map((v) => v.item)
           .join(", "),
-        `failed on extended=${extended}, sort=${sort}`
+        `failed on\n\tmatch type=${
+          match === basicMatch ? "basic" : "extended"
+        }\n\tsort=${sort}`
       ).toBe(expected);
     }
   }

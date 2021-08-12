@@ -1,6 +1,6 @@
 import type { FzfResultItem, Options } from "./types";
 
-function byLengthAsc<U>(
+export function byLengthAsc<U>(
   a: FzfResultItem<U>,
   b: FzfResultItem<U>,
   opts: Options<U>
@@ -8,8 +8,9 @@ function byLengthAsc<U>(
   return opts.selector(a.item).length - opts.selector(b.item).length;
 }
 
-function byStartAsc<U>(a: FzfResultItem<U>, b: FzfResultItem<U>): number {
+export function byStartAsc<U>(
+  a: FzfResultItem<U>,
+  b: FzfResultItem<U>
+): number {
   return a.start - b.start;
 }
-
-export const tiebreakers = { byLengthAsc, byStartAsc };

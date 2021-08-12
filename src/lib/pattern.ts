@@ -212,7 +212,7 @@ function parseTerms(
   return sets;
 }
 
-export const buildRunesForBasicMatch = (
+export const buildPatternForBasicMatch = (
   query: string,
   casing: Casing,
   normalize: boolean

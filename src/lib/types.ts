@@ -1,4 +1,5 @@
 import type { Result } from "./algo";
+import type { Finder } from "./finder";
 
 export type Casing = "smart-case" | "case-sensitive" | "case-insensitive";
 
@@ -52,13 +53,17 @@ export interface Options<U> {
    */
   fuzzy: "v1" | "v2" | false;
   /**
-   * If true, you can add special patterns to narrow down your search.
+   * A function that is responsible for matching list items with the query.
+   *
+   * We ship with two match functions - `basicMatch` and `extendedMatch`.
+   *
+   * If `extendedMatch` is used, you can add special patterns to narrow down your search.
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
    * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
    *
-   * @defaultValue false
+   * @defaultValue basicMatch
    */
-  extended: boolean;
+  match: (this: Finder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
   /**
    * A list of functions that act as fallback and help to
    * sort result entries when the score between two entries is tied.
@@ -67,6 +72,10 @@ export interface Options<U> {
    * compare function with an added third argument which is this `options` itself.
    *
    * Note that tiebreakers cannot be used if `sort=false`.
+   *
+   * FZF ships with these tiebreakers:
+   * - `byLengthAsc`
+   * - `byStartAsc`
    *
    * @defaultValue []
    *
