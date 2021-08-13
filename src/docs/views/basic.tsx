@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
+import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
@@ -53,6 +54,7 @@ export function Basic() {
 
   return (
     <div className="px-6">
+      <Seo title="Basic example" />
       <div className="flex justify-end items-center">
         <input
           type="radio"

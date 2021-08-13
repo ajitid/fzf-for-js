@@ -15,12 +15,14 @@ import { CodeBlock } from "./components/code-block";
 import linkIconSrc from "./assets/link.svg";
 import { DocsVersions } from "./views/docs-versions";
 import AppRoutes from "./app-routes";
+import Migrate from "./views/migrate.mdx";
 import "./utils/expose";
 
 function getAnchor(text: string) {
   return text
     .toLowerCase()
     .replace(/[ \(\.]/g, "-")
+    .replaceAll("→", "to")
     .replace(/[^a-z0-9-]/g, "");
 }
 
@@ -112,6 +114,7 @@ export function App() {
               <Navigate to="docs/latest" replace />
             </Route>
             <Route path="docs/latest/*" element={<AppRoutes />} />
+            <Route path="migrate" element={<Migrate />} />
             <Route path="*" element={<div>not found</div>} />
             <Route
               path="docs"
