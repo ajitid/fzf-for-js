@@ -16,7 +16,7 @@ export const theme = {
     {
       types: ["deleted"],
       style: {
-        color: "rgba(239, 83, 80, 0.56)",
+        color: "rgba(239, 83, 80, 0.81)",
         fontStyle: "italic",
       },
     },
