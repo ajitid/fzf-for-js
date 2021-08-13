@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
 import { Fzf, FzfResultItem } from "../../lib/main";
 
@@ -38,6 +39,7 @@ export function Custom() {
 
   return (
     <div className="px-6">
+      <Seo title="Non-string list example" />
       <div>
         <input
           autoFocus
