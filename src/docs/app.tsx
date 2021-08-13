@@ -22,6 +22,7 @@ function getAnchor(text: string) {
   return text
     .toLowerCase()
     .replace(/[ \(\.]/g, "-")
+    .replaceAll("→", "to")
     .replace(/[^a-z0-9-]/g, "");
 }
 
