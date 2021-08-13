@@ -2,6 +2,7 @@ import { slab } from "./slab";
 import {
   buildPatternForExtendedMatch,
   buildPatternForBasicMatch,
+  ExtendedFeatures,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
 import { Finder } from "./finder";
@@ -56,14 +57,14 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
 export function extendedMatch<U>(
   this: Finder<ReadonlyArray<U>>,
   query: string,
-  limitToFuzzy = false
+  features?: Partial<ExtendedFeatures>
 ) {
   const pattern = buildPatternForExtendedMatch(
     Boolean(this.opts.fuzzy),
     this.opts.casing,
     this.opts.normalize,
     query,
-    limitToFuzzy
+    features
   );
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
@@ -104,7 +105,15 @@ export function enhancedMatch<U>(
   this: Finder<ReadonlyArray<U>>,
   query: string
 ) {
-  return extendedMatch.bind(this)(query, true) as FzfResultItem<U>[];
+  const features: ExtendedFeatures = {
+    end: false,
+    exact: false,
+    not: false,
+    or: false,
+    start: false,
+  };
+
+  return extendedMatch.bind(this)(query, features) as FzfResultItem<U>[];
 }
 
 function getResultFromScoreMap<T>(

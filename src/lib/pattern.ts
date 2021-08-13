@@ -35,13 +35,31 @@ interface Term {
 
 type TermSet = Term[];
 
+export interface ExtendedFeatures {
+  or: boolean;
+  not: boolean;
+  start: boolean;
+  end: boolean;
+  exact: boolean;
+}
+
+const defaultExtendedFeatures: ExtendedFeatures = {
+  or: true,
+  not: true,
+  start: true,
+  end: true,
+  exact: true,
+};
+
 export function buildPatternForExtendedMatch(
   fuzzy: boolean,
   caseMode: Casing,
   normalize: boolean,
   str: string,
-  limitToFuzzy: boolean = false
+  features?: Partial<ExtendedFeatures>
 ) {
+  const extendedFeatures = { ...defaultExtendedFeatures, ...features };
+
   // TODO Implement caching here and below.
   // cacheable is received from caller of this fn
   let cacheable = true;
@@ -72,7 +90,7 @@ export function buildPatternForExtendedMatch(
   let sortable = false;
   let termSets: TermSet[] = [];
 
-  termSets = parseTerms(fuzzy, caseMode, normalize, str, limitToFuzzy);
+  termSets = parseTerms(fuzzy, caseMode, normalize, str, extendedFeatures);
 
   Loop: for (const termSet of termSets) {
     for (const [idx, term] of termSet.entries()) {
@@ -117,7 +135,7 @@ function parseTerms(
   caseMode: Casing,
   normalize: boolean,
   str: string,
-  limitToFuzzy: boolean
+  features: ExtendedFeatures
 ): TermSet[] {
   // <backslash><space> to a <tab>
   str = str.replaceAll("\\ ", "\t");
@@ -152,40 +170,38 @@ function parseTerms(
       typ = TermType.Exact;
     }
 
-    if (!limitToFuzzy) {
-      if (set.length > 0 && !afterBar && text === "|") {
-        switchSet = false;
-        afterBar = true;
-        continue;
-      }
-      afterBar = false;
+    if (features.or && set.length > 0 && !afterBar && text === "|") {
+      switchSet = false;
+      afterBar = true;
+      continue;
+    }
+    afterBar = false;
 
-      if (text.startsWith("!")) {
-        inv = true;
+    if (features.not && text.startsWith("!")) {
+      inv = true;
+      typ = TermType.Exact;
+      text = text.substring(1);
+    }
+
+    if (features.end && text !== "$" && text.endsWith("$")) {
+      typ = TermType.Suffix;
+      text = text.substring(0, text.length - 1);
+    }
+
+    if (features.exact && text.startsWith("'")) {
+      if (fuzzy && !inv) {
         typ = TermType.Exact;
-        text = text.substring(1);
+      } else {
+        typ = TermType.Fuzzy;
       }
-
-      if (text !== "$" && text.endsWith("$")) {
-        typ = TermType.Suffix;
-        text = text.substring(0, text.length - 1);
+      text = text.substring(1);
+    } else if (features.start && text.startsWith("^")) {
+      if (typ === TermType.Suffix) {
+        typ = TermType.Equal;
+      } else {
+        typ = TermType.Prefix;
       }
-
-      if (text.startsWith("'")) {
-        if (fuzzy && !inv) {
-          typ = TermType.Exact;
-        } else {
-          typ = TermType.Fuzzy;
-        }
-        text = text.substring(1);
-      } else if (text.startsWith("^")) {
-        if (typ === TermType.Suffix) {
-          typ = TermType.Equal;
-        } else {
-          typ = TermType.Prefix;
-        }
-        text = text.substring(1);
-      }
+      text = text.substring(1);
     }
 
     if (text.length > 0) {
