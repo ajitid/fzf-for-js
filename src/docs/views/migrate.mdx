@@ -1,0 +1,82 @@
+# Migration Guide
+
+## v0.3 → v0.4
+
+### `options.maxResultItems`
+
+`maxResultItems` has been renamed. Please change occurrences of `maxResultItems` to `limit` in your code.
+
+```diff
+const fzf = new Fzf(list, {
+- maxResultItems: 10
++ limit: 10
+})
+```
+
+### `options.cache`
+
+This option has been removed. Please remove its instances from your code if you've written any.
+
+```diff
+const fzf = new Fzf(list, {
+- cache: true,
+  // ... other options
+})
+```
+
+### `normalize`
+
+`normalize` is now turned on by default. This means that by default, diacritics/accents from words will be removed. (So search string "fe" will match both "Caffè" and "Caffe" for example.) This change should not affect most of the users of this library, but if you are aware of this feature and want to keep it turned off, you'll have to assign it to false.
+
+```diff
+const fzf = new Fzf(list, {
++ normalize: false,
+  // ... other options
+})
+```
+
+### `options.forward`
+
+This option wasn't available in v0.3.
+
+If you queried "comp" on "src/components/input-composed.ts" you would get:
+
+| v0.3                                    | v0.4                                    |
+| ---                                     | ---                                     |
+| src/components/input-<b>comp</b>osed.ts | src/<b>comp</b>onents/input-composed.ts |
+
+So in v0.3 "comp" that appears at the end is highlighted while in v0.4 first match from the start is highlighted.
+
+If you want to keep the old behaviour, you would need to turn `forward` off:
+
+```diff
+const fzf = new Fzf(list, {
++ forward: false,
+  // ... other options
+})
+```
+
+### `resultItem.positions`
+
+`positions` has now been converted to a [Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) and will always be a non-null value. You usually use `positions` to highlight matched characters of a string.
+
+```diff
+- <HighlightChars text={entry.item} indices={entry.positions ?? []} />
++ <HighlightChars text={entry.item} indices={entry.positions} />
+
+
+// ...
+
+interface HighlightCharsProps {
+  text: string
+- indices: number[]
++ indices: Set<number>
+}
+
+// ...
+
+const strArr = props.text.split("");
+const nodes = strArr.map((v, i) => {
+- if (props.indices.includes(i)) {
++ if (props.indices.has(i)) {
+```
