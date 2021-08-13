@@ -30,7 +30,7 @@ test("filtering in enhanced match", () => {
   const fzf = new Fzf(list, {
     match: enhancedMatch,
   });
-  let entries = fzf.find("o'nl");
+  let entries = fzf.find("'nl");
   expect(entries.length).toBe(1);
   expect(entries[0].item).toBe("April O'Neil");
 
