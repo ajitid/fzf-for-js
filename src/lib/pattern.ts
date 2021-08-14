@@ -118,7 +118,7 @@ function parseTerms(
   str: string
 ): TermSet[] {
   // <backslash><space> to a <tab>
-  str = str.replaceAll("\\ ", "\t");
+  str = str.replace(/\\ /g, "\t");
   // split on space groups
   const tokens = str.split(/ +/);
 
@@ -130,7 +130,7 @@ function parseTerms(
   for (const token of tokens) {
     let typ = TermType.Fuzzy,
       inv = false,
-      text = token.replaceAll("\t", " ");
+      text = token.replace(/\t/g, " ");
     const lowerText = text.toLowerCase();
 
     const caseSensitive =
