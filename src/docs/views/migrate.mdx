@@ -17,6 +17,8 @@ const fzf = new Fzf(list, {
 })
 ```
 
+_Reason for the change: We've found that users of this library and authors of other fuzzy libraries usually use `limit` as the term. This also matches with the term we use in SQL clauses._
+
 ### `options.cache`
 
 This option has been removed. Please remove its instances from your code if you've written any.
@@ -28,6 +30,8 @@ const fzf = new Fzf(list, {
 })
 ```
 
+_Reason: Caching mechanism which we were using was not too useful in the context of a fuzzy matcher._
+
 ### `options.normalize`
 
 `normalize` is now turned on by default. This means that by default, diacritics/accents from words will be removed. (So search string "fe" will match both "Caffè" and "Caffe" for example.) This change should not affect most of the users of this library, but if you are aware of this feature and want to keep it turned off, you'll have to assign it to false.
@@ -38,6 +42,8 @@ const fzf = new Fzf(list, {
   // ... other options
 })
 ```
+
+_Reason: We felt that setting this option on is a sensible default. This is something that [other finders](https://github.com/kentcdodds/match-sorter#keepdiacritics-boolean) have turned on too. However we are aware that few people can have [opinion](https://twitter.com/vanhelbergen/status/1425275180356571140?s=20) [against](https://twitter.com/bk2204/status/1425221716540801026?s=20) it. For fuzzy finders removing diacritics does make sense, but for form fields that are going to be saved it doesn't._
 
 ### `options.forward`
 
@@ -59,6 +65,8 @@ const fzf = new Fzf(list, {
   // ... other options
 })
 ```
+
+_Reason: This was mistakenly set other way round in previous version._
 
 ### `resultItem.positions`
 
@@ -86,6 +94,8 @@ export const HighlightChars = (props: HighlightCharsProps) => {
 +   if (props.indices.has(i)) {
 ```
 
+_Reason: We expect it to simplify highlighting logic._
+
 ### `resultItem.result`
 
 `result` is flattened. This will result in the following code change:
@@ -107,3 +117,4 @@ const entry = entries[0];
 + const score = entry.score
 ```
 
+_Reason: A nested `result` property introduces confusion while explaining the topics, as this word is also used when we get result from `find` for example. Moreover, this word is too vague in its definition if used alone._
