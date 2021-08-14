@@ -79,8 +79,9 @@ interface HighlightCharsProps {
 
 // ...
 
-const strArr = props.text.split("");
-const nodes = strArr.map((v, i) => {
-- if (props.indices.includes(i)) {
-+ if (props.indices.has(i)) {
+export const HighlightChars = (props: HighlightCharsProps) => {
+  const strArr = props.text.split("");
+  const nodes = strArr.map((v, i) => {
+-   if (props.indices.includes(i)) {
++   if (props.indices.has(i)) {
 ```
