@@ -22,7 +22,7 @@ function getAnchor(text: string) {
   return text
     .toLowerCase()
     .replace(/[ \(\.]/g, "-")
-    .replaceAll("→", "to")
+    .replace(/→/g, "to")
     .replace(/[^a-z0-9-]/g, "");
 }
 
@@ -124,7 +124,7 @@ export function App() {
               return (
                 <Route
                   key={v.version}
-                  path={`docs/${v.version.replaceAll(".", "-")}/*`}
+                  path={`docs/${v.version.replace(/\./g, "-")}/*`}
                   element={
                     <React.Suspense
                       fallback={

@@ -22,7 +22,7 @@ export const DocsVersions = (props: Props) => {
           .reverse()
           .map((v) => (
             <li key={v}>
-              <Link to={`${v.replaceAll(".", "-")}`} className="text-blue-700">
+              <Link to={`${v.replace(/\./g, "-")}`} className="text-blue-700">
                 {v}
               </Link>
             </li>
