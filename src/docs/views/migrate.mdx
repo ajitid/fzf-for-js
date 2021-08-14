@@ -28,7 +28,7 @@ const fzf = new Fzf(list, {
 })
 ```
 
-### `normalize`
+### `options.normalize`
 
 `normalize` is now turned on by default. This means that by default, diacritics/accents from words will be removed. (So search string "fe" will match both "Caffè" and "Caffe" for example.) This change should not affect most of the users of this library, but if you are aware of this feature and want to keep it turned off, you'll have to assign it to false.
 
@@ -79,8 +79,31 @@ interface HighlightCharsProps {
 
 // ...
 
-const strArr = props.text.split("");
-const nodes = strArr.map((v, i) => {
-- if (props.indices.includes(i)) {
-+ if (props.indices.has(i)) {
+export const HighlightChars = (props: HighlightCharsProps) => {
+  const strArr = props.text.split("");
+  const nodes = strArr.map((v, i) => {
+-   if (props.indices.includes(i)) {
++   if (props.indices.has(i)) {
 ```
+
+### `resultItem.result`
+
+`result` is flattened. This will result in the following code change:
+
+```diff
+const entries = (new Fzf(list)).find(query); 
+const entry = entries[0];
+
+- const { start, end, score } = entry.result
++ const { start, end, score } = entry
+
+
+// Alternatively:
+- const start = entry.result.start
+- const end = entry.result.end
+- const score = entry.result.score
++ const start = entry.start
++ const end = entry.end
++ const score = entry.score
+```
+
