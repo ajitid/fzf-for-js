@@ -50,6 +50,8 @@ const fillLegacyDocs = (verMajor, verMinor) => {
 
 const fillDocs = (verMajor, verMinor) => {
   if (verMajor === 0 && verMinor <= 3) {
+    if (verMinor < 3) return;
+
     fillLegacyDocs(verMajor, verMinor);
     return;
   }
