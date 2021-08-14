@@ -85,3 +85,19 @@ export const HighlightChars = (props: HighlightCharsProps) => {
 -   if (props.indices.includes(i)) {
 +   if (props.indices.has(i)) {
 ```
+
+### `resultItem.result`
+
+`result` is flattened. This will result in the following code change:
+
+```diff
+const entries = (new Fzf(list)).find(query); 
+const entry = entries[0];
+
+- const { start, end } = entry.result
++ const { start, end } = entry
+
+- const score = entry.result.score
+- const score = entry.score
+```
+
