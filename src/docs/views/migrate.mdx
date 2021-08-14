@@ -28,7 +28,7 @@ const fzf = new Fzf(list, {
 })
 ```
 
-### `normalize`
+### `options.normalize`
 
 `normalize` is now turned on by default. This means that by default, diacritics/accents from words will be removed. (So search string "fe" will match both "Caffè" and "Caffe" for example.) This change should not affect most of the users of this library, but if you are aware of this feature and want to keep it turned off, you'll have to assign it to false.
 
