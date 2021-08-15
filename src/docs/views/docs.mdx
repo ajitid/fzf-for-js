@@ -64,6 +64,14 @@ const ranking = entries.map(entry => entry.item.displayName).join(', ')
 console.log(ranking) // Output: cdef, abcd, bcde
 ```
 
+You can also use a combination of fields to search upon:
+
+```js
+const fzf = new Fzf(list, {
+  selector: (item) => `${item.displayName} (${item.id})` // bcde (2)
+})
+```
+
 ### Case sensitivity
 
 FZF does smart case searching by default. This means that if the list is
@@ -116,7 +124,7 @@ When we try to match "an" with Thane, Anandnagar, Tripura, Anandpur, Bangalore a
 <div>B<b>an</b>galore</div>
 <div>S<b>an</b>gam</div>
 
-Anandnagar and Anandpur are ranked above the others as their "an" got matched at the very start of those strings. Rest of the three contains "an" somewhere in them so they bear the same rank. This ranking is decided by a `score` that FZF calculates for each string.
+Anandnagar and Anandpur are ranked above the others as their "an" got matched at the very start of those strings. Rest of the three contains "an" somewhere between so they bear the same rank. This ranking is decided by a `score` that FZF calculates for each string.
 
 But what if we prefer to have shorter strings appear first? Well here is when a tiebreaker comes in:
 
@@ -142,6 +150,8 @@ Now the result will be:
 
 Note that a tiebreaker is only applied if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
 
+To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/37e6c0d02445e813bcc901f6cf5665db24d5b67b/src/lib/tiebreakers.ts).
+
 #### Disabling sorter
 
 FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism too:
@@ -153,6 +163,17 @@ const fzf = new Fzf(list, {
 ```
 
 When sorting is turned off, tiebreakers won't affect the sorting order either.
+
+### Matching backwards
+
+While matching file paths or links you might prefer for characters that appear the end to be highlighted first. Turning `forward=false` just lets you do that.
+
+For example, if you query "comp" you would get:
+
+| `forward=true` (default)                | `forward=false`                         |
+| ---                                     | ---                                     |
+| src/<b>comp</b>onents/input-composed.ts | src/components/input-<b>comp</b>osed.ts |
+| src/<b>comp</b>onents/portal.ts         | src/<b>comp</b>onents/portal.ts         |
 
 ### Usage with TypeScript
 
@@ -183,10 +204,12 @@ This library has different defaults compared to FZF CLI. Get a behaviour similar
 
 ```js
 const fzf = new Fzf(list, {
-  extended: true,
-  tiebreakers: [ tiebreakers.byLengthAsc ] // `tiebreakers` is available from the library
+  match: extendedMatch,
+  tiebreakers: [ byLengthAsc ]
 })
 ```
+
+Both `extendedMatch` and `byLengthAsc` are present in the library for you to import and use.
 
 ### Notes
 
