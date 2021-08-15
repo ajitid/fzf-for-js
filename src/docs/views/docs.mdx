@@ -129,12 +129,12 @@ Anandnagar and Anandpur are ranked above the others as their "an" got matched at
 But what if we prefer to have shorter strings appear first? Well here is when a tiebreaker comes in:
 
 ```js
-import { Fzf, tiebreakers } from 'fzf'
+import { Fzf, byLengthAsc } from 'fzf'
 
 // ...
 
 const fzf = new Fzf(list, {
-  tiebreakers: [tiebreakers.byLengthAsc]
+  tiebreakers: [byLengthAsc]
 })
 ```
 
@@ -148,7 +148,7 @@ Now the result will be:
 | Bangalore            | Sangam                              |
 | Sangam               | Bangalore                           |
 
-Note that a tiebreaker is only applied if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
+Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
 
 To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/37e6c0d02445e813bcc901f6cf5665db24d5b67b/src/lib/tiebreakers.ts).
 
@@ -180,7 +180,7 @@ For example, if you query "comp" you would get:
 The following code shows a descriptive usage with types. TypeScript can infer these types most of the time for you, so you wouldn't ever need to write them by hand. But for the cases when you do, these are the types you would use:
 
 ```ts
-import { Fzf, FzfResultItem, FzfOptions  } from 'fzf'
+import { Fzf, FzfResultItem, FzfOptions } from 'fzf'
 
 interface Fruit {
   id: string
@@ -193,7 +193,7 @@ const options: FzfOptions<Fruit> = {
   selector: v => v.name
 }
 
-const fzf = new Fzf<Fruit>(fruits, options)
+const fzf = new Fzf<Fruit[]>(fruits, options)
 
 const results: FzfResultItem<Fruit>[] = fzf.find('ppya') // gives you back a papaya!
 ```
@@ -205,7 +205,7 @@ This library has different defaults compared to FZF CLI. Get a behaviour similar
 ```js
 const fzf = new Fzf(list, {
   match: extendedMatch,
-  tiebreakers: [ byLengthAsc ]
+  tiebreakers: [byLengthAsc]
 })
 ```
 
@@ -229,7 +229,7 @@ Both `extendedMatch` and `byLengthAsc` are present in the library for you to imp
 - `tiebreakers?` - array, defaults to `[]` - A list of functions that decide sort order when the score is tied between two result entries. A tiebreaker is nothing but a compare function like the one you find in [JS Array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) with an added third argument which is this `options` itself. First and second arguments are result entries that you receive from `fzf.find`. Note that tiebreakers can't be used if `sort=false`. This library ships with two tiebreakers - `byLengthAsc` and `byStartAsc`.
 - `sort?` - boolean, defaults to `true` - If true, result items will be sorted in descending order by their score. Otherwise, result won't be sorted and tiebreakers won't be applied either.
 - `fuzzy?` - string, defaults to `"v2"`, accepts `"v1" | "v2" | false` - Select which version of fuzzy algo you want to use. Refer to [this explanation](https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5) to see the differences. If asssigned `false`, an exact match will be made instead of a fuzzy one.
-- `match?` - function, defaults to `basicMatch` - We provide two in-built functions, namely `basicMatch` and `extendedMatch`. If `extendedMatch` is used, you can add special patterns to narrow down your search. To read more about how it can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax). For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
+- `match?` - function, defaults to `basicMatch` - We provide two built-in functions, namely `basicMatch` and `extendedMatch`. If `extendedMatch` is used, you can add special patterns to narrow down your search. To read more about how it can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax). For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
 - `forward?` - boolean, defaults to `true` - If false, items will be matched from backwards. So if we query "/breeds/pyrenees" with "re" it will result in "/b<b>re</b>eds/pyrenees" but with forward=false it will result in "/breeds/py<b>re</b>nees".
 
 ### `fzf.find(query)`
