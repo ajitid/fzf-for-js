@@ -15,20 +15,21 @@
   "homepage": "https://fzf.netlify.app",
   "repository": "ajitid/fzf-for-js",
   "author": {
-    "name": "ajit",
+    "name": "Ajit",
     "email": "zlksnkwork+pkgnfo@gmail.com",
     "url": "https://ajitid.in"
   },
   "===== SCRIPTS =====": "",
   "scripts": {
-    "prepack": "node scripts/prepack.cjs",
-    "postpack": "node scripts/postpack.cjs",
     "dev": "vite -c vite-for-docs.config.ts",
     "build": "npm run build:modules && npm run build:types",
+    "postbuild": "node scripts/postbuild.js",
     "build:modules": "tsc && vite build && vite build -c vite-legacy.config.ts",
-    "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
+    "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist/types",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
+    "prepack": "node scripts/prepack.cjs",
+    "postpack": "node scripts/postpack.cjs",
     "test": "jest",
     "test:watch": "jest --watch -o",
     "test:cov": "jest --coverage",
@@ -46,7 +47,7 @@
       "require": "./dist/fzf.umd.js"
     }
   },
-  "types": "./dist/main.d.ts",
+  "types": "./dist/types/main.d.ts",
   "===== HINTING =====": "",
   "sideEffects": false,
   "===== DEPS =====": "",
