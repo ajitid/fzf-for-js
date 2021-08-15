@@ -64,7 +64,7 @@ const ranking = entries.map(entry => entry.item.displayName).join(', ')
 console.log(ranking) // Output: cdef, abcd, bcde
 ```
 
-You can also use a combination of fields to search on:
+You can also use a combination of fields to search upon:
 
 ```js
 const fzf = new Fzf(list, {
@@ -163,6 +163,17 @@ const fzf = new Fzf(list, {
 ```
 
 When sorting is turned off, tiebreakers won't affect the sorting order either.
+
+### Matching backwards
+
+While matching file paths or links you might prefer for characters that appear the end to be highlighted first. Turning `forward=false` just lets you do that.
+
+For example, if you query "comp" you would get:
+
+| `forward=true` (default)                | `forward=false`                         |
+| ---                                     | ---                                     |
+| src/<b>comp</b>onents/input-composed.ts | src/components/input-<b>comp</b>osed.ts |
+| src/<b>comp</b>onents/portal.ts         | src/<b>comp</b>onents/portal.ts         |
 
 ### Usage with TypeScript
 
