@@ -2,11 +2,11 @@
 // and using https://github.com/nvim-telescope/telescope-fzf-native.nvim/blob/f0379f50aa79a2bf028340067e443a3079b29d54/src/fzf.c
 // for extra reference
 
-import { normalized } from "./normalize";
+import { normalizeRune } from "./normalize";
 import { Slab } from "./slab";
 import { Int16, Int32, toShort, toInt, maxInt16 } from "./numerics";
 import { Rune, runesToStr } from "./runes";
-import { whitespacesAtEnd, whitespacesAtStart } from "./char";
+import { isWhitespace, whitespacesAtEnd, whitespacesAtStart } from "./char";
 
 const DEBUG = false;
 
@@ -51,7 +51,8 @@ enum Char {
   Number,
 }
 
-function posArray(withPos: boolean, len: number) {
+// named posArray in Go code
+function createPosSet(withPos: boolean) {
   if (withPos) {
     // TLDR; there is no easy way to do
     // ```
@@ -68,12 +69,8 @@ function posArray(withPos: boolean, len: number) {
     // then all elements in the capacity will be `undefined` and a push
     // will result in the push at the end of the capacity rather than
     // from the start of it (which happens in go using `append`).
-    // So while we'll accept len as arg, we won't do anything with it.
-    //
-    // {{ this is useless here, ignore: const pos = new Array(len).fill(0) }}
 
-    const pos = new Array();
-    return pos;
+    return new Set<number>();
   }
 
   return null;
@@ -178,21 +175,6 @@ function bonusAt(input: Rune[], idx: number): Int16 {
   return bonusFor(charClassOf(input[idx - 1]), charClassOf(input[idx]));
 }
 
-function normalizeRune(rune: Rune): Rune {
-  if (rune < 0x00c0 || rune > 0x2184) {
-    return rune;
-  }
-
-  // while a char can be converted to hex using str.charCodeAt().toString(16), it is not needed
-  // because in `normalized` map those hex in keys will be converted to decimals.
-  // Also we are passing a number instead of a converting a char so the above line doesn't apply (and that
-  // we are using codePointAt instead of charCodeAt)
-  const normalizedChar = normalized[rune];
-  if (normalizedChar !== undefined) return normalizedChar.codePointAt(0)!;
-
-  return rune;
-}
-
 export type AlgoFn = (
   caseSensitive: boolean,
   normalize: boolean,
@@ -201,7 +183,7 @@ export type AlgoFn = (
   pattern: Rune[],
   withPos: boolean,
   slab: Slab | null
-) => [Result, number[] | null];
+) => [Result, Set<number> | null];
 
 function trySkip(
   input: Rune[],
@@ -306,7 +288,7 @@ export const fuzzyMatchV2: AlgoFn = (
 ) => {
   const M = pattern.length;
   if (M === 0) {
-    return [{ start: 0, end: 0, score: 0 }, posArray(withPos, M)];
+    return [{ start: 0, end: 0, score: 0 }, createPosSet(withPos)];
   }
 
   const N = input.length;
@@ -434,7 +416,8 @@ export const fuzzyMatchV2: AlgoFn = (
     if (!withPos) {
       return [result, null];
     }
-    const pos = [maxScorePos];
+    const pos = new Set<number>();
+    pos.add(maxScorePos);
     return [result, pos];
   }
 
@@ -536,9 +519,9 @@ export const fuzzyMatchV2: AlgoFn = (
   }
 
   // Phase 4. (Optional) Backtrace to find character positions
-  const pos = posArray(withPos, M);
+  const pos = createPosSet(withPos);
   let j = f0;
-  if (withPos) {
+  if (withPos && pos !== null) {
     let i = M - 1;
     j = maxScorePos;
     let preferMatch = true;
@@ -562,8 +545,8 @@ export const fuzzyMatchV2: AlgoFn = (
       }
 
       if (s > s1 && (s > s2 || (s === s2 && preferMatch))) {
-        // TODO `pos` needs a typeguard or something using `withPos`
-        pos!.push(j);
+        pos.add(j);
+
         if (i === 0) {
           break;
         }
@@ -589,14 +572,14 @@ function calculateScore(
   sidx: number,
   eidx: number,
   withPos: boolean
-): [number, number[] | null] {
+): [number, Set<number> | null] {
   let pidx = 0,
     score = 0,
     inGap = false,
     consecutive = 0,
     firstBonus = toShort(0);
 
-  const pos = posArray(withPos, pattern.length);
+  const pos = createPosSet(withPos);
   let prevCharClass = Char.NonWord;
 
   if (sidx > 0) {
@@ -620,9 +603,8 @@ function calculateScore(
     }
 
     if (rune === pattern[pidx]) {
-      if (withPos) {
-        // TODO needs typeguard
-        pos?.push(idx);
+      if (withPos && pos !== null) {
+        pos.add(idx);
       }
 
       score += SCORE_MATCH;
@@ -882,8 +864,7 @@ export const prefixMatch: AlgoFn = (
   }
 
   let trimmedLen = 0;
-  // check if pattern[0] is not a whitespace
-  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[0])) {
     trimmedLen = whitespacesAtStart(text);
   }
 
@@ -934,8 +915,9 @@ export const suffixMatch: AlgoFn = (
 
   if (
     pattern.length === 0 ||
-    String.fromCodePoint(pattern[pattern.length - 1]).match(/\s/) ===
-      null /* last el in pattern is not a space */
+    !isWhitespace(
+      pattern[pattern.length - 1]
+    ) /* last el in pattern is not a space */
   ) {
     trimmedLen -= whitespacesAtEnd(text);
   }
@@ -996,13 +978,12 @@ export const equalMatch: AlgoFn = (
   }
 
   let trimmedLen = 0;
-  // check if first el in pattern is not a whitespace
-  if (String.fromCodePoint(pattern[0]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[0])) {
     trimmedLen = whitespacesAtStart(text);
   }
 
   let trimmedEndLen = 0;
-  if (String.fromCodePoint(pattern[lenPattern - 1]).match(/\s/) === null) {
+  if (!isWhitespace(pattern[lenPattern - 1])) {
     trimmedEndLen = whitespacesAtEnd(text);
   }
 

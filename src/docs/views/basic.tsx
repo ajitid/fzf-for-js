@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultItem } from "../lib/main";
+import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
+import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
 import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
-const options = {
+const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
-  maxResultItems: 32,
+  limit: 32,
 };
 
 let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
@@ -53,6 +54,7 @@ export function Basic() {
 
   return (
     <div className="px-6">
+      <Seo title="Basic example" />
       <div className="flex justify-end items-center">
         <input
           type="radio"
@@ -93,12 +95,9 @@ export function Basic() {
           <ul>
             {entries.map((entry, index) => (
               <li key={index} className="py-1">
-                <HighlightChars
-                  str={entry.item}
-                  highlightIndices={entry.positions ?? []}
-                />
+                <HighlightChars str={entry.item} indices={entry.positions} />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.result.score}
+                  {entry.score}
                 </span>
               </li>
             ))}

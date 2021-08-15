@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 
+import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
-import { Fzf, FzfResultItem } from "../lib/main";
+import { Fzf, FzfResultItem } from "../../lib/main";
 
 interface Stuff {
   id: string;
@@ -17,7 +18,7 @@ const list: Stuff[] = [
 
 const fzf = new Fzf(list, {
   selector: (v) => v.displayName,
-  maxResultItems: 32,
+  limit: 32,
 });
 
 export function Custom() {
@@ -38,6 +39,7 @@ export function Custom() {
 
   return (
     <div className="px-6">
+      <Seo title="Non-string list example" />
       <div>
         <input
           autoFocus
@@ -54,10 +56,10 @@ export function Custom() {
               <li key={entry.item.id} className="py-1">
                 <HighlightChars
                   str={entry.item.displayName}
-                  highlightIndices={entry.positions ?? []}
+                  indices={entry.positions}
                 />
                 <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.result.score}
+                  {entry.score}
                 </span>
               </li>
             ))}

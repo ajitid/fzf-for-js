@@ -3,5 +3,6 @@ module.exports = {
   transform: {
     "^.+\\.ts$": "ts-jest",
   },
-  setupFilesAfterEnv: ["jest-expect-message"],
+  setupFilesAfterEnv: ["jest-expect-message", "./src/setup-jest.ts"],
+  collectCoverageFrom: ["src/lib/**/*.{js,ts}"],
 };

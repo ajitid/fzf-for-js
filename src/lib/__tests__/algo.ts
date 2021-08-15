@@ -1,3 +1,5 @@
+import "jest-expect-message";
+
 import {
   AlgoFn,
   BONUS_CAMEL_123,
@@ -14,10 +16,9 @@ import {
   prefixMatch,
   suffixMatch,
   equalMatch,
-} from "./algo";
-import { strToRunes } from "./runes";
-
-import "jest-expect-message";
+} from "../algo";
+import { strToRunes } from "../runes";
+import { slab, Slab } from "../slab";
 
 function assertMatch(
   algo: AlgoFn,
@@ -51,7 +52,8 @@ function assertMatch2(
   pattern: string,
   sidx: number,
   eidx: number,
-  score: number
+  score: number,
+  slab: Slab | null = null
 ) {
   if (!caseSensitive) {
     pattern = pattern.toLowerCase();
@@ -64,18 +66,17 @@ function assertMatch2(
     strToRunes(input),
     strToRunes(pattern),
     true,
-    null
+    slab
   );
   let start = 0,
     end = 0;
 
-  if (pos === null || pos.length === 0) {
+  if (pos === null || pos.size === 0) {
     start = res.start;
     end = res.end;
   } else {
-    pos.sort((a, b) => a - b);
-    start = pos[0];
-    end = pos[pos.length - 1] + 1;
+    start = Math.min(...pos.values());
+    end = Math.max(...pos.values()) + 1;
   }
 
   const msg = `INPUT ${input} :: PATTERN ${pattern} :: FORWARD ${forward}`;
@@ -84,7 +85,7 @@ function assertMatch2(
   expect(res.score, msg).toBe(score);
 }
 
-it("testFuzzyMatch", () => {
+it("fuzzy match", () => {
   for (const algo of [fuzzyMatchV1, fuzzyMatchV2]) {
     for (const forward of [true, false]) {
       assertMatch(
@@ -332,7 +333,7 @@ it("testFuzzyMatch", () => {
   }
 });
 
-it("testFuzzyMatchBackward", () => {
+it("fuzzy match backward", () => {
   assertMatch(
     fuzzyMatchV1,
     false,
@@ -360,7 +361,7 @@ it("testFuzzyMatchBackward", () => {
   );
 });
 
-it("testExactMatchNaive", () => {
+it("exact match naive", () => {
   for (const dir of [true, false]) {
     assertMatch(exactMatchNaive, true, dir, "fooBarbaz", "oBA", -1, -1, 0);
     assertMatch(
@@ -417,7 +418,7 @@ it("testExactMatchNaive", () => {
   }
 });
 
-it("testExactMatchNaiveBackward", () => {
+it("exact match naive backward", () => {
   assertMatch(
     exactMatchNaive,
     false,
@@ -440,7 +441,7 @@ it("testExactMatchNaiveBackward", () => {
   );
 });
 
-it("testPrefixMatch", () => {
+it("prefix match", () => {
   const score =
     (SCORE_MATCH + BONUS_BOUNDARY) * 3 +
     BONUS_BOUNDARY * (BONUS_FIRST_CHAR_MULTIPLIER - 1);
@@ -458,7 +459,7 @@ it("testPrefixMatch", () => {
   }
 });
 
-it("testSuffixMatch", () => {
+it("suffix match", () => {
   for (const dir of [true, false]) {
     assertMatch(suffixMatch, true, dir, "fooBarbaz", "Baz", -1, -1, 0);
     assertMatch(suffixMatch, false, dir, "fooBarbaz", "Foo", -1, -1, 0);
@@ -510,7 +511,7 @@ it("testSuffixMatch", () => {
   }
 });
 
-it("testEmptyPattern", () => {
+it("empty pattern", () => {
   for (const dir of [true, false]) {
     assertMatch(fuzzyMatchV1, true, dir, "foobar", "", 0, 0, 0);
     assertMatch(fuzzyMatchV2, true, dir, "foobar", "", 0, 0, 0);
@@ -520,7 +521,7 @@ it("testEmptyPattern", () => {
   }
 });
 
-it("testNormalize", () => {
+it("normalize", () => {
   const caseSensitive = false;
   const normalize = true;
   const forward = true;
@@ -576,7 +577,7 @@ it("testNormalize", () => {
 });
 
 const MAX_UINT_16 = 65535;
-it("testLongString", () => {
+it("long string", () => {
   const strArr = new Array(MAX_UINT_16 * 2).fill("x");
   strArr[MAX_UINT_16] = "z";
   const str = strArr.join("");
@@ -591,4 +592,41 @@ it("testLongString", () => {
     MAX_UINT_16 + 2,
     SCORE_MATCH * 2 + BONUS_CONSECUTIVE
   );
+});
+
+it("fuzzy match with slab", () => {
+  for (const algo of [fuzzyMatchV1, fuzzyMatchV2]) {
+    for (const forward of [true, false]) {
+      assertMatch2(
+        algo,
+        false,
+        false,
+        forward,
+        "fooBarbaz1",
+        "oBZ",
+        2,
+        9,
+        SCORE_MATCH * 3 +
+          BONUS_CAMEL_123 +
+          SCORE_GAP_START +
+          SCORE_GAP_EXTENTION * 3,
+        slab
+      );
+
+      assertMatch2(
+        algo,
+        false,
+        false,
+        forward,
+        "/man1/zshcompctl.1",
+        "zshc",
+        6,
+        10,
+        SCORE_MATCH * 4 +
+          BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
+          BONUS_BOUNDARY * 3,
+        slab
+      );
+    }
+  }
 });

@@ -1,7 +1,7 @@
 {
   "===== INFO =====": "",
   "name": "fzf",
-  "version": "0.3.2",
+  "version": "0.4.1",
   "description": "Do fuzzy matching using FZF algorithm in JavaScript",
   "license": "BSD-3-Clause",
   "keywords": [
@@ -15,7 +15,7 @@
   "homepage": "https://fzf.netlify.app",
   "repository": "ajitid/fzf-for-js",
   "author": {
-    "name": "ajit",
+    "name": "Ajit",
     "email": "zlksnkwork+pkgnfo@gmail.com",
     "url": "https://ajitid.in"
   },
@@ -23,11 +23,16 @@
   "scripts": {
     "dev": "vite -c vite-for-docs.config.ts",
     "build": "npm run build:modules && npm run build:types",
-    "build:modules": "tsc && vite build",
-    "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist",
+    "postbuild": "node scripts/postbuild.js",
+    "build:modules": "tsc && vite build && vite build -c vite-legacy.config.ts",
+    "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist/types",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
-    "test": "jest src",
+    "prepack": "node scripts/prepack.cjs",
+    "postpack": "node scripts/postpack.cjs",
+    "test": "jest",
+    "test:watch": "jest --watch -o",
+    "test:cov": "jest --coverage",
     "fill-with-old-docs": "node scripts/fill-with-old-docs.js"
   },
   "===== BUILD =====": "",
@@ -42,12 +47,12 @@
       "require": "./dist/fzf.umd.js"
     }
   },
-  "types": "./dist/main.d.ts",
+  "types": "./dist/types/main.d.ts",
   "===== HINTING =====": "",
   "sideEffects": false,
   "===== DEPS =====": "",
   "devDependencies": {
-    "@mdx-js/mdx": "^2.0.0-next.9",
+    "@mdx-js/mdx": "^1.6.22",
     "@mdx-js/react": "^1.6.22",
     "@tailwindcss/typography": "^0.4.1",
     "@types/jest": "^26.0.24",
@@ -68,6 +73,7 @@
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
+    "react-git-info": "^2.0.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
     "shelljs": "^0.8.4",

@@ -1,19 +1,20 @@
 import { Rune } from "./runes";
 
 // values for `\s` from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet
-const _whitespaceCodePoints =
+const whitespaceRunes = new Set(
   " \f\n\r\t\v\u00a0\u1680\u2028\u2029\u202f\u205f\u3000\ufeff"
     .split("")
-    .map((v) => v.codePointAt(0)!);
+    .map((v) => v.codePointAt(0)!)
+);
 for (
   let codePoint = "\u2000".codePointAt(0)!;
   codePoint <= "\u200a".codePointAt(0)!;
   codePoint++
 ) {
-  _whitespaceCodePoints.push(codePoint);
+  whitespaceRunes.add(codePoint);
 }
-const whitespaceRunes = Object.freeze(_whitespaceCodePoints);
-export const isWhitespace = (rune: Rune) => whitespaceRunes.includes(rune);
+
+export const isWhitespace = (rune: Rune) => whitespaceRunes.has(rune);
 
 export const whitespacesAtStart = (runes: Rune[]) => {
   let whitespaces = 0;

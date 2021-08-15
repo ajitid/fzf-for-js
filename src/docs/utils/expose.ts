@@ -1,4 +1,5 @@
-import { version as newestVersion } from "../../package.json";
+import GitInfo from "react-git-info/macro";
+import { version as newestVersion } from "../../../package.json";
 
 function loadScript(
   filePath: string,
@@ -22,6 +23,8 @@ export const expose = (version = "") => {
 };
 
 if (import.meta.env.PROD) {
+  const gitInfo = GitInfo();
+  console.log("on commit", gitInfo.commit.hash);
   console.log(
     '%cFZF\n%cTo use FZF here type, `init()` or `init("' +
       newestVersion +

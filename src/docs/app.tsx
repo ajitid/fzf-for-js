@@ -1,5 +1,10 @@
 import React, { forwardRef, isValidElement } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { MDXProvider } from "@mdx-js/react";
 // @ts-ignore missing types
 import preval from "preval.macro";
@@ -7,19 +12,25 @@ import preval from "preval.macro";
 import "./app.css";
 
 import { CodeBlock } from "./components/code-block";
-import Docs from "./views/docs.mdx";
-import { Basic } from "./views/basic";
-import { Custom } from "./views/custom";
 import linkIconSrc from "./assets/link.svg";
 import { DocsVersions } from "./views/docs-versions";
+import AppRoutes from "./app-routes";
+import Migrate from "./views/migrate.mdx";
 import "./utils/expose";
 
 function getAnchor(text: string) {
   return text
     .toLowerCase()
     .replace(/[ \(\.]/g, "-")
+    .replace(/→/g, "to")
     .replace(/[^a-z0-9-]/g, "");
 }
+
+const {
+  fileVersions: docsVersions,
+}: {
+  fileVersions: string[];
+} = preval`module.exports = require('./old-docs-list')`;
 
 interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
@@ -84,16 +95,12 @@ const mdxComponents = {
   ),
 };
 
-const {
-  fileVersions: docsVersions,
-}: {
-  fileVersions: string[];
-} = preval`module.exports = require('./old-docs-list')`;
-
 const oldDocs = docsVersions.map((version) => {
   return {
     version,
-    Component: React.lazy(() => import(`./views/old-docs/${version}.mdx`)),
+    Component: React.lazy(
+      () => import(`./old-docs/${version}/src/docs/app-routes.tsx`)
+    ),
   };
 });
 
@@ -103,18 +110,21 @@ export function App() {
       <MDXProvider components={mdxComponents}>
         <Router>
           <Routes>
-            <Route path="/" element={<Docs />} />
-            <Route path="basic" element={<Basic />} />
-            <Route path="custom" element={<Custom />} />
+            <Route path="/">
+              <Navigate to="docs/latest" replace />
+            </Route>
+            <Route path="docs/latest/*" element={<AppRoutes />} />
+            <Route path="migrate" element={<Migrate />} />
+            <Route path="*" element={<div>not found</div>} />
             <Route
-              path="docs/versions"
+              path="docs"
               element={<DocsVersions versions={docsVersions} />}
             />
             {oldDocs.map((v) => {
               return (
                 <Route
                   key={v.version}
-                  path={`docs/versions/${v.version.replaceAll(".", "-")}`}
+                  path={`docs/${v.version.replace(/\./g, "-")}/*`}
                   element={
                     <React.Suspense
                       fallback={
@@ -127,7 +137,6 @@ export function App() {
                 />
               );
             })}
-            <Route path="*" element={<div>not found</div>} />
           </Routes>
         </Router>
       </MDXProvider>
