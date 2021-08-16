@@ -103,10 +103,10 @@ function getResultFromScoreMap<T>(
     .map((v) => parseInt(v, 10))
     .sort((a, b) => b - a);
 
-  const result: FzfResultItem<T>[] = [];
+  let result: FzfResultItem<T>[] = [];
 
   for (const score of scoresInDesc) {
-    result.push(...scoreMap[score]);
+    result = result.concat(scoreMap[score]);
     if (result.length >= limit) {
       break;
     }
