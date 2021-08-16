@@ -151,3 +151,9 @@ test("sort", () => {
     }
   }
 });
+
+test("large resultset", () => {
+  const list = new Array(200000).fill("hello");
+  const fzf = new Fzf(list);
+  expect(fzf.find("he").length).toBe(list.length);
+});
