@@ -152,8 +152,8 @@ test("sort", () => {
   }
 });
 
-test("large resultset", () => {
-  const list = new Array(200000).fill("hello");
+test("large result set", () => {
+  const list = new Array(510000).fill("hello");
   const fzf = new Fzf(list);
   expect(fzf.find("he").length).toBe(list.length);
 });
