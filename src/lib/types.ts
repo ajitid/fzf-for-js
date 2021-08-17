@@ -19,7 +19,7 @@ export interface Options<U> {
    * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
    *
-   * @defaultValue Infinity
+   * @defaultValue `Infinity`
    */
   limit: number;
   /**
@@ -29,7 +29,7 @@ export interface Options<U> {
   /**
    * Defines what type of case sensitive search you want.
    *
-   * @defaultValue "smart-case"
+   * @defaultValue `"smart-case"`
    */
   casing: Casing;
   /**
@@ -41,7 +41,7 @@ export interface Options<U> {
    * Zoë →  Zoe
    * blessèd →  blessed
    *
-   * @defaultValue true
+   * @defaultValue `true`
    */
   normalize: boolean;
   /**
@@ -49,7 +49,7 @@ export interface Options<U> {
    * https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5
    * If asssigned `false`, an exact match will be made instead of a fuzzy one.
    *
-   * @defaultValue "v2"
+   * @defaultValue `"v2"`
    */
   fuzzy: "v1" | "v2" | false;
   /**
@@ -61,7 +61,7 @@ export interface Options<U> {
    * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
    * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
    *
-   * @defaultValue basicMatch
+   * @defaultValue `basicMatch`
    */
   match: (this: Finder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
   /**
@@ -77,7 +77,7 @@ export interface Options<U> {
    * - `byLengthAsc`
    * - `byStartAsc`
    *
-   * @defaultValue []
+   * @defaultValue `[]`
    *
    * @example
    * ```js
@@ -100,13 +100,13 @@ export interface Options<U> {
    * If `false`, result won't be sorted and tiebreakers won't affect the sort
    * order either.
    *
-   * @defaultValue true
+   * @defaultValue `true`
    */
   sort: boolean;
   /**
    * If `false`, matching will be done from backwards.
    *
-   * @defaultValue true
+   * @defaultValue `true`
    *
    * @example
    * /breeds/pyrenees when queried with "re"
