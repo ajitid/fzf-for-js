@@ -86,12 +86,8 @@ const mdxComponents = {
   ),
   code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
   // headings
-  ...[2, 3, 4].reduce<Record<string, ReturnType<typeof getHeading>>>(
-    (prev, curr) => {
-      prev[`h${curr}`] = getHeading(curr);
-      return prev;
-    },
-    {}
+  ...Object.fromEntries(
+    [2, 3, 4].map((level) => ["h" + level, getHeading(level)])
   ),
 };
 
