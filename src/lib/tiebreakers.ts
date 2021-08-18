@@ -5,7 +5,7 @@ export function byLengthAsc<U>(
   b: FzfResultItem<U>,
   opts: Options<U>
 ): number {
-  return opts.selector(a.item).length - opts.selector(b.item).length;
+  return opts.selector(a.item).trim().length - opts.selector(b.item).trim().length;
 }
 
 export function byStartAsc<U>(

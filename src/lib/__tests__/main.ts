@@ -2,6 +2,7 @@ import "jest-expect-message";
 
 import { Fzf } from "../main";
 import { basicMatch, extendedMatch } from "../main";
+import {byLengthAsc} from "../tiebreakers";
 import { Options } from "../types";
 
 test("filtering in extended match", () => {
@@ -157,3 +158,8 @@ test("large result set", () => {
   const fzf = new Fzf(list);
   expect(fzf.find("he").length).toBe(list.length);
 });
+
+test("length tiebreaker trims length", () => {
+  const fzf = new Fzf(["aaaa", "  aaa", "  aa  ", "a      "], {tiebreakers: [byLengthAsc]})
+  expect(fzf.find("a").map(r => r.item)).toEqual(["a      ", "  aa  ", "  aaa", "aaaa"])
+})
