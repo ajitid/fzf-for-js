@@ -65,14 +65,17 @@ export class Finder<L extends ReadonlyArray<any>> {
       this.opts.match.bind(this)(query);
 
     if (this.opts.sort) {
-      for (const tiebreaker of this.opts.tiebreakers) {
         result.sort((a, b) => {
           if (a.score === b.score) {
-            return tiebreaker(a, b, this.opts);
+            for (const tiebreaker of this.opts.tiebreakers) {
+              const tb = tiebreaker(a, b, this.opts);
+              if (tb != 0) {
+                return tb
+              }
+            }
           }
           return 0;
         });
-      }
     }
 
     if (Number.isFinite(this.opts.limit)) {
