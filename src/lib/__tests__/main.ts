@@ -3,6 +3,7 @@ import "jest-expect-message";
 import { Fzf } from "../main";
 import { basicMatch, extendedMatch } from "../main";
 import { Options } from "../types";
+import { byLengthAsc, byStartAsc } from "../tiebreakers";
 
 test("filtering in extended match", () => {
   const list = ["package.json", "package-lock.json", "yarn.lock"];
@@ -157,3 +158,16 @@ test("large result set", () => {
   const fzf = new Fzf(list);
   expect(fzf.find("he").length).toBe(list.length);
 });
+
+test("multiple tiebreakers", () => {
+  const list = ["aaba", "abaa", "abac", "aab", "baa"]
+  const fzf = new Fzf(list, {tiebreakers: [byLengthAsc, byStartAsc]})
+  // correct order should be: baa (highest score), 
+  expect(fzf.find("b").map(r => r.item)).toEqual([
+    "baa", // highest score
+    "aab", // shortest length
+    "abaa", // startpos = 2, original index = 2
+    "abac", // startpos = 2, original index = 3
+    "aaba", // startpos = 2
+  ])
+})
