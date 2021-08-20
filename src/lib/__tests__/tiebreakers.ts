@@ -29,13 +29,13 @@ test("byStartAsc", () => {
 });
 
 test("multiple tiebreakers", () => {
-  const list = ["aaba", "abaa", "abac", "aab", "baa"]
-  const fzf = new Fzf(list, {tiebreakers: [byLengthAsc, byStartAsc]})
-  expect(fzf.find("b").map(r => r.item)).toEqual([
+  const list = ["aaba", "abaa", "abac", "aab", "baa"];
+  const fzf = new Fzf(list, { tiebreakers: [byLengthAsc, byStartAsc] });
+  expect(fzf.find("b").map((r) => r.item)).toEqual([
     "baa", // highest score
     "aab", // shortest length
     "abaa", // startpos = 2, original index = 2
     "abac", // startpos = 2, original index = 3
     "aaba", // startpos = 2
-  ])
-})
+  ]);
+});
