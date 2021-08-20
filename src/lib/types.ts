@@ -11,7 +11,7 @@ export interface FzfResultItem<U = string> extends Result {
 export type Tiebreaker<U> = (
   a: FzfResultItem<U>,
   b: FzfResultItem<U>,
-  options: Options<U>
+  selector: Options<U>["selector"]
 ) => number;
 
 export interface Options<U> {
@@ -69,7 +69,7 @@ export interface Options<U> {
    * sort result entries when the score between two entries is tied.
    *
    * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-   * compare function with an added third argument which is this `options` itself.
+   * compare function with an added third argument which is `options.selector`.
    *
    * If multiple tiebreakers are given, they are evaluated left to right until
    * one breaks the tie.
@@ -84,8 +84,8 @@ export interface Options<U> {
    *
    * @example
    * ```js
-   * function byLengthAsc(a, b, options) {
-   *   return options.selector(a.item).length - options.selector(b.item).length;
+   * function byLengthAsc(a, b, selector) {
+   *   return selector(a.item).length - selector(b.item).length;
    * }
    *
    * const fzf = new Fzf(list, { tiebreakers: [byLengthAsc] })
