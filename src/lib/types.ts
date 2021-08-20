@@ -101,9 +101,9 @@ export interface Options<U> {
   /**
    * If `true`, result items will be sorted in descending order by their score.
    *
-   * If `false`, result won't be sorted and tiebreakers won't affect the sort
-   * order either. In this case the results are returned in the same order as
-   * they are in the input list.
+   * If `false`, result items won't be sorted and tiebreakers won't affect the
+   * sort order either. In this case, the items are returned in the same order
+   * as they are in the input list.
    *
    * @defaultValue `true`
    */
