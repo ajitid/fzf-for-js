@@ -149,8 +149,8 @@ Now the result will be:
 | Sangam               | Bangalore                           |
 
 Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
-If there are multiple tiebreakers, the first one is applied first (when the scores are equal), if this ties (i.e. the tiebreaker function returns 0) the second one is applied, etc.
-Finally if the scores are equal and all tiebreakers also tie, then the results are returned in the order that they were in the original input list.
+
+If there are multiple tiebreakers, the first one is applied first (when the scores are equal), if this ties (i.e. the tiebreaker function returns 0) the second one is applied, etc. Finally if the scores are equal and all tiebreakers also tie, then the results are returned in the order that they were in the original input list.
 
 To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/37e6c0d02445e813bcc901f6cf5665db24d5b67b/src/lib/tiebreakers.ts).
 

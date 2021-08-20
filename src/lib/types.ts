@@ -71,6 +71,9 @@ export interface Options<U> {
    * Consider a tiebreaker to be a [JS array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
    * compare function with an added third argument which is this `options` itself.
    *
+   * If multiple tiebreakers are given, they are evaluated left to right until
+   * one breaks the tie.
+   *
    * Note that tiebreakers cannot be used if `sort=false`.
    *
    * FZF ships with these tiebreakers:
@@ -93,16 +96,14 @@ export interface Options<U> {
    * bxbbbb              bxbbbb
    * cxcccccccccc        dxddddddd
    * dxddddddd           cxcccccccccc
-   *
-   * If multiple tiebreakers are given, they are evaluated left to right until one
-   * breaks the tie.
    */
   tiebreakers: Tiebreaker<U>[];
   /**
    * If `true`, result items will be sorted in descending order by their score.
+   *
    * If `false`, result won't be sorted and tiebreakers won't affect the sort
-   * order either. In this case the results are returned in the same order as they are
-   * in the input list.
+   * order either. In this case the results are returned in the same order as
+   * they are in the input list.
    *
    * @defaultValue `true`
    */
