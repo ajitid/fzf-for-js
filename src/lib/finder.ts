@@ -68,9 +68,9 @@ export class Finder<L extends ReadonlyArray<any>> {
       result.sort((a, b) => {
         if (a.score === b.score) {
           for (const tiebreaker of this.opts.tiebreakers) {
-            const tb = tiebreaker(a, b, this.opts);
-            if (tb != 0) {
-              return tb;
+            const diff = tiebreaker(a, b, this.opts);
+            if (diff !== 0) {
+              return diff;
             }
           }
         }
