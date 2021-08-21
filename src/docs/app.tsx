@@ -1,4 +1,10 @@
-import React, { forwardRef, isValidElement } from "react";
+import React, {
+  forwardRef,
+  isValidElement,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -17,6 +23,7 @@ import { DocsVersions } from "./views/docs-versions";
 import AppRoutes from "./app-routes";
 import Migrate from "./views/migrate.mdx";
 import "./utils/expose";
+import { mergeReferences } from "./utils/merge-references";
 
 function getAnchor(text: string) {
   return text
@@ -36,18 +43,43 @@ interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 const getHeading = (level: number) => {
   const Heading = (props: HeadingProps, ref: React.Ref<HTMLHeadingElement>) => {
-    let anchor = getAnchor(
-      typeof props.children === "string" ? getAnchor(props.children) : ""
-    );
-    if (!anchor) {
-      if (isValidElement(props.children)) {
-        const elProps = props.children.props;
-        const children = elProps["children"];
-        if (typeof children === "string") {
-          anchor = getAnchor(children);
+    const elRef = useRef<HTMLHeadingElement>(null);
+    const mergedRefs = mergeReferences(ref, elRef);
+
+    const [anchor, setAnchor] = useState("");
+    useEffect(() => {
+      let anchor = getAnchor(
+        typeof props.children === "string" ? getAnchor(props.children) : ""
+      );
+      if (!anchor) {
+        if (isValidElement(props.children)) {
+          const elProps = props.children.props;
+          const children = elProps["children"];
+          if (typeof children === "string") {
+            anchor = getAnchor(children);
+          }
         }
       }
-    }
+
+      // eg. for h3, try to find h2 and combine to form the anchor
+      let headingEl = elRef.current;
+      if (level >= 3 && headingEl) {
+        let el: Node | null = headingEl;
+
+        const tagNameToFind = "H" + (level - 1);
+        while ((el = el.previousSibling)) {
+          if (el instanceof HTMLElement && el.tagName === tagNameToFind) {
+            const { textContent } = el;
+            if (!textContent) break;
+
+            anchor = getAnchor(textContent) + "-" + anchor;
+            break;
+          }
+        }
+      }
+
+      setAnchor(anchor);
+    }, []);
 
     const link = `#${anchor}`;
 
@@ -55,7 +87,7 @@ const getHeading = (level: number) => {
       `h${level}`,
       {
         id: anchor,
-        ref,
+        ref: mergedRefs,
       },
       [
         <a
