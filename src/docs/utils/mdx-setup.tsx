@@ -90,11 +90,18 @@ const getHeading = (level: number) => {
 };
 
 export const mdxComponents = {
-  wrapper: (props: any) => (
-    <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
-      <main {...props} />
-    </div>
-  ),
+  wrapper: (props: any) => {
+    useEffect(() => {
+      const { hash } = window.location;
+      if (hash) document.querySelector(hash)?.scrollIntoView();
+    }, []);
+
+    return (
+      <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
+        <main {...props} />
+      </div>
+    );
+  },
   code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
   // headings
   ...Object.fromEntries(
