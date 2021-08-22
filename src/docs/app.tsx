@@ -1,4 +1,11 @@
-import React, { forwardRef, isValidElement } from "react";
+import React, {
+  createContext,
+  forwardRef,
+  isValidElement,
+  MutableRefObject,
+  useContext,
+  useRef,
+} from "react";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -36,6 +43,8 @@ interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {}
 
 const getHeading = (level: number) => {
   const Heading = (props: HeadingProps, ref: React.Ref<HTMLHeadingElement>) => {
+    const { lastHeadingsLink } = useContext(HeadingContext);
+
     let anchor = getAnchor(
       typeof props.children === "string" ? getAnchor(props.children) : ""
     );
@@ -49,6 +58,10 @@ const getHeading = (level: number) => {
       }
     }
 
+    lastHeadingsLink[level] = anchor;
+    if (level >= 3 && lastHeadingsLink[level - 1]) {
+      anchor = lastHeadingsLink[level - 1] + "-" + anchor;
+    }
     const link = `#${anchor}`;
 
     return React.createElement(
@@ -78,12 +91,24 @@ const getHeading = (level: number) => {
   return forwardRef(Heading);
 };
 
+const HeadingContext = createContext<{
+  lastHeadingsLink: Record<string, string>;
+}>({ lastHeadingsLink: {} });
+
 const mdxComponents = {
-  wrapper: (props: any) => (
-    <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
-      <main {...props} />
-    </div>
-  ),
+  wrapper: (props: any) => {
+    const lastHeadingsLinkRef = useRef<Record<string, string>>({});
+
+    return (
+      <HeadingContext.Provider
+        value={{ lastHeadingsLink: lastHeadingsLinkRef.current }}
+      >
+        <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
+          <main {...props} />
+        </div>
+      </HeadingContext.Provider>
+    );
+  },
   code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
   // headings
   ...Object.fromEntries(
