@@ -3,13 +3,15 @@ import React, { useEffect, useState } from "react";
 import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
 import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
-import wordList from "../lists/words.json";
+import list from "../lists/data.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
 const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
   limit: 32,
 };
+
+const wordList = list as string[];
 
 let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
 
@@ -25,7 +27,9 @@ export function Basic() {
       return;
     }
 
+    console.time(input);
     let entries = fzf.find(input);
+    console.timeEnd(input);
     setEntries(entries);
   };
 
