@@ -1,7 +1,7 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { asyncBasicMatch, basicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
-import { FzfResultItem, Options } from "./types";
+import { FzfResultItem, Options, Token } from "./types";
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -40,6 +40,7 @@ export class Finder<L extends ReadonlyArray<any>> {
   items: L;
   readonly opts: Options<ArrayElement<L>>;
   algoFn: AlgoFn;
+  token: Token;
 
   constructor(list: L, ...optionsTuple: OptionsTuple<ArrayElement<L>>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
@@ -56,6 +57,7 @@ export class Finder<L extends ReadonlyArray<any>> {
         this.algoFn = fuzzyMatchV1;
         break;
     }
+    this.token = { cancelled: false };
   }
 
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
@@ -97,6 +99,9 @@ export class Finder<L extends ReadonlyArray<any>> {
   }
 
   async asyncFind(query: string): Promise<FzfResultItem<ArrayElement<L>>[]> {
+    this.token.cancelled = true;
+    this.token = { cancelled: false };
+
     if (query.length === 0 || this.items.length === 0)
       return this.items.slice(0, this.opts.limit).map((item) => ({
         item,
@@ -108,10 +113,9 @@ export class Finder<L extends ReadonlyArray<any>> {
 
     query = query.normalize();
 
-    const token = { cancelled: false };
     let result = (await asyncBasicMatch.bind(this)(
       query,
-      token
+      this.token
     )) as FzfResultItem<ArrayElement<L>>[];
 
     if (this.opts.sort) {

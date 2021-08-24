@@ -5,7 +5,7 @@ import {
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
 import { Finder } from "./finder";
-import type { FzfResultItem } from "./types";
+import type { FzfResultItem, Token } from "./types";
 
 export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
@@ -125,10 +125,6 @@ function getResultFromScoreMap<T>(
 const isNode =
   // @ts-expect-error TS is configured for browsers
   typeof require !== "undefined" && typeof window === "undefined";
-
-interface Token {
-  cancelled: boolean;
-}
 
 export async function asyncBasicMatch<U>(
   this: Finder<ReadonlyArray<U>>,

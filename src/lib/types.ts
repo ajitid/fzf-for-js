@@ -1,6 +1,10 @@
 import type { Result } from "./algo";
 import type { Finder } from "./finder";
 
+export interface Token {
+  cancelled: boolean;
+}
+
 export type Casing = "smart-case" | "case-sensitive" | "case-insensitive";
 
 export interface FzfResultItem<U = string> extends Result {

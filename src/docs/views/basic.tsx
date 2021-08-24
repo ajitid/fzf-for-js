@@ -28,7 +28,10 @@ export function Basic() {
     }
 
     console.time(input);
-    fzf.asyncFind(input).then(setEntries);
+    fzf
+      .asyncFind(input)
+      .then(setEntries)
+      .catch(() => {});
     console.timeEnd(input);
   };
 
