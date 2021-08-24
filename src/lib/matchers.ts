@@ -27,6 +27,85 @@ function getResultFromScoreMap<T>(
   return result;
 }
 
+function getBasicMatchIter<U>(
+  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  scoreMap: Record<number, FzfResultItem<U>[]>,
+  queryRunes: number[],
+  caseSensitive: boolean
+) {
+  return (idx: number) => {
+    const itemRunes = this.runesList[idx];
+    if (queryRunes.length > itemRunes.length) return;
+
+    let [match, positions] = this.algoFn(
+      caseSensitive,
+      this.opts.normalize,
+      this.opts.forward,
+      itemRunes,
+      queryRunes,
+      true,
+      slab
+    );
+    if (match.start === -1) return;
+
+    // we don't get positions array back for exact match, so we'll fill it by ourselves
+    if (this.opts.fuzzy === false) {
+      positions = new Set();
+      for (let position = match.start; position < match.end; ++position) {
+        positions.add(position);
+      }
+    }
+
+    const scoreKey = this.opts.sort ? match.score : 0;
+    if (scoreMap[scoreKey] === undefined) {
+      scoreMap[scoreKey] = [];
+    }
+    scoreMap[scoreKey].push({
+      item: this.items[idx],
+      ...match,
+      positions: positions ?? new Set(),
+    });
+  };
+}
+
+function getExtendedMatchIter<U>(
+  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  scoreMap: Record<number, FzfResultItem<U>[]>,
+  pattern: ReturnType<typeof buildPatternForExtendedMatch>
+) {
+  return (idx: number) => {
+    const runes = this.runesList[idx];
+    const match = computeExtendedMatch(
+      runes,
+      pattern,
+      this.algoFn,
+      this.opts.forward
+    );
+    if (match.offsets.length !== pattern.termSets.length) return;
+
+    let sidx = -1,
+      eidx = -1;
+    if (match.allPos.size > 0) {
+      sidx = Math.min(...match.allPos);
+      eidx = Math.max(...match.allPos) + 1;
+    }
+
+    const scoreKey = this.opts.sort ? match.totalScore : 0;
+    if (scoreMap[scoreKey] === undefined) {
+      scoreMap[scoreKey] = [];
+    }
+    scoreMap[scoreKey].push({
+      score: match.totalScore,
+      item: this.items[idx],
+      positions: match.allPos,
+      start: sidx,
+      end: eidx,
+    });
+  };
+}
+
+// Sync matchers:
+
 export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
     query,
@@ -106,83 +185,6 @@ export function asyncMatcher<F>(
 
     step();
   });
-}
-
-function getBasicMatchIter<U>(
-  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
-  scoreMap: Record<number, FzfResultItem<U>[]>,
-  queryRunes: number[],
-  caseSensitive: boolean
-) {
-  return (idx: number) => {
-    const itemRunes = this.runesList[idx];
-    if (queryRunes.length > itemRunes.length) return;
-
-    let [match, positions] = this.algoFn(
-      caseSensitive,
-      this.opts.normalize,
-      this.opts.forward,
-      itemRunes,
-      queryRunes,
-      true,
-      slab
-    );
-    if (match.start === -1) return;
-
-    // we don't get positions array back for exact match, so we'll fill it by ourselves
-    if (this.opts.fuzzy === false) {
-      positions = new Set();
-      for (let position = match.start; position < match.end; ++position) {
-        positions.add(position);
-      }
-    }
-
-    const scoreKey = this.opts.sort ? match.score : 0;
-    if (scoreMap[scoreKey] === undefined) {
-      scoreMap[scoreKey] = [];
-    }
-    scoreMap[scoreKey].push({
-      item: this.items[idx],
-      ...match,
-      positions: positions ?? new Set(),
-    });
-  };
-}
-
-function getExtendedMatchIter<U>(
-  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
-  scoreMap: Record<number, FzfResultItem<U>[]>,
-  pattern: ReturnType<typeof buildPatternForExtendedMatch>
-) {
-  return (idx: number) => {
-    const runes = this.runesList[idx];
-    const match = computeExtendedMatch(
-      runes,
-      pattern,
-      this.algoFn,
-      this.opts.forward
-    );
-    if (match.offsets.length !== pattern.termSets.length) return;
-
-    let sidx = -1,
-      eidx = -1;
-    if (match.allPos.size > 0) {
-      sidx = Math.min(...match.allPos);
-      eidx = Math.max(...match.allPos) + 1;
-    }
-
-    const scoreKey = this.opts.sort ? match.totalScore : 0;
-    if (scoreMap[scoreKey] === undefined) {
-      scoreMap[scoreKey] = [];
-    }
-    scoreMap[scoreKey].push({
-      score: match.totalScore,
-      item: this.items[idx],
-      positions: match.allPos,
-      start: sidx,
-      end: eidx,
-    });
-  };
 }
 
 export function asyncBasicMatch<U>(
