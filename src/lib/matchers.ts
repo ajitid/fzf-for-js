@@ -7,6 +7,8 @@ import { computeExtendedMatch } from "./extended";
 import { Finder } from "./finder";
 import type { FzfResultItem, Token } from "./types";
 
+// TODO rename iter to something else
+
 function getResultFromScoreMap<T>(
   scoreMap: Record<number, FzfResultItem<T>[]>,
   limit: number
@@ -36,40 +38,13 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
+  const iter = getBasicMatchIter.bind(this)(
+    scoreMap,
+    queryRunes,
+    caseSensitive
+  );
   for (let i = 0, len = this.runesList.length; i < len; ++i) {
-    const itemRunes = this.runesList[i];
-    if (queryRunes.length > itemRunes.length) continue;
-
-    let [match, positions] = this.algoFn(
-      caseSensitive,
-      this.opts.normalize,
-      this.opts.forward,
-      itemRunes,
-      queryRunes,
-      true,
-      slab
-    );
-    if (match.start === -1) continue;
-
-    // we don't get positions array back for exact match, so we'll fill it by ourselves
-    if (this.opts.fuzzy === false) {
-      positions = new Set();
-      for (let position = match.start; position < match.end; ++position) {
-        positions.add(position);
-      }
-    }
-
-    // If we aren't sorting, we'll put all items in the same score bucket (zero score).
-    // This will result in us getting items in same order in which we send it in the list.
-    const scoreKey = this.opts.sort ? match.score : 0;
-    if (scoreMap[scoreKey] === undefined) {
-      scoreMap[scoreKey] = [];
-    }
-    scoreMap[scoreKey].push({
-      item: this.items[i],
-      ...match,
-      positions: positions ?? new Set(),
-    });
+    iter(i);
   }
 
   return getResultFromScoreMap(scoreMap, this.opts.limit);
@@ -88,33 +63,9 @@ export function extendedMatch<U>(
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-  for (const [idx, runes] of this.runesList.entries()) {
-    const match = computeExtendedMatch(
-      runes,
-      pattern,
-      this.algoFn,
-      this.opts.forward
-    );
-    if (match.offsets.length !== pattern.termSets.length) continue;
-
-    let sidx = -1,
-      eidx = -1;
-    if (match.allPos.size > 0) {
-      sidx = Math.min(...match.allPos);
-      eidx = Math.max(...match.allPos) + 1;
-    }
-
-    const scoreKey = this.opts.sort ? match.totalScore : 0;
-    if (scoreMap[scoreKey] === undefined) {
-      scoreMap[scoreKey] = [];
-    }
-    scoreMap[scoreKey].push({
-      score: match.totalScore,
-      item: this.items[idx],
-      positions: match.allPos,
-      start: sidx,
-      end: eidx,
-    });
+  const iter = getExtendedMatchIter.bind(this)(scoreMap, pattern);
+  for (let i = 0, len = this.runesList.length; i < len; ++i) {
+    iter(i);
   }
 
   return getResultFromScoreMap(scoreMap, this.opts.limit);
@@ -159,7 +110,84 @@ export function asyncMatcher<F>(
   });
 }
 
-export async function asyncBasicMatch<U>(
+function getBasicMatchIter<U>(
+  this: Finder<ReadonlyArray<U>>,
+  scoreMap: Record<number, FzfResultItem<U>[]>,
+  queryRunes: number[],
+  caseSensitive: boolean
+) {
+  return (i: number) => {
+    const itemRunes = this.runesList[i];
+    if (queryRunes.length > itemRunes.length) return;
+
+    let [match, positions] = this.algoFn(
+      caseSensitive,
+      this.opts.normalize,
+      this.opts.forward,
+      itemRunes,
+      queryRunes,
+      true,
+      slab
+    );
+    if (match.start === -1) return;
+
+    // we don't get positions array back for exact match, so we'll fill it by ourselves
+    if (this.opts.fuzzy === false) {
+      positions = new Set();
+      for (let position = match.start; position < match.end; ++position) {
+        positions.add(position);
+      }
+    }
+
+    const scoreKey = this.opts.sort ? match.score : 0;
+    if (scoreMap[scoreKey] === undefined) {
+      scoreMap[scoreKey] = [];
+    }
+    scoreMap[scoreKey].push({
+      item: this.items[i],
+      ...match,
+      positions: positions ?? new Set(),
+    });
+  };
+}
+
+function getExtendedMatchIter<U>(
+  this: Finder<ReadonlyArray<U>>,
+  scoreMap: Record<number, FzfResultItem<U>[]>,
+  pattern: ReturnType<typeof buildPatternForExtendedMatch>
+) {
+  return (i: number) => {
+    const runes = this.runesList[i];
+    const match = computeExtendedMatch(
+      runes,
+      pattern,
+      this.algoFn,
+      this.opts.forward
+    );
+    if (match.offsets.length !== pattern.termSets.length) return;
+
+    let sidx = -1,
+      eidx = -1;
+    if (match.allPos.size > 0) {
+      sidx = Math.min(...match.allPos);
+      eidx = Math.max(...match.allPos) + 1;
+    }
+
+    const scoreKey = this.opts.sort ? match.totalScore : 0;
+    if (scoreMap[scoreKey] === undefined) {
+      scoreMap[scoreKey] = [];
+    }
+    scoreMap[scoreKey].push({
+      score: match.totalScore,
+      item: this.items[i],
+      positions: match.allPos,
+      start: sidx,
+      end: eidx,
+    });
+  };
+}
+
+export function asyncBasicMatch<U>(
   this: Finder<ReadonlyArray<U>>,
   query: string,
   token: Token
@@ -175,39 +203,7 @@ export async function asyncBasicMatch<U>(
   return asyncMatcher(
     token,
     this.runesList.length,
-    (i) => {
-      const itemRunes = this.runesList[i];
-      if (queryRunes.length > itemRunes.length) return;
-
-      let [match, positions] = this.algoFn(
-        caseSensitive,
-        this.opts.normalize,
-        this.opts.forward,
-        itemRunes,
-        queryRunes,
-        true,
-        slab
-      );
-      if (match.start === -1) return;
-
-      // we don't get positions array back for exact match, so we'll fill it by ourselves
-      if (this.opts.fuzzy === false) {
-        positions = new Set();
-        for (let position = match.start; position < match.end; ++position) {
-          positions.add(position);
-        }
-      }
-
-      const scoreKey = this.opts.sort ? match.score : 0;
-      if (scoreMap[scoreKey] === undefined) {
-        scoreMap[scoreKey] = [];
-      }
-      scoreMap[scoreKey].push({
-        item: this.items[i],
-        ...match,
-        positions: positions ?? new Set(),
-      });
-    },
+    getBasicMatchIter.bind(this)(scoreMap, queryRunes, caseSensitive),
     () => getResultFromScoreMap(scoreMap, this.opts.limit)
   );
 }
@@ -217,65 +213,19 @@ export function asyncExtendedMatch<U>(
   query: string,
   token: Token
 ) {
-  return new Promise((resolve, reject) => {
-    const pattern = buildPatternForExtendedMatch(
-      Boolean(this.opts.fuzzy),
-      this.opts.casing,
-      this.opts.normalize,
-      query
-    );
+  const pattern = buildPatternForExtendedMatch(
+    Boolean(this.opts.fuzzy),
+    this.opts.casing,
+    this.opts.normalize,
+    query
+  );
 
-    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+  const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-    const MAX_BUMP = 1000;
-    let i = 0,
-      len = this.runesList.length,
-      max = Math.min(MAX_BUMP, len);
-
-    const step = () => {
-      if (token.cancelled) return reject("search cancelled");
-
-      for (; i < max; ++i) {
-        const runes = this.runesList[i];
-        const match = computeExtendedMatch(
-          runes,
-          pattern,
-          this.algoFn,
-          this.opts.forward
-        );
-        if (match.offsets.length !== pattern.termSets.length) continue;
-
-        let sidx = -1,
-          eidx = -1;
-        if (match.allPos.size > 0) {
-          sidx = Math.min(...match.allPos);
-          eidx = Math.max(...match.allPos) + 1;
-        }
-
-        const scoreKey = this.opts.sort ? match.totalScore : 0;
-        if (scoreMap[scoreKey] === undefined) {
-          scoreMap[scoreKey] = [];
-        }
-        scoreMap[scoreKey].push({
-          score: match.totalScore,
-          item: this.items[i],
-          positions: match.allPos,
-          start: sidx,
-          end: eidx,
-        });
-      }
-
-      if (max < len) {
-        max = Math.min(max + MAX_BUMP, len);
-        isNode
-          ? // @ts-expect-error unavailable or deprecated for browsers
-            setImmediate(step)
-          : setTimeout(step);
-      } else {
-        resolve(getResultFromScoreMap(scoreMap, this.opts.limit));
-      }
-    };
-
-    step();
-  });
+  return asyncMatcher(
+    token,
+    this.runesList.length,
+    getExtendedMatchIter.bind(this)(scoreMap, pattern),
+    () => getResultFromScoreMap(scoreMap, this.opts.limit)
+  );
 }

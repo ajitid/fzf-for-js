@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
+import { Fzf, FzfResultItem, FzfOptions, extendedMatch } from "../../lib/main";
 import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
 import list from "../lists/data.json";
@@ -8,7 +8,8 @@ import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
 const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
-  // limit: 32,
+  limit: 32,
+  match: extendedMatch,
 };
 
 const wordList = list as string[];
@@ -31,7 +32,7 @@ export function Basic() {
     fzf
       .asyncFind(input)
       .then((x) => x.length)
-      .then((x) => console.log(x == syncLen))
+      .then((x) => console.log(syncLen, x === syncLen))
       .catch(() => {
         return;
       });

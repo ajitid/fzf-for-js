@@ -113,7 +113,7 @@ export class Finder<L extends ReadonlyArray<any>> {
 
     query = query.normalize();
 
-    let result = (await asyncBasicMatch.bind(this)(
+    let result = (await asyncExtendedMatch.bind(this)(
       query,
       this.token
     )) as FzfResultItem<ArrayElement<L>>[];
