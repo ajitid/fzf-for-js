@@ -8,6 +8,10 @@ import { Finder } from "./finder";
 import type { FzfResultItem, Token } from "./types";
 
 // TODO rename iter to something else
+// types build issues
+// test
+// post for 100ms and MRU list on empty, react algolia, built-in vs custom options
+// radix UI or reach ui or chakra UI
 
 function getResultFromScoreMap<T>(
   scoreMap: Record<number, FzfResultItem<T>[]>,
