@@ -39,6 +39,8 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
       }
     }
 
+    // If we aren't sorting, we'll put all items in the same score bucket (zero score).
+    // This will result in us getting items in same order in which we send it in the list.
     const scoreKey = this.opts.sort ? match.score : 0;
     if (scoreMap[scoreKey] === undefined) {
       scoreMap[scoreKey] = [];
@@ -53,7 +55,10 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-export function extendedMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
+export function extendedMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string
+) {
   const pattern = buildPatternForExtendedMatch(
     Boolean(this.opts.fuzzy),
     this.opts.casing,
