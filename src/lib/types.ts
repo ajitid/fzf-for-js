@@ -1,5 +1,5 @@
 import type { Result } from "./algo";
-import type { AsyncFinder, Finder } from "./finder";
+import type { Finder, AsyncFinder } from "./finder";
 
 export interface Token {
   cancelled: boolean;

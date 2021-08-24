@@ -1,7 +1,7 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
-import { asyncBasicMatch, asyncExtendedMatch, basicMatch } from "./matchers";
+import { basicMatch, asyncBasicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
-import { AsyncOptions, FzfResultItem, Options, Token } from "./types";
+import { FzfResultItem, Options, AsyncOptions, Token } from "./types";
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -40,7 +40,6 @@ export class Finder<L extends ReadonlyArray<any>> {
   items: L;
   readonly opts: Options<ArrayElement<L>>;
   algoFn: AlgoFn;
-  token: Token;
 
   constructor(list: L, ...optionsTuple: OptionsTuple<ArrayElement<L>>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
@@ -57,7 +56,6 @@ export class Finder<L extends ReadonlyArray<any>> {
         this.algoFn = fuzzyMatchV1;
         break;
     }
-    this.token = { cancelled: false };
   }
 
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
@@ -105,10 +103,10 @@ export type AsyncOptsToUse<U> = Omit<
 > &
   SortAttrs<U>;
 
-// from https://stackoverflow.com/a/52318137/7683365
 export type AsyncOptionsTuple<U> = U extends string
   ? [options?: AsyncOptsToUse<U>]
   : [options: AsyncOptsToUse<U> & { selector: AsyncOptions<U>["selector"] }];
+
 const asyncDefaultOpts: AsyncOptions<any> = {
   ...defaultOpts,
   match: asyncBasicMatch,

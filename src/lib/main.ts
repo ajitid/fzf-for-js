@@ -1,11 +1,12 @@
-import {
-  AsyncFinder,
+import { Finder, AsyncFinder } from "./finder";
+import type {
+  ArrayElement,
+  OptionsTuple,
+  OptsToUse,
   AsyncOptionsTuple,
   AsyncOptsToUse,
-  Finder,
 } from "./finder";
-import type { ArrayElement, OptionsTuple, OptsToUse } from "./finder";
-import type { Options } from "./types";
+import type { Options, AsyncOptions } from "./types";
 
 export type { Tiebreaker, FzfResultItem } from "./types";
 export * from "./matchers";
@@ -27,7 +28,7 @@ export class Fzf<L extends ReadonlyArray<any>> {
 
 export type AsyncFzfOptions<U = string> = U extends string
   ? AsyncOptsToUse<U>
-  : AsyncOptsToUse<U> & { selector: Options<U>["selector"] };
+  : AsyncOptsToUse<U> & { selector: AsyncOptions<U>["selector"] };
 
 export class AsyncFzf<L extends ReadonlyArray<any>> {
   private finder: AsyncFinder<L>;

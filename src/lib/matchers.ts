@@ -1,17 +1,11 @@
 import { slab } from "./slab";
 import {
-  buildPatternForExtendedMatch,
   buildPatternForBasicMatch,
+  buildPatternForExtendedMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
 import { AsyncFinder, Finder } from "./finder";
-import type { FzfResultItem, Token } from "./types";
-
-// TODO rename iter to something else
-// types build issues
-// test
-// post for 100ms and MRU list on empty, react algolia, built-in vs custom options
-// radix UI or reach ui or chakra UI
+import { FzfResultItem, Token } from "./types";
 
 function getResultFromScoreMap<T>(
   scoreMap: Record<number, FzfResultItem<T>[]>,
@@ -75,10 +69,10 @@ export function extendedMatch<U>(
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-// async matchers
+// Async matchers:
 
 const isNode =
-  // @ts-expect-error TS is configured for browsers
+  // @ts-ignore TS is configured for browsers
   typeof require !== "undefined" && typeof window === "undefined";
 
 export function asyncMatcher<F>(
@@ -102,7 +96,7 @@ export function asyncMatcher<F>(
       if (max < len) {
         max = Math.min(max + MAX_BUMP, len);
         isNode
-          ? // @ts-expect-error unavailable or deprecated for browsers
+          ? // @ts-ignore unavailable or deprecated for browsers
             setImmediate(step)
           : setTimeout(step);
       } else {
@@ -120,8 +114,8 @@ function getBasicMatchIter<U>(
   queryRunes: number[],
   caseSensitive: boolean
 ) {
-  return (i: number) => {
-    const itemRunes = this.runesList[i];
+  return (idx: number) => {
+    const itemRunes = this.runesList[idx];
     if (queryRunes.length > itemRunes.length) return;
 
     let [match, positions] = this.algoFn(
@@ -148,7 +142,7 @@ function getBasicMatchIter<U>(
       scoreMap[scoreKey] = [];
     }
     scoreMap[scoreKey].push({
-      item: this.items[i],
+      item: this.items[idx],
       ...match,
       positions: positions ?? new Set(),
     });
@@ -160,8 +154,8 @@ function getExtendedMatchIter<U>(
   scoreMap: Record<number, FzfResultItem<U>[]>,
   pattern: ReturnType<typeof buildPatternForExtendedMatch>
 ) {
-  return (i: number) => {
-    const runes = this.runesList[i];
+  return (idx: number) => {
+    const runes = this.runesList[idx];
     const match = computeExtendedMatch(
       runes,
       pattern,
@@ -183,7 +177,7 @@ function getExtendedMatchIter<U>(
     }
     scoreMap[scoreKey].push({
       score: match.totalScore,
-      item: this.items[i],
+      item: this.items[idx],
       positions: match.allPos,
       start: sidx,
       end: eidx,
