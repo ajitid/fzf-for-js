@@ -154,7 +154,8 @@ export function extendedMatch<U>(
 // Async matchers:
 
 const isNode =
-  // @ts-ignore TS is configured for browsers
+  // @ts-ignore TS is configured for browsers so `require` is not present.
+  // This is also why we aren't using @ts-expect-error
   typeof require !== "undefined" && typeof window === "undefined";
 
 export function asyncMatcher<F>(
@@ -164,19 +165,19 @@ export function asyncMatcher<F>(
   onFinish: () => F
 ): Promise<F> {
   return new Promise((resolve, reject) => {
-    const MAX_BUMP = 1000;
+    const INCREMENT = 1000;
     let i = 0,
-      max = Math.min(MAX_BUMP, len);
+      end = Math.min(INCREMENT, len);
 
     const step = () => {
       if (token.cancelled) return reject("search cancelled");
 
-      for (; i < max; ++i) {
+      for (; i < end; ++i) {
         iter(i);
       }
 
-      if (max < len) {
-        max = Math.min(max + MAX_BUMP, len);
+      if (end < len) {
+        end = Math.min(end + INCREMENT, len);
         isNode
           ? // @ts-ignore unavailable or deprecated for browsers
             setImmediate(step)
