@@ -126,60 +126,22 @@ const isNode =
   // @ts-expect-error TS is configured for browsers
   typeof require !== "undefined" && typeof window === "undefined";
 
-export async function asyncBasicMatch<U>(
-  this: Finder<ReadonlyArray<U>>,
-  query: string,
-  token: Token
-): Promise<FzfResultItem<U>[]> {
+export function asyncMatcher<F>(
+  token: Token,
+  len: number,
+  iter: (index: number) => unknown,
+  onFinish: () => F
+): Promise<F> {
   return new Promise((resolve, reject) => {
-    const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
-      query,
-      this.opts.casing,
-      this.opts.normalize
-    );
-
-    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
-
     const MAX_BUMP = 1000;
     let i = 0,
-      len = this.runesList.length,
       max = Math.min(MAX_BUMP, len);
 
     const step = () => {
       if (token.cancelled) return reject("search cancelled");
 
       for (; i < max; ++i) {
-        const itemRunes = this.runesList[i];
-        if (queryRunes.length > itemRunes.length) continue;
-
-        let [match, positions] = this.algoFn(
-          caseSensitive,
-          this.opts.normalize,
-          this.opts.forward,
-          itemRunes,
-          queryRunes,
-          true,
-          slab
-        );
-        if (match.start === -1) continue;
-
-        // we don't get positions array back for exact match, so we'll fill it by ourselves
-        if (this.opts.fuzzy === false) {
-          positions = new Set();
-          for (let position = match.start; position < match.end; ++position) {
-            positions.add(position);
-          }
-        }
-
-        const scoreKey = this.opts.sort ? match.score : 0;
-        if (scoreMap[scoreKey] === undefined) {
-          scoreMap[scoreKey] = [];
-        }
-        scoreMap[scoreKey].push({
-          item: this.items[i],
-          ...match,
-          positions: positions ?? new Set(),
-        });
+        iter(i);
       }
 
       if (max < len) {
@@ -189,12 +151,65 @@ export async function asyncBasicMatch<U>(
             setImmediate(step)
           : setTimeout(step);
       } else {
-        resolve(getResultFromScoreMap(scoreMap, this.opts.limit));
+        resolve(onFinish());
       }
     };
 
     step();
   });
+}
+
+export async function asyncBasicMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string,
+  token: Token
+): Promise<FzfResultItem<U>[]> {
+  const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
+    query,
+    this.opts.casing,
+    this.opts.normalize
+  );
+
+  const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+  return asyncMatcher(
+    token,
+    this.runesList.length,
+    (i) => {
+      const itemRunes = this.runesList[i];
+      if (queryRunes.length > itemRunes.length) return;
+
+      let [match, positions] = this.algoFn(
+        caseSensitive,
+        this.opts.normalize,
+        this.opts.forward,
+        itemRunes,
+        queryRunes,
+        true,
+        slab
+      );
+      if (match.start === -1) return;
+
+      // we don't get positions array back for exact match, so we'll fill it by ourselves
+      if (this.opts.fuzzy === false) {
+        positions = new Set();
+        for (let position = match.start; position < match.end; ++position) {
+          positions.add(position);
+        }
+      }
+
+      const scoreKey = this.opts.sort ? match.score : 0;
+      if (scoreMap[scoreKey] === undefined) {
+        scoreMap[scoreKey] = [];
+      }
+      scoreMap[scoreKey].push({
+        item: this.items[i],
+        ...match,
+        positions: positions ?? new Set(),
+      });
+    },
+    () => getResultFromScoreMap(scoreMap, this.opts.limit)
+  );
 }
 
 export function asyncExtendedMatch<U>(
