@@ -59,6 +59,15 @@ export class Finder<L extends ReadonlyArray<any>> {
   }
 
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
+    if (query.length === 0 || this.items.length === 0)
+      return this.items.slice(0, this.opts.limit).map((item) => ({
+        item,
+        start: -1,
+        end: -1,
+        score: 0,
+        positions: new Set(),
+      }));
+
     query = query.normalize();
 
     let result: FzfResultItem<ArrayElement<L>>[] =
