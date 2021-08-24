@@ -7,6 +7,26 @@ import { computeExtendedMatch } from "./extended";
 import { Finder } from "./finder";
 import type { FzfResultItem, Token } from "./types";
 
+function getResultFromScoreMap<T>(
+  scoreMap: Record<number, FzfResultItem<T>[]>,
+  limit: number
+): FzfResultItem<T>[] {
+  const scoresInDesc = Object.keys(scoreMap)
+    .map((v) => parseInt(v, 10))
+    .sort((a, b) => b - a);
+
+  let result: FzfResultItem<T>[] = [];
+
+  for (const score of scoresInDesc) {
+    result = result.concat(scoreMap[score]);
+    if (result.length >= limit) {
+      break;
+    }
+  }
+
+  return result;
+}
+
 export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
     query,
@@ -100,26 +120,6 @@ export function extendedMatch<U>(
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-function getResultFromScoreMap<T>(
-  scoreMap: Record<number, FzfResultItem<T>[]>,
-  limit: number
-): FzfResultItem<T>[] {
-  const scoresInDesc = Object.keys(scoreMap)
-    .map((v) => parseInt(v, 10))
-    .sort((a, b) => b - a);
-
-  let result: FzfResultItem<T>[] = [];
-
-  for (const score of scoresInDesc) {
-    result = result.concat(scoreMap[score]);
-    if (result.length >= limit) {
-      break;
-    }
-  }
-
-  return result;
-}
-
 // async matchers
 
 const isNode =
@@ -179,6 +179,74 @@ export async function asyncBasicMatch<U>(
           item: this.items[i],
           ...match,
           positions: positions ?? new Set(),
+        });
+      }
+
+      if (max < len) {
+        max = Math.min(max + MAX_BUMP, len);
+        isNode
+          ? // @ts-expect-error unavailable or deprecated for browsers
+            setImmediate(step)
+          : setTimeout(step);
+      } else {
+        resolve(getResultFromScoreMap(scoreMap, this.opts.limit));
+      }
+    };
+
+    step();
+  });
+}
+
+export function asyncExtendedMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string,
+  token: Token
+) {
+  return new Promise((resolve, reject) => {
+    const pattern = buildPatternForExtendedMatch(
+      Boolean(this.opts.fuzzy),
+      this.opts.casing,
+      this.opts.normalize,
+      query
+    );
+
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    const MAX_BUMP = 1000;
+    let i = 0,
+      len = this.runesList.length,
+      max = Math.min(MAX_BUMP, len);
+
+    const step = () => {
+      if (token.cancelled) return reject("search cancelled");
+
+      for (; i < max; ++i) {
+        const runes = this.runesList[i];
+        const match = computeExtendedMatch(
+          runes,
+          pattern,
+          this.algoFn,
+          this.opts.forward
+        );
+        if (match.offsets.length !== pattern.termSets.length) continue;
+
+        let sidx = -1,
+          eidx = -1;
+        if (match.allPos.size > 0) {
+          sidx = Math.min(...match.allPos);
+          eidx = Math.max(...match.allPos) + 1;
+        }
+
+        const scoreKey = this.opts.sort ? match.totalScore : 0;
+        if (scoreMap[scoreKey] === undefined) {
+          scoreMap[scoreKey] = [];
+        }
+        scoreMap[scoreKey].push({
+          score: match.totalScore,
+          item: this.items[i],
+          positions: match.allPos,
+          start: sidx,
+          end: eidx,
         });
       }
 

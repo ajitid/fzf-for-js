@@ -1,5 +1,5 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
-import { asyncBasicMatch, basicMatch } from "./matchers";
+import { asyncBasicMatch, asyncExtendedMatch, basicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
 import { FzfResultItem, Options, Token } from "./types";
 

@@ -8,7 +8,7 @@ import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
 const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
-  limit: 32,
+  // limit: 32,
 };
 
 const wordList = list as string[];
@@ -27,12 +27,23 @@ export function Basic() {
       return;
     }
 
-    console.time(input);
+    let syncLen = fzf.find(input).length;
     fzf
       .asyncFind(input)
-      .then(setEntries)
-      .catch(() => {});
-    console.timeEnd(input);
+      .then((x) => x.length)
+      .then((x) => console.log(x == syncLen))
+      .catch(() => {
+        return;
+      });
+    // many linter configs. don't allow empty funtion so putting an explicit return
+    // makes the problem go away.
+
+    // console.time(input);
+    // fzf
+    //   .asyncFind(input)
+    //   .then(setEntries)
+    //   .catch(() => {});
+    // console.timeEnd(input);
   };
 
   const [choice, setChoice] = useState("words");
