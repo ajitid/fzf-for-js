@@ -48,7 +48,7 @@ function getBasicMatchIter<U>(
     );
     if (match.start === -1) return;
 
-    // we don't get positions array back for exact match, so we'll fill it by ourselves
+    // We don't get positions array back for exact match, so we'll fill it by ourselves.
     if (this.opts.fuzzy === false) {
       positions = new Set();
       for (let position = match.start; position < match.end; ++position) {
@@ -56,6 +56,9 @@ function getBasicMatchIter<U>(
       }
     }
 
+    // If we aren't sorting, we'll put all items in the same score bucket
+    // (we've chosen zero score for it below). This will result in us getting
+    // items in the same order in which we've send them in the list.
     const scoreKey = this.opts.sort ? match.score : 0;
     if (scoreMap[scoreKey] === undefined) {
       scoreMap[scoreKey] = [];
