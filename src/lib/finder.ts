@@ -1,5 +1,5 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
-import { basicMatch } from "./matchers";
+import { asyncBasicMatch, basicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
 import { FzfResultItem, Options } from "./types";
 
@@ -72,6 +72,47 @@ export class Finder<L extends ReadonlyArray<any>> {
 
     let result: FzfResultItem<ArrayElement<L>>[] =
       this.opts.match.bind(this)(query);
+
+    if (this.opts.sort) {
+      const { selector } = this.opts;
+
+      result.sort((a, b) => {
+        if (a.score === b.score) {
+          for (const tiebreaker of this.opts.tiebreakers) {
+            const diff = tiebreaker(a, b, selector);
+            if (diff !== 0) {
+              return diff;
+            }
+          }
+        }
+        return 0;
+      });
+    }
+
+    if (Number.isFinite(this.opts.limit)) {
+      result.splice(this.opts.limit);
+    }
+
+    return result;
+  }
+
+  async asyncFind(query: string): Promise<FzfResultItem<ArrayElement<L>>[]> {
+    if (query.length === 0 || this.items.length === 0)
+      return this.items.slice(0, this.opts.limit).map((item) => ({
+        item,
+        start: -1,
+        end: -1,
+        score: 0,
+        positions: new Set(),
+      }));
+
+    query = query.normalize();
+
+    const token = { cancelled: false };
+    let result = (await asyncBasicMatch.bind(this)(
+      query,
+      token
+    )) as FzfResultItem<ArrayElement<L>>[];
 
     if (this.opts.sort) {
       const { selector } = this.opts;

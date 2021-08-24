@@ -28,9 +28,8 @@ export function Basic() {
     }
 
     console.time(input);
-    let entries = fzf.find(input);
+    fzf.asyncFind(input).then(setEntries);
     console.timeEnd(input);
-    setEntries(entries);
   };
 
   const [choice, setChoice] = useState("words");

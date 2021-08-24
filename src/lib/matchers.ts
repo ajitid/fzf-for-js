@@ -119,3 +119,84 @@ function getResultFromScoreMap<T>(
 
   return result;
 }
+
+// async matchers
+
+const isNode =
+  // @ts-expect-error TS is configured for browsers
+  typeof require !== "undefined" && typeof window === "undefined";
+
+interface Token {
+  cancelled: boolean;
+}
+
+export async function asyncBasicMatch<U>(
+  this: Finder<ReadonlyArray<U>>,
+  query: string,
+  token: Token
+): Promise<FzfResultItem<U>[]> {
+  return new Promise((resolve, reject) => {
+    const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
+      query,
+      this.opts.casing,
+      this.opts.normalize
+    );
+
+    const scoreMap: Record<number, FzfResultItem<U>[]> = {};
+
+    const MAX_BUMP = 1000;
+    let i = 0,
+      len = this.runesList.length,
+      max = Math.min(MAX_BUMP, len);
+
+    const step = () => {
+      if (token.cancelled) return reject("search cancelled");
+
+      for (; i < max; ++i) {
+        const itemRunes = this.runesList[i];
+        if (queryRunes.length > itemRunes.length) continue;
+
+        let [match, positions] = this.algoFn(
+          caseSensitive,
+          this.opts.normalize,
+          this.opts.forward,
+          itemRunes,
+          queryRunes,
+          true,
+          slab
+        );
+        if (match.start === -1) continue;
+
+        // we don't get positions array back for exact match, so we'll fill it by ourselves
+        if (this.opts.fuzzy === false) {
+          positions = new Set();
+          for (let position = match.start; position < match.end; ++position) {
+            positions.add(position);
+          }
+        }
+
+        const scoreKey = this.opts.sort ? match.score : 0;
+        if (scoreMap[scoreKey] === undefined) {
+          scoreMap[scoreKey] = [];
+        }
+        scoreMap[scoreKey].push({
+          item: this.items[i],
+          ...match,
+          positions: positions ?? new Set(),
+        });
+      }
+
+      if (max < len) {
+        max = Math.min(max + MAX_BUMP, len);
+        isNode
+          ? // @ts-expect-error unavailable or deprecated for browsers
+            setImmediate(step)
+          : setTimeout(step);
+      } else {
+        resolve(getResultFromScoreMap(scoreMap, this.opts.limit));
+      }
+    };
+
+    step();
+  });
+}
