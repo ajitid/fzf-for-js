@@ -1,5 +1,5 @@
 import type { Result } from "./algo";
-import type { Finder } from "./finder";
+import type { AsyncFinder, Finder } from "./finder";
 
 export interface Token {
   cancelled: boolean;
@@ -128,3 +128,11 @@ export interface Options<U> {
    */
   forward: boolean;
 }
+
+export type AsyncOptions<U> = Omit<Options<U>, "match"> & {
+  match: (
+    this: AsyncFinder<ReadonlyArray<U>>,
+    query: string,
+    token: Token
+  ) => Promise<FzfResultItem<U>[]>;
+};

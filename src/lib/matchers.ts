@@ -4,7 +4,7 @@ import {
   buildPatternForBasicMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
-import { Finder } from "./finder";
+import { AsyncFinder, Finder } from "./finder";
 import type { FzfResultItem, Token } from "./types";
 
 // TODO rename iter to something else
@@ -115,7 +115,7 @@ export function asyncMatcher<F>(
 }
 
 function getBasicMatchIter<U>(
-  this: Finder<ReadonlyArray<U>>,
+  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   queryRunes: number[],
   caseSensitive: boolean
@@ -156,7 +156,7 @@ function getBasicMatchIter<U>(
 }
 
 function getExtendedMatchIter<U>(
-  this: Finder<ReadonlyArray<U>>,
+  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   pattern: ReturnType<typeof buildPatternForExtendedMatch>
 ) {
@@ -192,7 +192,7 @@ function getExtendedMatchIter<U>(
 }
 
 export function asyncBasicMatch<U>(
-  this: Finder<ReadonlyArray<U>>,
+  this: AsyncFinder<ReadonlyArray<U>>,
   query: string,
   token: Token
 ): Promise<FzfResultItem<U>[]> {
@@ -213,7 +213,7 @@ export function asyncBasicMatch<U>(
 }
 
 export function asyncExtendedMatch<U>(
-  this: Finder<ReadonlyArray<U>>,
+  this: AsyncFinder<ReadonlyArray<U>>,
   query: string,
   token: Token
 ) {

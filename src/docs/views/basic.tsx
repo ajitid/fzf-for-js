@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 
-import { Fzf, FzfResultItem, FzfOptions, extendedMatch } from "../../lib/main";
+import { Fzf, FzfResultItem, FzfOptions } from "../../lib/main";
 import { Seo } from "../components/seo";
 import { HighlightChars } from "../components/highlight-chars";
-import list from "../lists/data.json";
+import wordList from "../lists/words.json";
 import dateFnDirList from "../lists/date-fns-repo-folders.json";
 
 const options: FzfOptions = {
   // limiting size of the result to avoid jank while rendering it
   limit: 32,
-  match: extendedMatch,
 };
-
-const wordList = list as string[];
 
 let fzf = new Fzf(wordList, { ...options, casing: "case-insensitive" });
 
@@ -28,23 +25,8 @@ export function Basic() {
       return;
     }
 
-    let syncLen = fzf.find(input).length;
-    fzf
-      .asyncFind(input)
-      .then((x) => x.length)
-      .then((x) => console.log(syncLen, x === syncLen))
-      .catch(() => {
-        return;
-      });
-    // many linter configs. don't allow empty funtion so putting an explicit return
-    // makes the problem go away.
-
-    // console.time(input);
-    // fzf
-    //   .asyncFind(input)
-    //   .then(setEntries)
-    //   .catch(() => {});
-    // console.timeEnd(input);
+    let entries = fzf.find(input);
+    setEntries(entries);
   };
 
   const [choice, setChoice] = useState("words");

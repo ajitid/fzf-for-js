@@ -1,7 +1,7 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { asyncBasicMatch, asyncExtendedMatch, basicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
-import { FzfResultItem, Options, Token } from "./types";
+import { AsyncOptions, FzfResultItem, Options, Token } from "./types";
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -97,8 +97,49 @@ export class Finder<L extends ReadonlyArray<any>> {
 
     return result;
   }
+}
 
-  async asyncFind(query: string): Promise<FzfResultItem<ArrayElement<L>>[]> {
+export type AsyncOptsToUse<U> = Omit<
+  Partial<AsyncOptions<U>>,
+  "sort" | "tiebreakers"
+> &
+  SortAttrs<U>;
+
+// from https://stackoverflow.com/a/52318137/7683365
+export type AsyncOptionsTuple<U> = U extends string
+  ? [options?: AsyncOptsToUse<U>]
+  : [options: AsyncOptsToUse<U> & { selector: AsyncOptions<U>["selector"] }];
+const asyncDefaultOpts: AsyncOptions<any> = {
+  ...defaultOpts,
+  match: asyncBasicMatch,
+};
+
+export class AsyncFinder<L extends ReadonlyArray<any>> {
+  runesList: Rune[][];
+  items: L;
+  readonly opts: AsyncOptions<ArrayElement<L>>;
+  algoFn: AlgoFn;
+  token: Token;
+
+  constructor(list: L, ...optionsTuple: AsyncOptionsTuple<ArrayElement<L>>) {
+    this.opts = { ...asyncDefaultOpts, ...optionsTuple[0] };
+    this.items = list;
+    this.runesList = list.map((item) =>
+      strToRunes(this.opts.selector(item).normalize())
+    );
+    this.algoFn = exactMatchNaive;
+    switch (this.opts.fuzzy) {
+      case "v2":
+        this.algoFn = fuzzyMatchV2;
+        break;
+      case "v1":
+        this.algoFn = fuzzyMatchV1;
+        break;
+    }
+    this.token = { cancelled: false };
+  }
+
+  async find(query: string): Promise<FzfResultItem<ArrayElement<L>>[]> {
     this.token.cancelled = true;
     this.token = { cancelled: false };
 
@@ -113,7 +154,7 @@ export class Finder<L extends ReadonlyArray<any>> {
 
     query = query.normalize();
 
-    let result = (await asyncExtendedMatch.bind(this)(
+    let result = (await this.opts.match.bind(this)(
       query,
       this.token
     )) as FzfResultItem<ArrayElement<L>>[];
