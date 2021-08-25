@@ -60,40 +60,16 @@ export class Finder<L extends ReadonlyArray<any>> {
 
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
     if (query.length === 0 || this.items.length === 0)
-      return this.items.slice(0, this.opts.limit).map((item) => ({
-        item,
-        start: -1,
-        end: -1,
-        score: 0,
-        positions: new Set(),
-      }));
+      return this.items
+        .slice(0, this.opts.limit)
+        .map(createResultItemWithEmptyPos);
 
     query = query.normalize();
 
     let result: FzfResultItem<ArrayElement<L>>[] =
       this.opts.match.bind(this)(query);
 
-    if (this.opts.sort) {
-      const { selector } = this.opts;
-
-      result.sort((a, b) => {
-        if (a.score === b.score) {
-          for (const tiebreaker of this.opts.tiebreakers) {
-            const diff = tiebreaker(a, b, selector);
-            if (diff !== 0) {
-              return diff;
-            }
-          }
-        }
-        return 0;
-      });
-    }
-
-    if (Number.isFinite(this.opts.limit)) {
-      result.splice(this.opts.limit);
-    }
-
-    return result;
+    return postProcessResultItems(result, this.opts);
   }
 }
 
@@ -142,13 +118,9 @@ export class AsyncFinder<L extends ReadonlyArray<any>> {
     this.token = { cancelled: false };
 
     if (query.length === 0 || this.items.length === 0)
-      return this.items.slice(0, this.opts.limit).map((item) => ({
-        item,
-        start: -1,
-        end: -1,
-        score: 0,
-        positions: new Set(),
-      }));
+      return this.items
+        .slice(0, this.opts.limit)
+        .map(createResultItemWithEmptyPos);
 
     query = query.normalize();
 
@@ -157,26 +129,41 @@ export class AsyncFinder<L extends ReadonlyArray<any>> {
       this.token
     )) as FzfResultItem<ArrayElement<L>>[];
 
-    if (this.opts.sort) {
-      const { selector } = this.opts;
+    return postProcessResultItems(result, this.opts);
+  }
+}
 
-      result.sort((a, b) => {
-        if (a.score === b.score) {
-          for (const tiebreaker of this.opts.tiebreakers) {
-            const diff = tiebreaker(a, b, selector);
-            if (diff !== 0) {
-              return diff;
-            }
+const createResultItemWithEmptyPos = <U>(item: U): FzfResultItem<U> => ({
+  item,
+  start: -1,
+  end: -1,
+  score: 0,
+  positions: new Set(),
+});
+
+function postProcessResultItems<U>(
+  result: FzfResultItem<U>[],
+  opts: Options<U> | AsyncOptions<U>
+) {
+  if (opts.sort) {
+    const { selector } = opts;
+
+    result.sort((a, b) => {
+      if (a.score === b.score) {
+        for (const tiebreaker of opts.tiebreakers) {
+          const diff = tiebreaker(a, b, selector);
+          if (diff !== 0) {
+            return diff;
           }
         }
-        return 0;
-      });
-    }
-
-    if (Number.isFinite(this.opts.limit)) {
-      result.splice(this.opts.limit);
-    }
-
-    return result;
+      }
+      return 0;
+    });
   }
+
+  if (Number.isFinite(opts.limit)) {
+    result.splice(opts.limit);
+  }
+
+  return result;
 }
