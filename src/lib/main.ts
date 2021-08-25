@@ -1,11 +1,11 @@
-import { Finder, AsyncFinder } from "./finder";
+import { Finder, AsyncFinder } from "./finders";
 import type {
   ArrayElement,
   OptionsTuple,
   OptsToUse,
   AsyncOptionsTuple,
   AsyncOptsToUse,
-} from "./finder";
+} from "./finders";
 import type { Options, AsyncOptions } from "./types";
 
 export type { Tiebreaker, FzfResultItem } from "./types";

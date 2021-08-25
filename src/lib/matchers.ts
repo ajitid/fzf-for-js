@@ -4,7 +4,7 @@ import {
   buildPatternForExtendedMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
-import { AsyncFinder, Finder } from "./finder";
+import { AsyncFinder, Finder } from "./finders";
 import { FzfResultItem, Token } from "./types";
 
 function getResultFromScoreMap<T>(
