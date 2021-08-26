@@ -4,7 +4,7 @@ import {
   buildPatternForExtendedMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
-import { SyncFinder, AsyncFinder } from "./finders";
+import { BaseFinder, SyncFinder, AsyncFinder } from "./finders";
 import { FzfResultItem, Token } from "./types";
 
 function getResultFromScoreMap<T>(
@@ -28,7 +28,7 @@ function getResultFromScoreMap<T>(
 }
 
 function getBasicMatchIter<U>(
-  this: SyncFinder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  this: BaseFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   queryRunes: number[],
   caseSensitive: boolean
@@ -72,7 +72,7 @@ function getBasicMatchIter<U>(
 }
 
 function getExtendedMatchIter<U>(
-  this: SyncFinder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  this: BaseFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   pattern: ReturnType<typeof buildPatternForExtendedMatch>
 ) {
@@ -121,7 +121,7 @@ export function basicMatch<U>(
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-  const iter = getBasicMatchIter.bind(this)(
+  const iter = getBasicMatchIter.bind(this as BaseFinder<readonly U[]>)(
     scoreMap,
     queryRunes,
     caseSensitive
@@ -146,7 +146,10 @@ export function extendedMatch<U>(
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-  const iter = getExtendedMatchIter.bind(this)(scoreMap, pattern);
+  const iter = getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(
+    scoreMap,
+    pattern
+  );
   for (let i = 0, len = this.runesList.length; i < len; ++i) {
     iter(i);
   }
@@ -210,7 +213,11 @@ export function asyncBasicMatch<U>(
   return asyncMatcher(
     token,
     this.runesList.length,
-    getBasicMatchIter.bind(this)(scoreMap, queryRunes, caseSensitive),
+    getBasicMatchIter.bind(this as BaseFinder<readonly U[]>)(
+      scoreMap,
+      queryRunes,
+      caseSensitive
+    ),
     () => getResultFromScoreMap(scoreMap, this.opts.limit)
   );
 }
@@ -232,7 +239,10 @@ export function asyncExtendedMatch<U>(
   return asyncMatcher(
     token,
     this.runesList.length,
-    getExtendedMatchIter.bind(this)(scoreMap, pattern),
+    getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(
+      scoreMap,
+      pattern
+    ),
     () => getResultFromScoreMap(scoreMap, this.opts.limit)
   );
 }

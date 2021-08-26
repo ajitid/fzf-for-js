@@ -42,7 +42,7 @@ const defaultOpts: BaseOptions<any> = {
   forward: true,
 };
 
-abstract class BaseFinder<L extends ReadonlyArray<any>> {
+export abstract class BaseFinder<L extends ReadonlyArray<any>> {
   runesList: Rune[][];
   items: L;
   readonly opts: BaseOptions<ArrayElement<L>>;
