@@ -1,8 +1,8 @@
 import { Finder, AsyncFinder } from "./finders";
 import type {
   ArrayElement,
-  OptionsTuple,
-  OptsToUse,
+  SyncOptionsTuple,
+  SyncOptsToUse,
   AsyncOptionsTuple,
   AsyncOptsToUse,
 } from "./finders";
@@ -13,14 +13,14 @@ export * from "./matchers";
 export * from "./tiebreakers";
 
 export type FzfOptions<U = string> = U extends string
-  ? OptsToUse<U>
-  : OptsToUse<U> & { selector: Options<U>["selector"] };
+  ? SyncOptsToUse<U>
+  : SyncOptsToUse<U> & { selector: Options<U>["selector"] };
 
 export class Fzf<L extends ReadonlyArray<any>> {
   private finder: Finder<L>;
   find: Finder<L>["find"];
 
-  constructor(list: L, ...optionsTuple: OptionsTuple<ArrayElement<L>>) {
+  constructor(list: L, ...optionsTuple: SyncOptionsTuple<ArrayElement<L>>) {
     this.finder = new Finder(list, ...optionsTuple);
     this.find = this.finder.find.bind(this.finder);
   }

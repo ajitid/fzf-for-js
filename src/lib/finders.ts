@@ -3,10 +3,12 @@ import { basicMatch, asyncBasicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
 import {
   FzfResultItem,
+  BaseOptions,
   Options,
   AsyncOptions,
   Tiebreaker,
   Token,
+  Selector,
 } from "./types";
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
@@ -19,21 +21,20 @@ type SortAttrs<U> =
     }
   | { sort: false };
 
-export type OptsToUse<U> = Omit<Partial<Options<U>>, "sort" | "tiebreakers"> &
+type OptsToUse<U> = Omit<Partial<BaseOptions<U>>, "sort" | "tiebreakers"> &
   SortAttrs<U>;
 
 // from https://stackoverflow.com/a/52318137/7683365
-export type OptionsTuple<U> = U extends string
+export type BaseOptionsTuple<U> = U extends string
   ? [options?: OptsToUse<U>]
-  : [options: OptsToUse<U> & { selector: Options<U>["selector"] }];
+  : [options: OptsToUse<U> & { selector: Selector<U> }];
 
-const defaultOpts: Options<any> = {
+const defaultOpts: BaseOptions<any> = {
   limit: Infinity,
   selector: (v) => v,
   casing: "smart-case",
   normalize: true,
   fuzzy: "v2",
-  match: basicMatch,
   // example:
   // tiebreakers: [byLengthAsc, byStartAsc],
   tiebreakers: [],
@@ -41,13 +42,13 @@ const defaultOpts: Options<any> = {
   forward: true,
 };
 
-export class Finder<L extends ReadonlyArray<any>> {
+abstract class BaseFinder<L extends ReadonlyArray<any>> {
   runesList: Rune[][];
   items: L;
-  readonly opts: Options<ArrayElement<L>>;
+  readonly opts: BaseOptions<ArrayElement<L>>;
   algoFn: AlgoFn;
 
-  constructor(list: L, ...optionsTuple: OptionsTuple<ArrayElement<L>>) {
+  constructor(list: L, ...optionsTuple: BaseOptionsTuple<ArrayElement<L>>) {
     this.opts = { ...defaultOpts, ...optionsTuple[0] };
     this.items = list;
     this.runesList = list.map((item) =>
@@ -62,6 +63,28 @@ export class Finder<L extends ReadonlyArray<any>> {
         this.algoFn = fuzzyMatchV1;
         break;
     }
+  }
+}
+
+export type SyncOptsToUse<U> = OptsToUse<U> &
+  Partial<Pick<Options<U>, "match">>;
+
+// from https://stackoverflow.com/a/52318137/7683365
+export type SyncOptionsTuple<U> = U extends string
+  ? [options?: SyncOptsToUse<U>]
+  : [options: SyncOptsToUse<U> & { selector: Selector<U> }];
+
+const syncDefaultOpts: Options<any> = {
+  ...defaultOpts,
+  match: basicMatch,
+};
+
+export class Finder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
+  readonly opts: Options<ArrayElement<L>>;
+
+  constructor(list: L, ...optionsTuple: SyncOptionsTuple<ArrayElement<L>>) {
+    super(list, ...optionsTuple);
+    this.opts = { ...syncDefaultOpts, ...optionsTuple[0] };
   }
 
   find(query: string): FzfResultItem<ArrayElement<L>>[] {
@@ -79,43 +102,25 @@ export class Finder<L extends ReadonlyArray<any>> {
   }
 }
 
-export type AsyncOptsToUse<U> = Omit<
-  Partial<AsyncOptions<U>>,
-  "sort" | "tiebreakers"
-> &
-  SortAttrs<U>;
+export type AsyncOptsToUse<U> = OptsToUse<U> & Partial<Pick<AsyncOptions<U>, "match">>;
 
+// from https://stackoverflow.com/a/52318137/7683365
 export type AsyncOptionsTuple<U> = U extends string
   ? [options?: AsyncOptsToUse<U>]
-  : [options: AsyncOptsToUse<U> & { selector: AsyncOptions<U>["selector"] }];
+  : [options: AsyncOptsToUse<U> & { selector: Selector<U> }];
 
 const asyncDefaultOpts: AsyncOptions<any> = {
   ...defaultOpts,
   match: asyncBasicMatch,
 };
 
-export class AsyncFinder<L extends ReadonlyArray<any>> {
-  runesList: Rune[][];
-  items: L;
+export class AsyncFinder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
   readonly opts: AsyncOptions<ArrayElement<L>>;
-  algoFn: AlgoFn;
   token: Token;
 
   constructor(list: L, ...optionsTuple: AsyncOptionsTuple<ArrayElement<L>>) {
+    super(list, ...optionsTuple);
     this.opts = { ...asyncDefaultOpts, ...optionsTuple[0] };
-    this.items = list;
-    this.runesList = list.map((item) =>
-      strToRunes(this.opts.selector(item).normalize())
-    );
-    this.algoFn = exactMatchNaive;
-    switch (this.opts.fuzzy) {
-      case "v2":
-        this.algoFn = fuzzyMatchV2;
-        break;
-      case "v1":
-        this.algoFn = fuzzyMatchV1;
-        break;
-    }
     this.token = { cancelled: false };
   }
 

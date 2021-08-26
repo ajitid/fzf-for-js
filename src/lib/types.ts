@@ -20,7 +20,7 @@ export type Tiebreaker<U> = (
   selector: Selector<U>
 ) => number;
 
-interface BaseOptions<U> {
+export interface BaseOptions<U> {
   /**
    * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
