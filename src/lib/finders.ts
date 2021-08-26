@@ -4,7 +4,7 @@ import { Rune, strToRunes } from "./runes";
 import {
   FzfResultItem,
   BaseOptions,
-  Options,
+  SyncOptions,
   AsyncOptions,
   Tiebreaker,
   Token,
@@ -21,13 +21,13 @@ type SortAttrs<U> =
     }
   | { sort: false };
 
-type OptsToUse<U> = Omit<Partial<BaseOptions<U>>, "sort" | "tiebreakers"> &
+type BaseOptsToUse<U> = Omit<Partial<BaseOptions<U>>, "sort" | "tiebreakers"> &
   SortAttrs<U>;
 
 // from https://stackoverflow.com/a/52318137/7683365
-export type BaseOptionsTuple<U> = U extends string
-  ? [options?: OptsToUse<U>]
-  : [options: OptsToUse<U> & { selector: Selector<U> }];
+type BaseOptionsTuple<U> = U extends string
+  ? [options?: BaseOptsToUse<U>]
+  : [options: BaseOptsToUse<U> & { selector: Selector<U> }];
 
 const defaultOpts: BaseOptions<any> = {
   limit: Infinity,
@@ -66,21 +66,20 @@ abstract class BaseFinder<L extends ReadonlyArray<any>> {
   }
 }
 
-export type SyncOptsToUse<U> = OptsToUse<U> &
-  Partial<Pick<Options<U>, "match">>;
+export type SyncOptsToUse<U> = BaseOptsToUse<U> &
+  Partial<Pick<SyncOptions<U>, "match">>;
 
-// from https://stackoverflow.com/a/52318137/7683365
 export type SyncOptionsTuple<U> = U extends string
   ? [options?: SyncOptsToUse<U>]
   : [options: SyncOptsToUse<U> & { selector: Selector<U> }];
 
-const syncDefaultOpts: Options<any> = {
+const syncDefaultOpts: SyncOptions<any> = {
   ...defaultOpts,
   match: basicMatch,
 };
 
-export class Finder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
-  readonly opts: Options<ArrayElement<L>>;
+export class SyncFinder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
+  readonly opts: SyncOptions<ArrayElement<L>>;
 
   constructor(list: L, ...optionsTuple: SyncOptionsTuple<ArrayElement<L>>) {
     super(list, ...optionsTuple);
@@ -102,7 +101,8 @@ export class Finder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
   }
 }
 
-export type AsyncOptsToUse<U> = OptsToUse<U> & Partial<Pick<AsyncOptions<U>, "match">>;
+export type AsyncOptsToUse<U> = BaseOptsToUse<U> &
+  Partial<Pick<AsyncOptions<U>, "match">>;
 
 // from https://stackoverflow.com/a/52318137/7683365
 export type AsyncOptionsTuple<U> = U extends string
@@ -154,7 +154,7 @@ const createResultItemWithEmptyPos = <U>(item: U): FzfResultItem<U> => ({
 
 function postProcessResultItems<U>(
   result: FzfResultItem<U>[],
-  opts: Options<U> | AsyncOptions<U>
+  opts: SyncOptions<U> | AsyncOptions<U>
 ) {
   if (opts.sort) {
     const { selector } = opts;

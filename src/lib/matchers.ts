@@ -4,7 +4,7 @@ import {
   buildPatternForExtendedMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
-import { AsyncFinder, Finder } from "./finders";
+import { SyncFinder, AsyncFinder } from "./finders";
 import { FzfResultItem, Token } from "./types";
 
 function getResultFromScoreMap<T>(
@@ -28,7 +28,7 @@ function getResultFromScoreMap<T>(
 }
 
 function getBasicMatchIter<U>(
-  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  this: SyncFinder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   queryRunes: number[],
   caseSensitive: boolean
@@ -72,7 +72,7 @@ function getBasicMatchIter<U>(
 }
 
 function getExtendedMatchIter<U>(
-  this: Finder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
+  this: SyncFinder<ReadonlyArray<U>> | AsyncFinder<ReadonlyArray<U>>,
   scoreMap: Record<number, FzfResultItem<U>[]>,
   pattern: ReturnType<typeof buildPatternForExtendedMatch>
 ) {
@@ -109,7 +109,10 @@ function getExtendedMatchIter<U>(
 
 // Sync matchers:
 
-export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
+export function basicMatch<U>(
+  this: SyncFinder<ReadonlyArray<U>>,
+  query: string
+) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
     query,
     this.opts.casing,
@@ -131,7 +134,7 @@ export function basicMatch<U>(this: Finder<ReadonlyArray<U>>, query: string) {
 }
 
 export function extendedMatch<U>(
-  this: Finder<ReadonlyArray<U>>,
+  this: SyncFinder<ReadonlyArray<U>>,
   query: string
 ) {
   const pattern = buildPatternForExtendedMatch(

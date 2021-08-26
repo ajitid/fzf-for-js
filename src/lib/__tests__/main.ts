@@ -2,12 +2,12 @@ import "jest-expect-message";
 
 import { Fzf } from "../main";
 import { basicMatch, extendedMatch } from "../main";
-import { Options } from "../types";
+import { BaseOptions } from "../types";
 
 test("filtering in extended match", () => {
   const list = ["package.json", "package-lock.json", "yarn.lock"];
 
-  const algos: Options<string>["fuzzy"][] = ["v1", "v2", false];
+  const algos: BaseOptions<string>["fuzzy"][] = ["v1", "v2", false];
 
   for (const algo of [...algos, undefined]) {
     const fzf = new Fzf(list, {

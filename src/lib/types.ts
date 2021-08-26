@@ -1,5 +1,5 @@
 import type { Result } from "./algo";
-import type { Finder, AsyncFinder } from "./finders";
+import type { SyncFinder, AsyncFinder } from "./finders";
 
 export interface Token {
   cancelled: boolean;
@@ -119,7 +119,7 @@ export interface BaseOptions<U> {
   forward: boolean;
 }
 
-export type Options<U> = BaseOptions<U> & {
+export type SyncOptions<U> = BaseOptions<U> & {
   /**
    * A function that is responsible for matching list items with the query.
    *
@@ -131,7 +131,10 @@ export type Options<U> = BaseOptions<U> & {
    *
    * @defaultValue `basicMatch`
    */
-  match: (this: Finder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
+  match: (
+    this: SyncFinder<ReadonlyArray<U>>,
+    query: string
+  ) => FzfResultItem<U>[];
 };
 
 export type AsyncOptions<U> = BaseOptions<U> & {
