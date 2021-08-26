@@ -104,7 +104,6 @@ export class SyncFinder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
 export type AsyncOptsToUse<U> = BaseOptsToUse<U> &
   Partial<Pick<AsyncOptions<U>, "match">>;
 
-// from https://stackoverflow.com/a/52318137/7683365
 export type AsyncOptionsTuple<U> = U extends string
   ? [options?: AsyncOptsToUse<U>]
   : [options: AsyncOptsToUse<U> & { selector: Selector<U> }];
@@ -154,7 +153,7 @@ const createResultItemWithEmptyPos = <U>(item: U): FzfResultItem<U> => ({
 
 function postProcessResultItems<U>(
   result: FzfResultItem<U>[],
-  opts: SyncOptions<U> | AsyncOptions<U>
+  opts: BaseOptions<U>
 ) {
   if (opts.sort) {
     const { selector } = opts;
