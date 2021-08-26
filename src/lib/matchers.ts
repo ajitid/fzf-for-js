@@ -4,7 +4,7 @@ import {
   buildPatternForExtendedMatch,
 } from "./pattern";
 import { computeExtendedMatch } from "./extended";
-import { BaseFinder, SyncFinder, AsyncFinder } from "./finders";
+import type { BaseFinder, SyncFinder, AsyncFinder } from "./finders";
 import { FzfResultItem, Token } from "./types";
 
 function getResultFromScoreMap<T>(
@@ -164,7 +164,7 @@ const isNode =
   // This is also why we aren't using @ts-expect-error
   typeof require !== "undefined" && typeof window === "undefined";
 
-export function asyncMatcher<F>(
+function asyncMatcher<F>(
   token: Token,
   len: number,
   iter: (index: number) => unknown,
