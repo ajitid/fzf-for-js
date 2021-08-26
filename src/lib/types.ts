@@ -12,13 +12,15 @@ export interface FzfResultItem<U = string> extends Result {
   positions: Set<number>;
 }
 
+export type Selector<U> = BaseOptions<U>["selector"];
+
 export type Tiebreaker<U> = (
   a: FzfResultItem<U>,
   b: FzfResultItem<U>,
-  selector: Options<U>["selector"]
+  selector: Selector<U>
 ) => number;
 
-export interface Options<U> {
+interface BaseOptions<U> {
   /**
    * If `limit` is 32, top 32 items that matches your query will be returned.
    * By default all matched items are returned.
@@ -56,18 +58,6 @@ export interface Options<U> {
    * @defaultValue `"v2"`
    */
   fuzzy: "v1" | "v2" | false;
-  /**
-   * A function that is responsible for matching list items with the query.
-   *
-   * We ship with two match functions - `basicMatch` and `extendedMatch`.
-   *
-   * If `extendedMatch` is used, you can add special patterns to narrow down your search.
-   * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
-   * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
-   *
-   * @defaultValue `basicMatch`
-   */
-  match: (this: Finder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
   /**
    * A list of functions that act as fallback and help to
    * sort result entries when the score between two entries is tied.
@@ -129,7 +119,33 @@ export interface Options<U> {
   forward: boolean;
 }
 
-export type AsyncOptions<U> = Omit<Options<U>, "match"> & {
+export type Options<U> = BaseOptions<U> & {
+  /**
+   * A function that is responsible for matching list items with the query.
+   *
+   * We ship with two match functions - `basicMatch` and `extendedMatch`.
+   *
+   * If `extendedMatch` is used, you can add special patterns to narrow down your search.
+   * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
+   * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
+   *
+   * @defaultValue `basicMatch`
+   */
+  match: (this: Finder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
+};
+
+export type AsyncOptions<U> = BaseOptions<U> & {
+  /**
+   * A function that is responsible for matching list items with the query.
+   *
+   * We ship with two match functions - `asyncBasicMatch` and `asyncExtendedMatch`.
+   *
+   * If `asyncExtendedMatch` is used, you can add special patterns to narrow down your search.
+   * To read about how they can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax).
+   * For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
+   *
+   * @defaultValue `asyncBasicMatch`
+   */
   match: (
     this: AsyncFinder<ReadonlyArray<U>>,
     query: string,

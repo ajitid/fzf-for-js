@@ -8,7 +8,7 @@ import type {
 } from "./finders";
 import type { Options, AsyncOptions } from "./types";
 
-export type { Tiebreaker, FzfResultItem } from "./types";
+export type { FzfResultItem, Selector, Tiebreaker } from "./types";
 export * from "./matchers";
 export * from "./tiebreakers";
 

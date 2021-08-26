@@ -1,7 +1,13 @@
 import { fuzzyMatchV2, fuzzyMatchV1, AlgoFn, exactMatchNaive } from "./algo";
 import { basicMatch, asyncBasicMatch } from "./matchers";
 import { Rune, strToRunes } from "./runes";
-import { FzfResultItem, Options, AsyncOptions, Token } from "./types";
+import {
+  FzfResultItem,
+  Options,
+  AsyncOptions,
+  Tiebreaker,
+  Token,
+} from "./types";
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -9,7 +15,7 @@ export type ArrayElement<ArrayType extends readonly unknown[]> =
 type SortAttrs<U> =
   | {
       sort?: true;
-      tiebreakers?: Options<U>["tiebreakers"];
+      tiebreakers?: Tiebreaker<U>[];
     }
   | { sort: false };
 
