@@ -1,9 +1,9 @@
-import type { FzfResultItem, Options } from "./types";
+import type { FzfResultItem, Selector } from "./types";
 
 export function byLengthAsc<U>(
   a: FzfResultItem<U>,
   b: FzfResultItem<U>,
-  selector: Options<U>["selector"]
+  selector: Selector<U>
 ): number {
   return selector(a.item).length - selector(b.item).length;
 }

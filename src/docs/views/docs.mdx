@@ -177,6 +177,61 @@ For example, if you query "comp" you would get:
 | src/<b>comp</b>onents/input-composed.ts | src/components/input-<b>comp</b>osed.ts |
 | src/<b>comp</b>onents/portal.ts         | src/<b>comp</b>onents/portal.ts         |
 
+### Async finder
+
+#### Considering other options first
+
+If the list items are many and/or are lengthy, FZF would take more time to process and give you the result back. Usually this time decreases when you type in more letters in the query. However, if you are noticing a minimal lag while typing first few letters, you can employ a faster version for it:
+
+```js
+const fzf = new Fzf(list)
+const fzfFast = new Fzf(list, { fuzzy: 'v1' })
+
+// ...
+
+if(query.length <= 3) {
+  return fzfFast.find(query)
+} else {
+  return fzf.find(query)
+}
+```
+
+By default, FZF uses v2 algo which gives better matched positions for items. However, this is something that is not quite noticeable if you have typed very few letters in the query. So v1 can easily replace v2 algo in this case.
+
+#### Opting for async
+
+If the queries are taking around 100ms to resolve, then you could opt for an async finder as input lags are noticeable if they cross 100ms mark<sup>[1]</sup>. You can [read more about it here](https://www.nngroup.com/articles/response-times-3-important-limits).
+
+You would change your code from:
+
+```js
+import { Fzf } from 'fzf'
+
+const fzf = new Fzf(list)
+
+const result = fzf.find(query)
+// process `result`
+```
+
+to:
+
+```js
+import { AsyncFzf } from 'fzf'
+
+const fzf = new AsyncFzf(list)
+
+fzf
+  .find(query)
+  .then(result => {
+    // process `result`
+  })
+  .catch(() => {})
+```
+
+If you are typing in query input, and the result for previous query isn't resolved before the next one is send off to FZF, FZF would throw an error for the previous query. So in the case when you've typed "he" in you query and you press "y" to make it "hey", if FZF hasn't send you the result back for "he" yet, it'll throw an error for "he" instead. This is why we need to give an empty function to `catch` if we are not planning to handle it in any manner.
+
+[1] People have [different conclusions](https://stackoverflow.com/questions/536300/what-is-the-shortest-perceivable-application-response-delay) about this perceivability threshold
+
 ### Usage with TypeScript
 
 The following code shows a descriptive usage with types. TypeScript can infer these types most of the time for you, so you wouldn't ever need to write them by hand. But for the cases when you do, these are the types you would use:

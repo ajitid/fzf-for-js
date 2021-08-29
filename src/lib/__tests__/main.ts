@@ -1,13 +1,13 @@
 import "jest-expect-message";
 
-import { Fzf } from "../main";
-import { basicMatch, extendedMatch } from "../main";
-import { Options } from "../types";
+import { Fzf, AsyncFzf } from "../main";
+import { basicMatch, extendedMatch, asyncExtendedMatch } from "../main";
+import { BaseOptions } from "../types";
 
 test("filtering in extended match", () => {
   const list = ["package.json", "package-lock.json", "yarn.lock"];
 
-  const algos: Options<string>["fuzzy"][] = ["v1", "v2", false];
+  const algos: BaseOptions<string>["fuzzy"][] = ["v1", "v2", false];
 
   for (const algo of [...algos, undefined]) {
     const fzf = new Fzf(list, {
@@ -156,4 +156,30 @@ test("large result set", () => {
   const list = new Array(510000).fill("hello");
   const fzf = new Fzf(list);
   expect(fzf.find("he").length).toBe(list.length);
+});
+
+test("previous search is cancelled when a new one created", () => {
+  const list = new Array(10000).fill("hellooooooooooooooooooooooooooooo");
+  const fzf = new AsyncFzf(list);
+
+  const p = fzf.find("oo");
+  fzf.find("ooooooo");
+
+  return expect(p).rejects.toMatch("search cancelled");
+});
+
+test("async search gives correct result", () => {
+  const FILL_LENGTH = 10000;
+  const list = new Array(FILL_LENGTH).fill("hellooooooooooooooooooooooooooooo");
+  list.push("heya");
+  const QUERY = "oo he";
+
+  expect(new Fzf(list, { match: extendedMatch }).find(QUERY)).toHaveLength(
+    FILL_LENGTH
+  );
+
+  const fzf = new AsyncFzf(list, { match: asyncExtendedMatch });
+  fzf.find("zz").catch(() => {});
+  const p = fzf.find(QUERY);
+  return expect(p).resolves.toHaveLength(FILL_LENGTH);
 });
