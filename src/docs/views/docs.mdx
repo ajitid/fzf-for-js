@@ -202,7 +202,7 @@ By default, FZF uses v2 algo which gives better matched positions for items. How
 
 If the queries are taking around 100ms to resolve, then you could opt for an async finder as input lags are noticeable if they cross 100ms mark<sup>[1]</sup>. You can [read more about it here](https://www.nngroup.com/articles/response-times-3-important-limits).
 
-You would change your code from:
+To use an async finder, we would need to change our code from:
 
 ```js
 import { Fzf } from 'fzf'
@@ -228,7 +228,7 @@ fzf
   .catch(() => {})
 ```
 
-If you are typing in query input, and the result for previous query isn't resolved before the next one is send off to FZF, FZF would throw an error for the previous query. So in the case when you've typed "he" in you query and you press "y" to make it "hey", if FZF hasn't send you the result back for "he" yet, it'll throw an error for "he" instead. This is why we need to give an empty function to `catch` if we are not planning to handle it in any manner.
+For async, FZF cancels previous search before making a new one. This is why we need to put at least an empty function in `catch` so that these cancellation errors are handled.
 
 [1] People have [different conclusions](https://stackoverflow.com/questions/536300/what-is-the-shortest-perceivable-application-response-delay) about this perceivability threshold
 
