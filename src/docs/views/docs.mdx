@@ -150,7 +150,11 @@ Now the result will be:
 
 Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
 
-If there are multiple tiebreakers, the first one is applied first (when the scores are equal), if this ties (i.e. the tiebreaker function returns 0) the second one is applied, etc. Finally if the scores are equal and all tiebreakers also tie, then the results are returned in the order that they were in the original input list.
+#### Implementation detail
+
+A tiebreaker is a function, and just like a [sort function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) it acts on two result entries at a time.
+
+If multiple tiebreakers are given, the first one is applied first. If it is able to rank one entry higher than the other, then this rank is chosen and the next set of result entries are processed. But if the first tiebreaker isn't able to rank the entries, the next tiebreaker in the list is applied and so on.
 
 To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/8f83d205432f7f4b4fe6f7de08bb98d441da04e7/src/lib/tiebreakers.ts).
 
@@ -164,7 +168,7 @@ const fzf = new Fzf(list, {
 })
 ```
 
-When sorting is turned off, tiebreakers won't affect the sorting order either, and the results are returned in the order that they were in the original input list.
+When sorting is turned off, tiebreakers won't affect the sorting order either. And so the result items would be returned in the same order as they were in the original input list.
 
 ### Matching backwards
 
@@ -172,10 +176,10 @@ While matching file paths or links you might prefer for characters that appear t
 
 For example, if you query "comp" you would get:
 
-| `forward=true` (default)                | `forward=false`                         |
-| ---                                     | ---                                     |
-| src/<b>comp</b>onents/input-composed.ts | src/components/input-<b>comp</b>osed.ts |
-| src/<b>comp</b>onents/portal.ts         | src/<b>comp</b>onents/portal.ts         |
+| `forward=true` (default)                 | `forward=false`                          |
+| ---                                      | ---                                      |
+| src/<b>comp</b>onents/composite-input.ts | src/components/<b>comp</b>osite-input.ts |
+| src/<b>comp</b>onents/portal.ts          | src/<b>comp</b>onents/portal.ts          |
 
 ### Async finder
 
