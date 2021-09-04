@@ -154,7 +154,7 @@ Note that a tiebreaker is applied only if two items have the same score. That is
 
 A tiebreaker is a function, and just like a [sort function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) it acts on two result entries at a time.
 
-If multiple tiebreakers are given, the first one is applied first. If it is able to rank one entry higher than the other, then this rank is chosen and the next set of result entries are processed. But if the first tiebreaker isn't able to rank the entries, the next tiebreaker in the list is applied and so on.
+If multiple tiebreakers are given, the first one is applied first. If it is able to rank one entry higher than the other, then this rank is chosen and the next pair of result entries are processed. If not, the next tiebreaker in the list is applied, and so on.
 
 To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/8f83d205432f7f4b4fe6f7de08bb98d441da04e7/src/lib/tiebreakers.ts).
 
