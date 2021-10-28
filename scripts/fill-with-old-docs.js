@@ -82,29 +82,46 @@ const fillDocs = (verMajor, verMinor) => {
   );
 };
 
-for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
-  if (i === currVerMajor) {
-    for (let j = currVerMinor - 1; j >= Math.max(0, currVerMinor - 2); j--) {
-      fillDocs(i, j);
-    }
-  } else {
-    const nextCommitHash = shell
-      .exec(
-        `git log -S '"version": "${i}.' --oneline -n 1 --branches HEAD -- package.json`,
-        {
+function run() {
+  if (process.platform === "win32") {
+    /*
+      On Windows, shelljs uses command prompt. Command prompt doesn't recognizes
+      strings in single quotes and so more stuff needs to be escaped, for
+      example 'something "else" happened' → "something \"else\" happened" and it
+      needs more stuff to be in quotes.
+    */
+    require("./fill-with-old-docs-win-compat");
+    // ^ above `require`-d file basically functions as this file but for Windows
+    return;
+  }
+
+  for (let i = currVerMajor; i >= Math.max(0, currVerMajor - 2); i--) {
+    if (i === currVerMajor) {
+      for (let j = currVerMinor - 1; j >= Math.max(0, currVerMinor - 2); j--) {
+        fillDocs(i, j);
+      }
+    } else {
+      const nextCommitHash = shell
+        .exec(
+          `git log -S '"version": "${i}.' --oneline -n 1 --branches HEAD -- package.json`,
+          {
+            silent: true,
+          }
+        )
+        .stdout.split(" ")[0];
+
+      const verStr = JSON.parse(
+        shell.exec(`git show ${nextCommitHash}^:./package.json`, {
           silent: true,
-        }
-      )
-      .stdout.split(" ")[0];
+        }).stdout
+      )["version"];
+      const verMinor = parseInt(verStr.split(".")[1], 10);
 
-    const verStr = JSON.parse(
-      shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true })
-        .stdout
-    )["version"];
-    const verMinor = parseInt(verStr.split(".")[1], 10);
-
-    for (let j = verMinor; j >= Math.max(0, verMinor - 2); j--) {
-      fillDocs(i, j);
+      for (let j = verMinor; j >= Math.max(0, verMinor - 2); j--) {
+        fillDocs(i, j);
+      }
     }
   }
 }
+
+run();
