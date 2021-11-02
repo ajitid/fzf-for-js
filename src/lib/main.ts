@@ -1,4 +1,8 @@
-import { SyncFinder, AsyncFinder } from "./finders";
+import {
+  SyncFinder,
+  AsyncFinder,
+  createResultItemWithEmptyPos,
+} from "./finders";
 import type {
   ArrayElement,
   SyncOptionsTuple,
@@ -39,10 +43,13 @@ export class FzfMulti<
   Options extends FzfOptions<ArrayElement<L>>
 > {
   private fzfList: { finder: Fzf<L>; weight: number }[] = [];
-  private list: L;
+  private items: L;
+  private commonOptions: Partial<
+    Omit<FzfOptions<ArrayElement<L>>, "selector" | "match">
+  >;
 
   constructor(
-    list: L,
+    items: L,
     getters: (Partial<Omit<Options, "limit" | "match" | "sort">> & {
       selector: Options["selector"];
       // TODO renaming it to interval makes more sense
@@ -52,10 +59,11 @@ export class FzfMulti<
       Omit<FzfOptions<ArrayElement<L>>, "selector" | "match">
     > = {}
   ) {
-    this.list = list;
+    this.items = items;
+    this.commonOptions = commonOptions;
 
     for (const getter of getters) {
-      const finder = new Fzf(list, {
+      const finder = new Fzf(items, {
         ...commonOptions,
         ...getter,
         match: basicMatch,
@@ -94,13 +102,18 @@ export class FzfMulti<
   }
 
   find(query: string) {
+    if (query.length === 0 || this.items.length === 0)
+      return this.items
+        .slice(0, this.commonOptions.limit)
+        .map(createResultItemWithEmptyPos);
+
     const terms = query.split(" ");
 
     const result = terms.reduceRight((data, term) => {
       const partialResultIterator = this.getResultForSubstring(term);
       const partialResultArray = Array.from(partialResultIterator);
       return partialResultArray;
-    }, this.list as unknown as ArrayElement<L>[] /* <- TODO */);
+    }, this.items as unknown as ArrayElement<L>[] /* <- TODO */);
 
     // TODO get sort info from common options and sort result items, apply limit here too.
     // ^ use defaultOptions spread

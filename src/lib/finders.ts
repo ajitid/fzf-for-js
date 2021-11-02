@@ -143,7 +143,7 @@ export class AsyncFinder<L extends ReadonlyArray<any>> extends BaseFinder<L> {
   }
 }
 
-const createResultItemWithEmptyPos = <U>(item: U): FzfResultItem<U> => ({
+export const createResultItemWithEmptyPos = <U>(item: U): FzfResultItem<U> => ({
   item,
   start: -1,
   end: -1,
