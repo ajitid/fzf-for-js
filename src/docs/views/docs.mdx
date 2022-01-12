@@ -150,7 +150,13 @@ Now the result will be:
 
 Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
 
-To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/37e6c0d02445e813bcc901f6cf5665db24d5b67b/src/lib/tiebreakers.ts).
+#### Implementation detail
+
+A tiebreaker is a function, and just like a [sort function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) it acts on two result entries at a time.
+
+If multiple tiebreakers are given, the first one is applied first. If it is able to rank one entry higher than the other, then this rank is chosen and the next pair of result entries are processed. If not, the next tiebreaker in the list is applied, and so on.
+
+To get an idea on how a custom tiebreaker can be implemented, you can look into the [code for built-in ones](https://github.com/ajitid/fzf-for-js/blob/8f83d205432f7f4b4fe6f7de08bb98d441da04e7/src/lib/tiebreakers.ts).
 
 #### Disabling sorter
 
@@ -162,7 +168,7 @@ const fzf = new Fzf(list, {
 })
 ```
 
-When sorting is turned off, tiebreakers won't affect the sorting order either.
+When sorting is turned off, tiebreakers won't affect the sorting order either. And so the result items would be returned in the same order as they were in the original input list.
 
 ### Matching backwards
 
@@ -170,10 +176,65 @@ While matching file paths or links you might prefer for characters that appear t
 
 For example, if you query "comp" you would get:
 
-| `forward=true` (default)                | `forward=false`                         |
-| ---                                     | ---                                     |
-| src/<b>comp</b>onents/input-composed.ts | src/components/input-<b>comp</b>osed.ts |
-| src/<b>comp</b>onents/portal.ts         | src/<b>comp</b>onents/portal.ts         |
+| `forward=true` (default)                 | `forward=false`                          |
+| ---                                      | ---                                      |
+| src/<b>comp</b>onents/composite-input.ts | src/components/<b>comp</b>osite-input.ts |
+| src/<b>comp</b>onents/portal.ts          | src/<b>comp</b>onents/portal.ts          |
+
+### Async finder
+
+#### Considering other options first
+
+If the list items are many and/or are lengthy, FZF would take more time to process and give you the result back. Usually this time decreases when you type in more letters in the query. However, if you are noticing a minimal lag while typing first few letters, you can employ a faster version for it:
+
+```js
+const fzf = new Fzf(list)
+const fzfFast = new Fzf(list, { fuzzy: 'v1' })
+
+// ...
+
+if(query.length <= 3) {
+  return fzfFast.find(query)
+} else {
+  return fzf.find(query)
+}
+```
+
+By default, FZF uses v2 algo which gives better matched positions for items. However, this is something that is not quite noticeable if you have typed very few letters in the query. So v1 can easily replace v2 algo in this case.
+
+#### Opting for async
+
+If the queries are taking around 100ms to resolve, then you could opt for an async finder as input lags are noticeable if they cross 100ms mark<sup>[1]</sup>. You can [read more about it here](https://www.nngroup.com/articles/response-times-3-important-limits).
+
+To use an async finder, we would need to change our code from:
+
+```js
+import { Fzf } from 'fzf'
+
+const fzf = new Fzf(list)
+
+const result = fzf.find(query)
+// process `result`
+```
+
+To:
+
+```js
+import { AsyncFzf } from 'fzf'
+
+const fzf = new AsyncFzf(list)
+
+fzf
+  .find(query)
+  .then(result => {
+    // process `result`
+  })
+  .catch(() => {})
+```
+
+For async, FZF cancels previous search before making a new one. This is why we need to put at least an empty function in `catch` so that these cancellation errors are handled.
+
+[1] People have [different conclusions](https://stackoverflow.com/questions/536300/what-is-the-shortest-perceivable-application-response-delay) about this perceivability threshold
 
 ### Usage with TypeScript
 
@@ -203,13 +264,17 @@ const results: FzfResultItem<Fruit>[] = fzf.find('ppya') // gives you back a pap
 This library has different defaults compared to FZF CLI. Get a behaviour similar to CLI with these options:
 
 ```js
+function byTrimmedLengthAsc(a, b, selector) {
+  return selector(a.item).trim().length - selector(b.item).trim().length;
+}
+
 const fzf = new Fzf(list, {
   match: extendedMatch,
-  tiebreakers: [byLengthAsc]
+  tiebreakers: [byTrimmedLengthAsc]
 })
 ```
 
-Both `extendedMatch` and `byLengthAsc` are present in the library for you to import and use.
+`extendedMatch` is present in the library for you to import and use.
 
 ### Notes
 
@@ -226,8 +291,8 @@ Both `extendedMatch` and `byLengthAsc` are present in the library for you to imp
 - `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
 - `normalize?` - boolean, defaults to `true` - If true, FZF will try to remove diacritics from list items. This is useful if the list contains items with diacritics but you want to query with plain A-Z letters. For example, Zoë will be converted to Zoe.
-- `tiebreakers?` - array, defaults to `[]` - A list of functions that decide sort order when the score is tied between two result entries. A tiebreaker is nothing but a compare function like the one you find in [JS Array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) with an added third argument which is this `options` itself. First and second arguments are result entries that you receive from `fzf.find`. Note that tiebreakers can't be used if `sort=false`. This library ships with two tiebreakers - `byLengthAsc` and `byStartAsc`.
-- `sort?` - boolean, defaults to `true` - If true, result items will be sorted in descending order by their score. Otherwise, result won't be sorted and tiebreakers won't be applied either.
+- `tiebreakers?` - array, defaults to `[]` - A list of functions that decide sort order when the score is tied between two result entries. A tiebreaker is nothing but a compare function like the one you find in [JS Array sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) with an added third argument which is `options.selector`. First and second arguments are result entries that you receive from `fzf.find`. Note that tiebreakers can't be used if `sort=false`. This library ships with two tiebreakers - `byLengthAsc` and `byStartAsc`.
+- `sort?` - boolean, defaults to `true` - If true, result items will be sorted in descending order by their score. Otherwise, the items won't be sorted and tiebreakers won't be applied either; they will be returned in the same order that they were in the input list.
 - `fuzzy?` - string, defaults to `"v2"`, accepts `"v1" | "v2" | false` - Select which version of fuzzy algo you want to use. Refer to [this explanation](https://github.com/junegunn/fzf/blob/4c9cab3f8ae7b55f7124d7c3cf7ac6b4cc3db210/src/algo/algo.go#L5) to see the differences. If asssigned `false`, an exact match will be made instead of a fuzzy one.
 - `match?` - function, defaults to `basicMatch` - We provide two built-in functions, namely `basicMatch` and `extendedMatch`. If `extendedMatch` is used, you can add special patterns to narrow down your search. To read more about how it can be used, see [this section](https://github.com/junegunn/fzf/tree/7191ebb615f5d6ebbf51d598d8ec853a65e2274d#search-syntax). For a quick glance, see [this piece](https://github.com/junegunn/fzf/blob/764316a53d0eb60b315f0bbcd513de58ed57a876/src/pattern.go#L12-L19).
 - `forward?` - boolean, defaults to `true` - If false, items will be matched from backwards. So if we query "/breeds/pyrenees" with "re" it will result in "/b<b>re</b>eds/pyrenees" but with forward=false it will result in "/breeds/py<b>re</b>nees".

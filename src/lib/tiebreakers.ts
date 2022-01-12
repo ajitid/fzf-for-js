@@ -1,11 +1,11 @@
-import type { FzfResultItem, Options } from "./types";
+import type { FzfResultItem, Selector } from "./types";
 
 export function byLengthAsc<U>(
   a: FzfResultItem<U>,
   b: FzfResultItem<U>,
-  opts: Options<U>
+  selector: Selector<U>
 ): number {
-  return opts.selector(a.item).length - opts.selector(b.item).length;
+  return selector(a.item).length - selector(b.item).length;
 }
 
 export function byStartAsc<U>(

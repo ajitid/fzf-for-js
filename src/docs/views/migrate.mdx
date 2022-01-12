@@ -4,6 +4,29 @@ import { Seo } from '../components/seo'
 
 # Migration Guide
 
+## v0.4 → v0.5
+
+We only have made some changes in `tiebreakers` in this release. FZF doesn't uses this option by default. So if you have not used a tiebreaker in your code, a version bump is all what you need!
+
+### `options.tiebreakers`
+
+- The third argument of tiebreaker has been changed from `options` to `selector`
+
+```diff
+- function byTrimmedLengthAsc(a, b, options) {
+-   return options.selector(a.item).trim().length - options.selector(b.item).trim().length;
++ function byTrimmedLengthAsc(a, b, selector) {
++   return selector(a.item).trim().length - selector(b.item).trim().length;
+  }
+
+
+const fzf = new Fzf(list, () => {
+  tiebreakers: [byTrimmedLengthAsc]
+})
+```
+
+- The behaviour of tiebreakers now matches with original FZF and with [other search solutions](https://youtu.be/7WQ00Y-80qs?t=3195). You can find more details about it in the updated section for tiebreakers in the docs.
+
 ## v0.3 → v0.4
 
 ### `options.maxResultItems`

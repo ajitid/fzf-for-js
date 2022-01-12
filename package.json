@@ -1,7 +1,7 @@
 {
   "===== INFO =====": "",
   "name": "fzf",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Do fuzzy matching using FZF algorithm in JavaScript",
   "license": "BSD-3-Clause",
   "keywords": [
@@ -50,6 +50,10 @@
   "types": "./dist/types/main.d.ts",
   "===== HINTING =====": "",
   "sideEffects": false,
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
+  },
   "===== DEPS =====": "",
   "devDependencies": {
     "@mdx-js/mdx": "^1.6.22",
@@ -62,7 +66,6 @@
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.3.1",
     "autoprefixer": "^10.2.6",
-    "comlink": "^4.3.1",
     "glob": "^7.1.7",
     "history": "^5.0.0",
     "jest": "^27.0.6",

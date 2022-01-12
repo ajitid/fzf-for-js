@@ -7,7 +7,7 @@
 
 <img src="assets/landing.gif" align="right" />
 
-[Docs](https://fzf.netlify.app) · [Demo](https://fzf.netlify.app/basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
+[Docs](https://fzf.netlify.app) · [Demo](https://fzf.netlify.app/docs/latest/basic) · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)
 
 Originally available as [a fuzzy finder for CLIs](https://github.com/junegunn/fzf), FZF for JavaScript is a port of FZF's main algorithm so it can be used in browser context.
 
