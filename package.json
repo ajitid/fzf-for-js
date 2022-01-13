@@ -50,10 +50,6 @@
   "types": "./dist/types/main.d.ts",
   "===== HINTING =====": "",
   "sideEffects": false,
-  "engines": {
-    "npm": ">=8.0.0",
-    "node": ">=16.0.0"
-  },
   "===== DEPS =====": "",
   "devDependencies": {
     "@mdx-js/mdx": "^1.6.22",
