@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
 [![Docs deployment status](https://img.shields.io/netlify/e4324b0d-d5b2-4139-a688-e58f32a5af6b?label=Docs&logo=netlify)](https://app.netlify.com/sites/fzf/deploys)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fajitid%2Ffzf-for-js.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fajitid%2Ffzf-for-js?ref=badge_shield)
 
 [//]: # "Image, text and counter/assist image needs to follow this order to be correctly aligned"
 
@@ -49,3 +50,7 @@ There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-pal
 
 - Junegunn Choi (author of FZF, [website](https://junegunn.kr/)) – for making his work available and accessible to us. You can [sponsor his project](https://github.com/junegunn/fzf).
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fajitid%2Ffzf-for-js.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fajitid%2Ffzf-for-js?ref=badge_large)
