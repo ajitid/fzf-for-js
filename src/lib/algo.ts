@@ -202,10 +202,8 @@ function trySkip(
       rest = rest.slice(0, idx);
     }
 
-    // TODO I hope that I'm doing it right
     // convert ascii lower to upper by subtracting 32 (a -> A)
     // and then checking if it is present in str
-    // dunno, this logic looks odd for chars which aren't alphabets
     const uidx = rest.indexOf(char - 32);
     if (uidx >= 0) {
       idx = uidx;
