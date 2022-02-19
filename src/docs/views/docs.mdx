@@ -16,11 +16,28 @@ _"FZF for JavaScript" will be referred as "FZF" from here on._
 
 ## Installation
 
+### Node.js
+
 Install FZF by typing the following command in your shell:
 
 ```sh
 npm i fzf
 ```
+
+### Deno
+
+Grab FZF from a web source:
+
+```ts
+// use the latest
+import { Fzf } from 'https://esm.sh/fzf'
+// or pin it to a version
+import { Fzf } from 'https://esm.sh/fzf@0.5.1'
+// or opt for an alternative source
+import { Fzf } from 'https://cdn.skypack.dev/fzf?dts'
+```
+
+`deno.land/x` is not available as a source [for now](https://github.com/ajitid/fzf-for-js/issues/100#issuecomment-1045992897).
 
 ## Usage
 
