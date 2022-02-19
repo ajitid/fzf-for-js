@@ -1,6 +1,8 @@
 // porting FZF at commit hash 7191ebb615f5d6ebbf51d598d8ec853a65e2274d of junegunn/fzf
 // and using https://github.com/nvim-telescope/telescope-fzf-native.nvim/blob/f0379f50aa79a2bf028340067e443a3079b29d54/src/fzf.c
 // for extra reference
+//
+// updated to match to FZF commit hash 9cb7a364a31bdb882d873807774bdcf6fad0c9e4
 
 import { normalizeRune } from "./normalize";
 import { Slab } from "./slab";
@@ -202,10 +204,8 @@ function trySkip(
       rest = rest.slice(0, idx);
     }
 
-    // TODO I hope that I'm doing it right
     // convert ascii lower to upper by subtracting 32 (a -> A)
     // and then checking if it is present in str
-    // dunno, this logic looks odd for chars which aren't alphabets
     const uidx = rest.indexOf(char - 32);
     if (uidx >= 0) {
       idx = uidx;

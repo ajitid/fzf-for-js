@@ -41,9 +41,9 @@ For more ways to use this library, [visit documentation](https://fzf.netlify.app
 
 ## Motivation
 
-Command palette is becoming ubiquitous – you can find it in code editors ([Sublime Text](https://www.sublimetext.com/blog/articles/sublime-text-2-beta), VS Code), design tools ([Figma](https://forum.figma.com/t/new-quick-actions-menu/1788)), project management apps ([Height](https://twitter.com/michaelvillar/status/1347276324772192256), [Linear](https://linear.app/)), source control tools ([Fork](https://fork.dev/blog/posts/quick-launch/), Sublime Merge). Web apps are becoming more prevelant as well. FZF has a great fuzzy finding mechanism which could be used outside of CLI and into these palettes.
+Command palette is becoming ubiquitous – you can find it in code editors ([Sublime Text](https://www.sublimetext.com/blog/articles/sublime-text-2-beta), VS Code), design tools ([Figma](https://forum.figma.com/t/new-quick-actions-menu/1788)), project management apps ([Height](https://twitter.com/michaelvillar/status/1347276324772192256), [Linear](https://linear.app/)), source control tools ([Fork](https://fork.dev/blog/posts/quick-launch/), Sublime Merge). Web apps are becoming more prevalent as well. FZF has a great fuzzy finding mechanism which could be used outside of CLI and into these palettes.
 
-There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-palette)  about command palettes if you want to learn more.
+There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-palette) about command palettes if you want to learn more.
 
 ## Thanks
 
