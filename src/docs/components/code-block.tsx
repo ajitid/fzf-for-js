@@ -4,7 +4,7 @@ import Highlight, {
   Language,
   PrismTheme,
 } from "prism-react-renderer";
-// @ts-expect-error missing declaration file
+
 import { theme as lightTheme } from "./customized-night-owl-light";
 
 export const CodeBlock = ({

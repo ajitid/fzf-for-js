@@ -1,6 +1,9 @@
 // Original: https://github.com/sdras/night-owl-vscode-theme
 // Converted automatically using ./tools/themeFromVsCode
-export const theme = {
+
+import type { PrismTheme } from "prism-react-renderer";
+
+export const theme: PrismTheme = {
   plain: {
     color: "#403f53",
     backgroundColor: "#fdfdfd",
