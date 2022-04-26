@@ -7,19 +7,22 @@ import Highlight, {
 // @ts-expect-error missing declaration file
 import { theme as lightTheme } from "./customized-night-owl-light";
 
-interface Props {
-  children: ReactNode;
-  className?: string;
-}
+export const CodeBlock = ({
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLPreElement>) => {
+  if (!React.isValidElement(children) || children.type !== "code") {
+    return <pre children={children} {...rest} />;
+  }
 
-export const CodeBlock = ({ children, className = "" }: Props) => {
-  const lang = String(className).replace(/language-/, "");
+  const codeProps = children.props as React.HTMLAttributes<HTMLElement>;
+  const lang = String(codeProps.className ?? "").replace(/language-/, "");
 
   return (
     <Highlight
       {...prismDefaultProps}
       theme={lightTheme as PrismTheme}
-      code={children?.toString().trim() ?? ""}
+      code={codeProps.children?.toString().trim() ?? ""}
       language={lang as Language}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (

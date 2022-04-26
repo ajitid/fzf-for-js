@@ -87,7 +87,7 @@ export const mdxComponents = {
       </HeadingContext.Provider>
     );
   },
-  code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
+  pre: CodeBlock,
   // headings
   ...Object.fromEntries(
     [2, 3, 4].map((level) => ["h" + level, getHeading(level)])
