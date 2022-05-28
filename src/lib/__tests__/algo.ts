@@ -30,17 +30,7 @@ function assertMatch(
   eidx: number,
   score: number
 ) {
-  assertMatch2(
-    algo,
-    caseSensitive,
-    false,
-    forward,
-    input,
-    pattern,
-    sidx,
-    eidx,
-    score
-  );
+  assertMatch2(algo, caseSensitive, false, forward, input, pattern, sidx, eidx, score);
 }
 
 function assertMatch2(
@@ -96,10 +86,7 @@ it("fuzzy match", () => {
         "oBZ",
         2,
         9,
-        SCORE_MATCH * 3 +
-          BONUS_CAMEL_123 +
-          SCORE_GAP_START +
-          SCORE_GAP_EXTENTION * 3
+        SCORE_MATCH * 3 + BONUS_CAMEL_123 + SCORE_GAP_START + SCORE_GAP_EXTENTION * 3
       );
 
       assertMatch(
@@ -136,9 +123,7 @@ it("fuzzy match", () => {
         "zshc",
         6,
         10,
-        SCORE_MATCH * 4 +
-          BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
-          BONUS_BOUNDARY * 3
+        SCORE_MATCH * 4 + BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER + BONUS_BOUNDARY * 3
       );
 
       assertMatch(
@@ -163,10 +148,7 @@ it("fuzzy match", () => {
         "12356",
         3,
         10,
-        SCORE_MATCH * 5 +
-          BONUS_CONSECUTIVE * 3 +
-          SCORE_GAP_START +
-          SCORE_GAP_EXTENTION
+        SCORE_MATCH * 5 + BONUS_CONSECUTIVE * 3 + SCORE_GAP_START + SCORE_GAP_EXTENTION
       );
 
       assertMatch(
@@ -238,9 +220,7 @@ it("fuzzy match", () => {
         "foob",
         0,
         4,
-        SCORE_MATCH * 4 +
-          BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
-          BONUS_BOUNDARY * 3
+        SCORE_MATCH * 4 + BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER + BONUS_BOUNDARY * 3
       );
 
       assertMatch(
@@ -267,10 +247,7 @@ it("fuzzy match", () => {
         "oBz",
         2,
         9,
-        SCORE_MATCH * 3 +
-          BONUS_CAMEL_123 +
-          SCORE_GAP_START +
-          SCORE_GAP_EXTENTION * 3
+        SCORE_MATCH * 3 + BONUS_CAMEL_123 + SCORE_GAP_START + SCORE_GAP_EXTENTION * 3
       );
       assertMatch(
         algo,
@@ -355,25 +332,14 @@ it("fuzzy match backward", () => {
     "fb",
     7,
     9,
-    SCORE_MATCH * 2 +
-      BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
-      BONUS_BOUNDARY
+    SCORE_MATCH * 2 + BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER + BONUS_BOUNDARY
   );
 });
 
 it("exact match naive", () => {
   for (const dir of [true, false]) {
     assertMatch(exactMatchNaive, true, dir, "fooBarbaz", "oBA", -1, -1, 0);
-    assertMatch(
-      exactMatchNaive,
-      true,
-      dir,
-      "fooBarbaz",
-      "fooBarbazz",
-      -1,
-      -1,
-      0
-    );
+    assertMatch(exactMatchNaive, true, dir, "fooBarbaz", "fooBarbazz", -1, -1, 0);
 
     assertMatch(
       exactMatchNaive,
@@ -443,8 +409,7 @@ it("exact match naive backward", () => {
 
 it("prefix match", () => {
   const score =
-    (SCORE_MATCH + BONUS_BOUNDARY) * 3 +
-    BONUS_BOUNDARY * (BONUS_FIRST_CHAR_MULTIPLIER - 1);
+    (SCORE_MATCH + BONUS_BOUNDARY) * 3 + BONUS_BOUNDARY * (BONUS_FIRST_CHAR_MULTIPLIER - 1);
 
   for (const dir of [true, false]) {
     assertMatch(prefixMatch, true, dir, "fooBarbaz", "Foo", -1, -1, 0);
@@ -482,8 +447,7 @@ it("suffix match", () => {
       "baz",
       6,
       9,
-      (SCORE_MATCH + BONUS_CAMEL_123) * 3 +
-        BONUS_CAMEL_123 * (BONUS_FIRST_CHAR_MULTIPLIER - 1)
+      (SCORE_MATCH + BONUS_CAMEL_123) * 3 + BONUS_CAMEL_123 * (BONUS_FIRST_CHAR_MULTIPLIER - 1)
     );
 
     // Strip trailing white space from the string
@@ -535,17 +499,7 @@ it("normalize", () => {
     ...fns: AlgoFn[]
   ) => {
     for (const fn of fns) {
-      assertMatch2(
-        fn,
-        caseSensitive,
-        normalize,
-        forward,
-        input,
-        pattern,
-        sidx,
-        eidx,
-        score
-      );
+      assertMatch2(fn, caseSensitive, normalize, forward, input, pattern, sidx, eidx, score);
     }
   };
 
@@ -606,10 +560,7 @@ it("fuzzy match with slab", () => {
         "oBZ",
         2,
         9,
-        SCORE_MATCH * 3 +
-          BONUS_CAMEL_123 +
-          SCORE_GAP_START +
-          SCORE_GAP_EXTENTION * 3,
+        SCORE_MATCH * 3 + BONUS_CAMEL_123 + SCORE_GAP_START + SCORE_GAP_EXTENTION * 3,
         slab
       );
 
@@ -622,9 +573,7 @@ it("fuzzy match with slab", () => {
         "zshc",
         6,
         10,
-        SCORE_MATCH * 4 +
-          BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER +
-          BONUS_BOUNDARY * 3,
+        SCORE_MATCH * 4 + BONUS_BOUNDARY * BONUS_FIRST_CHAR_MULTIPLIER + BONUS_BOUNDARY * 3,
         slab
       );
     }

@@ -144,9 +144,7 @@ test("sort", () => {
           .find("li")
           .map((v) => v.item)
           .join(", "),
-        `failed on\n\tmatch type=${
-          match === basicMatch ? "basic" : "extended"
-        }\n\tsort=${sort}`
+        `failed on\n\tmatch type=${match === basicMatch ? "basic" : "extended"}\n\tsort=${sort}`
       ).toBe(expected);
     }
   }
@@ -174,9 +172,7 @@ test("async search gives correct result", () => {
   list.push("heya");
   const QUERY = "oo he";
 
-  expect(new Fzf(list, { match: extendedMatch }).find(QUERY)).toHaveLength(
-    FILL_LENGTH
-  );
+  expect(new Fzf(list, { match: extendedMatch }).find(QUERY)).toHaveLength(FILL_LENGTH);
 
   const fzf = new AsyncFzf(list, { match: asyncExtendedMatch });
   fzf.find("zz").catch(() => {});

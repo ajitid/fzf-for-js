@@ -131,10 +131,7 @@ export type SyncOptions<U> = BaseOptions<U> & {
    *
    * @defaultValue `basicMatch`
    */
-  match: (
-    this: SyncFinder<ReadonlyArray<U>>,
-    query: string
-  ) => FzfResultItem<U>[];
+  match: (this: SyncFinder<ReadonlyArray<U>>, query: string) => FzfResultItem<U>[];
 };
 
 export type AsyncOptions<U> = BaseOptions<U> & {

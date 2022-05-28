@@ -6,11 +6,7 @@ const whitespaceRunes = new Set(
     .split("")
     .map((v) => v.codePointAt(0)!)
 );
-for (
-  let codePoint = "\u2000".codePointAt(0)!;
-  codePoint <= "\u200a".codePointAt(0)!;
-  codePoint++
-) {
+for (let codePoint = "\u2000".codePointAt(0)!; codePoint <= "\u200a".codePointAt(0)!; codePoint++) {
   whitespaceRunes.add(codePoint);
 }
 

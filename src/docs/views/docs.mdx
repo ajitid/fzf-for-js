@@ -3,11 +3,22 @@ import pkg from "../../../package.json";
 
 # FZF for JavaScript
 
-<span className="docs-hidden"><i>If you are reading this file on GitHub, we'll suggest to read it on <a href="https://fzf.netlify.app">documentation website</a> instead.</i></span>
+<span className="docs-hidden">
+  <i>
+    If you are reading this file on GitHub, we'll suggest to read it on{" "}
+    <a href="https://fzf.netlify.app">documentation website</a> instead.
+  </i>
+</span>
 
 <div className="flex justify-between flex-wrap">
-  <div><Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)</div>
-  <div>Docs for v{pkg.version} (<Link to="/docs">Change</Link>) · <Link to="/migrate">Migration Guide</Link></div>
+  <div>
+    <Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) ·
+    [NPM](https://www.npmjs.com/package/fzf)
+  </div>
+  <div>
+    Docs for v{pkg.version} (<Link to="/docs">Change</Link>) ·{" "}
+    <Link to="/migrate">Migration Guide</Link>
+  </div>
 </div>
 
 [FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
@@ -30,11 +41,11 @@ Grab FZF from a web source:
 
 ```ts
 // use the latest
-import { Fzf } from 'https://esm.sh/fzf'
+import { Fzf } from "https://esm.sh/fzf";
 // or pin it to a version
-import { Fzf } from 'https://esm.sh/fzf@0.5.1'
+import { Fzf } from "https://esm.sh/fzf@0.5.1";
 // or opt for an alternative source
-import { Fzf } from 'https://cdn.skypack.dev/fzf?dts'
+import { Fzf } from "https://cdn.skypack.dev/fzf?dts";
 ```
 
 `deno.land/x` is not available as a source [for now](https://github.com/ajitid/fzf-for-js/issues/100#issuecomment-1045992897).
@@ -65,29 +76,29 @@ When life is not simple and items in list aren't just plain strings:
 
 ```js
 const list = [
-  { id: '1', displayName: 'abcd' },
-  { id: '2', displayName: 'bcde' },
-  { id: '3', displayName: 'cdef' },
-  { id: '4', displayName: 'defg' },
-  { id: '5', displayName: 'efgh' },
+  { id: "1", displayName: "abcd" },
+  { id: "2", displayName: "bcde" },
+  { id: "3", displayName: "cdef" },
+  { id: "4", displayName: "defg" },
+  { id: "5", displayName: "efgh" },
 ];
 
 const fzf = new Fzf(list, {
-  // With selector you tell FZF where it can find 
+  // With selector you tell FZF where it can find
   // the string that you want to query on
   selector: (item) => item.displayName,
 });
-const entries = fzf.find('cd')
-const ranking = entries.map(entry => entry.item.displayName).join(', ')
-console.log(ranking) // Output: cdef, abcd, bcde
+const entries = fzf.find("cd");
+const ranking = entries.map((entry) => entry.item.displayName).join(", ");
+console.log(ranking); // Output: cdef, abcd, bcde
 ```
 
 You can also use a combination of fields to search upon:
 
 ```js
 const fzf = new Fzf(list, {
-  selector: (item) => `${item.displayName} (${item.id})` // bcde (2)
-})
+  selector: (item) => `${item.displayName} (${item.id})`, // bcde (2)
+});
 ```
 
 ### Case sensitivity
@@ -95,7 +106,7 @@ const fzf = new Fzf(list, {
 FZF does smart case searching by default. This means that if the list is
 
 ```js
-const list = ['Vulpix', 'Pikachu', 'Bulbasaur', 'Typholsion']
+const list = ["Vulpix", "Pikachu", "Bulbasaur", "Typholsion"];
 ```
 
 and you query for "pi" you will get Pikachu, Vulpix and Typholsion but if you query for "Pi" you will only get Pikachu back. This can be customized in options.
@@ -104,9 +115,15 @@ and you query for "pi" you will get Pikachu, Vulpix and Typholsion but if you qu
 
 Let's take the list above with query "pi". The result will be:
 
-<div><b>Pi</b>kachu</div>
-<div>Vul<b>pi</b>x</div>
-<div>Ty<b>p</b>hols<b>i</b>on</div>
+<div>
+  <b>Pi</b>kachu
+</div>
+<div>
+  Vul<b>pi</b>x
+</div>
+<div>
+  Ty<b>p</b>hols<b>i</b>on
+</div>
 
 To highlight characters "p" and "i" using React for example, it would be:
 
@@ -126,7 +143,7 @@ const HighlightChars = (props) => {
 };
 
 // and can be used like so:
-const reactElement = <HighlightChars str={entry.item} indices={entry.positions} />
+const reactElement = <HighlightChars str={entry.item} indices={entry.positions} />;
 // where `entry` is an item from the result list which is returned from `fzf.find()`
 ```
 
@@ -136,30 +153,40 @@ Find a <Link to="basic">working example</Link> for this and its [sourcecode](htt
 
 When we try to match "an" with Thane, Anandnagar, Tripura, Anandpur, Bangalore and Sangam we'll get:
 
-<div><b>An</b>andnagar</div>
-<div><b>An</b>andpur</div>
-<div>Th<b>an</b>e</div>
-<div>B<b>an</b>galore</div>
-<div>S<b>an</b>gam</div>
+<div>
+  <b>An</b>andnagar
+</div>
+<div>
+  <b>An</b>andpur
+</div>
+<div>
+  Th<b>an</b>e
+</div>
+<div>
+  B<b>an</b>galore
+</div>
+<div>
+  S<b>an</b>gam
+</div>
 
 Anandnagar and Anandpur are ranked above the others as their "an" got matched at the very start of those strings. Rest of the three contains "an" somewhere between so they bear the same rank. This ranking is decided by a `score` that FZF calculates for each string.
 
 But what if we prefer to have shorter strings appear first? Well here is when a tiebreaker comes in:
 
 ```js
-import { Fzf, byLengthAsc } from 'fzf'
+import { Fzf, byLengthAsc } from "fzf";
 
 // ...
 
 const fzf = new Fzf(list, {
-  tiebreakers: [byLengthAsc]
-})
+  tiebreakers: [byLengthAsc],
+});
 ```
 
 Now the result will be:
 
 | Default (only score) | Score with `byLengthAsc` tiebreaker |
-| ---                  | ---                                 |
+| -------------------- | ----------------------------------- |
 | Anandnagar           | Anandpur                            |
 | Anandpur             | Anandnagar                          |
 | Thane                | Thane                               |
@@ -182,8 +209,8 @@ FZF doesn't uses a tiebreaker by default. But sometimes you don't want the resul
 
 ```js
 const fzf = new Fzf(list, {
-  sort: false
-})
+  sort: false,
+});
 ```
 
 When sorting is turned off, tiebreakers won't affect the sorting order either. And so the result items would be returned in the same order as they were in the original input list.
@@ -195,7 +222,7 @@ While matching file paths or links you might prefer for characters that appear t
 For example, if you query "comp" you would get:
 
 | `forward=true` (default)                 | `forward=false`                          |
-| ---                                      | ---                                      |
+| ---------------------------------------- | ---------------------------------------- |
 | src/<b>comp</b>onents/composite-input.ts | src/components/<b>comp</b>osite-input.ts |
 | src/<b>comp</b>onents/portal.ts          | src/<b>comp</b>onents/portal.ts          |
 
@@ -206,15 +233,15 @@ For example, if you query "comp" you would get:
 If the list items are many and/or are lengthy, FZF would take more time to process and give you the result back. Usually this time decreases when you type in more letters in the query. However, if you are noticing a minimal lag while typing first few letters, you can employ a faster version for it:
 
 ```js
-const fzf = new Fzf(list)
-const fzfFast = new Fzf(list, { fuzzy: 'v1' })
+const fzf = new Fzf(list);
+const fzfFast = new Fzf(list, { fuzzy: "v1" });
 
 // ...
 
-if(query.length <= 3) {
-  return fzfFast.find(query)
+if (query.length <= 3) {
+  return fzfFast.find(query);
 } else {
-  return fzf.find(query)
+  return fzf.find(query);
 }
 ```
 
@@ -227,27 +254,27 @@ If the queries are taking around 100ms to resolve, then you could opt for an asy
 To use an async finder, we would need to change our code from:
 
 ```js
-import { Fzf } from 'fzf'
+import { Fzf } from "fzf";
 
-const fzf = new Fzf(list)
+const fzf = new Fzf(list);
 
-const result = fzf.find(query)
+const result = fzf.find(query);
 // process `result`
 ```
 
 To:
 
 ```js
-import { AsyncFzf } from 'fzf'
+import { AsyncFzf } from "fzf";
 
-const fzf = new AsyncFzf(list)
+const fzf = new AsyncFzf(list);
 
 fzf
   .find(query)
-  .then(result => {
+  .then((result) => {
     // process `result`
   })
-  .catch(() => {})
+  .catch(() => {});
 ```
 
 For async, FZF cancels previous search before making a new one. This is why we need to put at least an empty function in `catch` so that these cancellation errors are handled.
@@ -259,22 +286,24 @@ For async, FZF cancels previous search before making a new one. This is why we n
 The following code shows a descriptive usage with types. TypeScript can infer these types most of the time for you, so you wouldn't ever need to write them by hand. But for the cases when you do, these are the types you would use:
 
 ```ts
-import { Fzf, FzfResultItem, FzfOptions } from 'fzf'
+import { Fzf, FzfResultItem, FzfOptions } from "fzf";
 
 interface Fruit {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
-const fruits: Fruit[] = [ /* ... */ ]
+const fruits: Fruit[] = [
+  /* ... */
+];
 
 const options: FzfOptions<Fruit> = {
-  selector: v => v.name
-}
+  selector: (v) => v.name,
+};
 
-const fzf = new Fzf<Fruit[]>(fruits, options)
+const fzf = new Fzf<Fruit[]>(fruits, options);
 
-const results: FzfResultItem<Fruit>[] = fzf.find('ppya') // gives you back a papaya!
+const results: FzfResultItem<Fruit>[] = fzf.find("ppya"); // gives you back a papaya!
 ```
 
 ### Making it behave like FZF CLI
@@ -288,8 +317,8 @@ function byTrimmedLengthAsc(a, b, selector) {
 
 const fzf = new Fzf(list, {
   match: extendedMatch,
-  tiebreakers: [byTrimmedLengthAsc]
-})
+  tiebreakers: [byTrimmedLengthAsc],
+});
 ```
 
 `extendedMatch` is present in the library for you to import and use.
@@ -305,6 +334,7 @@ const fzf = new Fzf(list, {
 `list` can be a list of strings or can have items where in any property of item can resolve to a string.
 
 `options`:
+
 - `limit?` - number, defaults to `Infinity` - If `limit` is 32, top 32 items that matches your query will be returned. By default all matched items are returned.
 - `selector?` - function, defaults to `v => v` - For each item in the list, target a specific property of the item to search for. This becomes a required option to pass when `list` is composed of items other than strings.
 - `casing?` - string, defaults to `"smart-case"`, accepts `"smart-case" | "case-sensitive" | "case-insensitive"` - Defines what type of case sensitive search you want.
@@ -320,13 +350,14 @@ const fzf = new Fzf(list, {
 For the code below
 
 ```js
-const entries = (new Fzf(list)).find(query); 
+const entries = new Fzf(list).find(query);
 const entry = entries[0];
 ```
 
 `entries` is a list of all the items that were able to match with `query` string.
 
 Each `entry` contains:
+
 - `item` - Original item that you send in the `list`.
 - `start` - number - Start index where the item is matched.
 - `end` - number - End index + 1 where the item is matched.
