@@ -8,9 +8,6 @@ export function byLengthAsc<U>(
   return selector(a.item).length - selector(b.item).length;
 }
 
-export function byStartAsc<U>(
-  a: FzfResultItem<U>,
-  b: FzfResultItem<U>
-): number {
+export function byStartAsc<U>(a: FzfResultItem<U>, b: FzfResultItem<U>): number {
   return a.start - b.start;
 }

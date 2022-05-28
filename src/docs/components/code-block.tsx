@@ -7,10 +7,7 @@ import Highlight, {
 
 import { theme as lightTheme } from "./customized-night-owl-light";
 
-export const CodeBlock = ({
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLPreElement>) => {
+export const CodeBlock = ({ children, ...rest }: React.HTMLAttributes<HTMLPreElement>) => {
   if (!React.isValidElement(children) || children.type !== "code") {
     return <pre children={children} {...rest} />;
   }

@@ -23,6 +23,7 @@ npm i fzf
 
 Then you can use it like:
 
+<!-- prettier-ignore -->
 ```js
 import { Fzf } from 'fzf'
 
@@ -48,4 +49,3 @@ There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-pal
 ## Thanks
 
 - Junegunn Choi (author of FZF, [website](https://junegunn.kr/)) – for making his work available and accessible to us. You can [sponsor his project](https://github.com/junegunn/fzf).
-

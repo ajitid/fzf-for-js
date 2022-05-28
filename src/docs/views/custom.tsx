@@ -54,20 +54,15 @@ export function Custom() {
           <ul>
             {entries.map((entry) => (
               <li key={entry.item.id} className="py-1">
-                <HighlightChars
-                  str={entry.item.displayName}
-                  indices={entry.positions}
-                />
-                <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.score}
-                </span>
+                <HighlightChars str={entry.item.displayName} indices={entry.positions} />
+                <span className="text-sm pl-4 italic text-gray-400">{entry.score}</span>
               </li>
             ))}
           </ul>
         ) : (
           <div className="text-gray-600 py-1">
-            List MRU + contextual when query or in frequency (frequent +
-            recency) when input is empty
+            List MRU + contextual when query or in frequency (frequent + recency) when input is
+            empty
           </div>
         )}
       </div>

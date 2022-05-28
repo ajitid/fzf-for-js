@@ -28,12 +28,13 @@
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist/types",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
+    "fill-with-old-docs": "node scripts/fill-with-old-docs.js",
     "prepack": "node scripts/prepack.cjs",
     "postpack": "node scripts/postpack.cjs",
     "test": "jest",
     "test:watch": "jest --watch -o",
     "test:cov": "jest --coverage",
-    "fill-with-old-docs": "node scripts/fill-with-old-docs.js"
+    "format": "prettier --write ."
   },
   "===== BUILD =====": "",
   "files": [
@@ -69,6 +70,7 @@
     "jest-expect-message": "^1.0.2",
     "patch-package": "^6.4.7",
     "postcss": "^8.3.5",
+    "prettier": "^2.6.2",
     "preval.macro": "^5.0.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.0",

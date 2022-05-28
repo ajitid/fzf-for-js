@@ -19,28 +19,21 @@ const fillLegacyDocs = (verMajor, verMinor) => {
     .stdout.split(" ")[0];
 
   const verStr = JSON.parse(
-    shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true })
-      .stdout
+    shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true }).stdout
   )["version"];
 
-  const fileContent = shell.exec(
-    `git show ${nextCommitHash}^:./src/views/docs.mdx`,
-    { silent: true }
-  ).stdout;
+  const fileContent = shell.exec(`git show ${nextCommitHash}^:./src/views/docs.mdx`, {
+    silent: true,
+  }).stdout;
 
-  const pkgFileContent = shell.exec(
-    `git show ${nextCommitHash}^:./package.json`,
-    { silent: true }
-  ).stdout;
+  const pkgFileContent = shell.exec(`git show ${nextCommitHash}^:./package.json`, {
+    silent: true,
+  }).stdout;
 
   if (fileContent !== "") {
     shell.mkdir("-p", `src/docs/old-docs/${verStr}/src/docs`);
-    shell
-      .ShellString(fileContent)
-      .to(`src/docs/old-docs/${verStr}/src/docs/docs.mdx`);
-    shell
-      .ShellString(pkgFileContent)
-      .to(`src/docs/old-docs/${verStr}/package.json`);
+    shell.ShellString(fileContent).to(`src/docs/old-docs/${verStr}/src/docs/docs.mdx`);
+    shell.ShellString(pkgFileContent).to(`src/docs/old-docs/${verStr}/package.json`);
     shell.cp(
       "scripts/legacy-app-routes.tsx",
       `src/docs/old-docs/${verStr}/src/docs/app-routes.tsx`
@@ -66,14 +59,12 @@ const fillDocs = (verMajor, verMinor) => {
     .stdout.split(" ")[0];
 
   const verStr = JSON.parse(
-    shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true })
-      .stdout
+    shell.exec(`git show ${nextCommitHash}^:./package.json`, { silent: true }).stdout
   )["version"];
 
-  shell.exec(
-    `git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`,
-    { silent: true }
-  );
+  shell.exec(`git worktree add -f src/docs/old-docs/${verStr} ${nextCommitHash}^`, {
+    silent: true,
+  });
 
   shell.rm(
     "-r",
@@ -102,12 +93,9 @@ function run() {
       }
     } else {
       const nextCommitHash = shell
-        .exec(
-          `git log -S '"version": "${i}.' --oneline -n 1 --branches HEAD -- package.json`,
-          {
-            silent: true,
-          }
-        )
+        .exec(`git log -S '"version": "${i}.' --oneline -n 1 --branches HEAD -- package.json`, {
+          silent: true,
+        })
         .stdout.split(" ")[0];
 
       const verStr = JSON.parse(
