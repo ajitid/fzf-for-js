@@ -23,13 +23,13 @@ export const CodeBlock = ({ children, ...rest }: React.HTMLAttributes<HTMLPreEle
       language={lang as Language}
     >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <div className="-mt-3">
+        <div className="-mt-3 px-4 py-2">
           <div className="flex justify-end">
             <div
               style={{
                 backgroundColor: "#fdfdfd",
               }}
-              className="relative z-10 -mb-3 inline-block text-sm border text-gray-400 px-3 py-1 rounded leading-none mr-4"
+              className="relative z-10 -mb-3 inline-block font-mono text-sm border text-gray-400 px-3 py-1 rounded leading-none mr-4"
             >
               {lang.toUpperCase()}
             </div>

@@ -3,22 +3,10 @@ import pkg from "../../../package.json";
 
 # FZF for JavaScript
 
-<span className="docs-hidden">
-  <i>
-    If you are reading this file on GitHub, we'll suggest to read it on{" "}
-    <a href="https://fzf.netlify.app">documentation website</a> instead.
-  </i>
-</span>
-
+{/* prettier-ignore */}
 <div className="flex justify-between flex-wrap">
-  <div>
-    <Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) ·
-    [NPM](https://www.npmjs.com/package/fzf)
-  </div>
-  <div>
-    Docs for v{pkg.version} (<Link to="/docs">Change</Link>) ·{" "}
-    <Link to="/migrate">Migration Guide</Link>
-  </div>
+  <div><Link to="basic">Demo</Link> · [GitHub](https://github.com/ajitid/fzf-for-js) · [NPM](https://www.npmjs.com/package/fzf)</div>
+  <div>Docs for v{pkg.version} (<Link to="/docs">Change</Link>) · <Link to="/migrate">Migration Guide</Link></div>
 </div>
 
 [FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
@@ -115,15 +103,10 @@ and you query for "pi" you will get Pikachu, Vulpix and Typholsion but if you qu
 
 Let's take the list above with query "pi". The result will be:
 
-<div>
-  <b>Pi</b>kachu
-</div>
-<div>
-  Vul<b>pi</b>x
-</div>
-<div>
-  Ty<b>p</b>hols<b>i</b>on
-</div>
+{/* prettier-ignore */}
+<div><b>Pi</b>kachu</div>
+<div>Vul<b>pi</b>x</div>
+<div>Ty<b>p</b>hols<b>i</b>on</div>
 
 To highlight characters "p" and "i" using React for example, it would be:
 
@@ -153,21 +136,12 @@ Find a <Link to="basic">working example</Link> for this and its [sourcecode](htt
 
 When we try to match "an" with Thane, Anandnagar, Tripura, Anandpur, Bangalore and Sangam we'll get:
 
-<div>
-  <b>An</b>andnagar
-</div>
-<div>
-  <b>An</b>andpur
-</div>
-<div>
-  Th<b>an</b>e
-</div>
-<div>
-  B<b>an</b>galore
-</div>
-<div>
-  S<b>an</b>gam
-</div>
+{/* prettier-ignore */}
+<div><b>An</b>andnagar</div>
+<div><b>An</b>andpur</div>
+<div>Th<b>an</b>e</div>
+<div>B<b>an</b>galore</div>
+<div>S<b>an</b>gam</div>
 
 Anandnagar and Anandpur are ranked above the others as their "an" got matched at the very start of those strings. Rest of the three contains "an" somewhere between so they bear the same rank. This ranking is decided by a `score` that FZF calculates for each string.
 
