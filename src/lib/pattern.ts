@@ -1,10 +1,4 @@
-import {
-  equalMatch,
-  exactMatchNaive,
-  fuzzyMatchV2,
-  prefixMatch,
-  suffixMatch,
-} from "./algo";
+import { equalMatch, exactMatchNaive, fuzzyMatchV2, prefixMatch, suffixMatch } from "./algo";
 import { normalizeRune } from "./normalize";
 import { Rune, runesToStr, strToRunes } from "./runes";
 import { Casing } from "./types";
@@ -53,10 +47,7 @@ export function buildPatternForExtendedMatch(
   // ^^ simplified below:
   {
     const trimmedAtRightStr = str.trimRight();
-    if (
-      trimmedAtRightStr.endsWith("\\") &&
-      str[trimmedAtRightStr.length] === " "
-    ) {
+    if (trimmedAtRightStr.endsWith("\\") && str[trimmedAtRightStr.length] === " ") {
       str = trimmedAtRightStr + " ";
     } else {
       str = trimmedAtRightStr;
@@ -111,12 +102,7 @@ export function buildPatternForExtendedMatch(
   };
 }
 
-function parseTerms(
-  fuzzy: boolean,
-  caseMode: Casing,
-  normalize: boolean,
-  str: string
-): TermSet[] {
+function parseTerms(fuzzy: boolean, caseMode: Casing, normalize: boolean, str: string): TermSet[] {
   // <backslash><space> to a <tab>
   str = str.replace(/\\ /g, "\t");
   // split on space groups
@@ -134,13 +120,11 @@ function parseTerms(
     const lowerText = text.toLowerCase();
 
     const caseSensitive =
-      caseMode === "case-sensitive" ||
-      (caseMode === "smart-case" && text !== lowerText);
+      caseMode === "case-sensitive" || (caseMode === "smart-case" && text !== lowerText);
 
     // TODO double conversion here, could be simplified
     const normalizeTerm =
-      normalize &&
-      lowerText === runesToStr(strToRunes(lowerText).map(normalizeRune));
+      normalize && lowerText === runesToStr(strToRunes(lowerText).map(normalizeRune));
 
     if (!caseSensitive) {
       text = lowerText;
@@ -212,11 +196,7 @@ function parseTerms(
   return sets;
 }
 
-export const buildPatternForBasicMatch = (
-  query: string,
-  casing: Casing,
-  normalize: boolean
-) => {
+export const buildPatternForBasicMatch = (query: string, casing: Casing, normalize: boolean) => {
   let caseSensitive = false;
 
   switch (casing) {

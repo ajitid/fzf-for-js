@@ -7,11 +7,7 @@ test("byLengthAsc", () => {
     tiebreakers: [byLengthAsc],
   });
 
-  expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject([
-    "aaaaa",
-    "baaaaa",
-    "caaaaaaaa",
-  ]);
+  expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject(["aaaaa", "baaaaa", "caaaaaaaa"]);
 });
 
 test("byStartAsc", () => {
@@ -21,11 +17,7 @@ test("byStartAsc", () => {
     tiebreakers: [byStartAsc],
   });
 
-  expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject([
-    "aaaa",
-    "baaa",
-    "ccaaaa",
-  ]);
+  expect(fzf.find("aa").map((entry) => entry.item)).toMatchObject(["aaaa", "baaa", "ccaaaa"]);
 });
 
 test("multiple tiebreakers", () => {

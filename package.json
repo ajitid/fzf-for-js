@@ -17,7 +17,7 @@
   "author": {
     "name": "Ajit",
     "email": "zlksnkwork+pkgnfo@gmail.com",
-    "url": "https://ajitid.in"
+    "url": "https://ajitid.com"
   },
   "===== SCRIPTS =====": "",
   "scripts": {
@@ -28,12 +28,13 @@
     "build:types": "tsc -p tsconfig-to-build-types.json --outDir dist/types",
     "build:only-docs": "tsc && vite build -c vite-for-docs.config.ts",
     "build:docs": "npm run fill-with-old-docs && npm run build:only-docs",
+    "fill-with-old-docs": "node scripts/fill-with-old-docs.js",
     "prepack": "node scripts/prepack.cjs",
     "postpack": "node scripts/postpack.cjs",
     "test": "jest",
     "test:watch": "jest --watch -o",
     "test:cov": "jest --coverage",
-    "fill-with-old-docs": "node scripts/fill-with-old-docs.js"
+    "format": "prettier --write ."
   },
   "===== BUILD =====": "",
   "files": [
@@ -52,12 +53,13 @@
   "sideEffects": false,
   "===== DEPS =====": "",
   "devDependencies": {
-    "@mdx-js/mdx": "^1.6.22",
-    "@mdx-js/react": "^1.6.22",
-    "@tailwindcss/typography": "^0.4.1",
+    "@mdx-js/mdx": "^2.1.1",
+    "@mdx-js/react": "^2.1.1",
+    "@mdx-js/rollup": "^2.1.1",
+    "@tailwindcss/typography": "^0.5.2",
     "@types/jest": "^26.0.24",
     "@types/jest-expect-message": "^1.0.3",
-    "@types/mdx-js__react": "^1.5.4",
+    "@types/mdx": "^2.0.1",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.3.1",
@@ -68,6 +70,7 @@
     "jest-expect-message": "^1.0.2",
     "patch-package": "^6.4.7",
     "postcss": "^8.3.5",
+    "prettier": "^2.6.2",
     "preval.macro": "^5.0.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.0",
@@ -75,12 +78,12 @@
     "react-git-info": "^2.0.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
+    "remark-gfm": "^3.0.1",
     "shelljs": "^0.8.4",
-    "tailwindcss": "^2.2.4",
+    "tailwindcss": "^3.0.24",
     "ts-jest": "^27.0.3",
-    "typescript": "^4.3.2",
-    "vite": "^2.3.8",
-    "vite-plugin-babel-macros": "^1.0.5",
-    "vite-plugin-mdx": "^3.5.6"
+    "typescript": "^4.6.3",
+    "vite": "^2.9.13",
+    "vite-plugin-babel-macros": "^1.0.5"
   }
 }

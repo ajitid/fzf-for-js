@@ -92,22 +92,12 @@ test("buildPatternForExtendedMatch for exact match", () => {
 });
 
 test("buildPatternForExtendedMatch for empty string", () => {
-  const { termSets: terms } = buildPatternForExtendedMatch(
-    true,
-    "smart-case",
-    false,
-    "' ^ !' !^"
-  );
+  const { termSets: terms } = buildPatternForExtendedMatch(true, "smart-case", false, "' ^ !' !^");
   expect(terms.length).toBe(0);
 });
 
 test("exact match", () => {
-  const pattern = buildPatternForExtendedMatch(
-    true,
-    "smart-case",
-    false,
-    "abc"
-  );
+  const pattern = buildPatternForExtendedMatch(true, "smart-case", false, "abc");
 
   const [result, positions] = exactMatchNaive(
     true,
@@ -124,12 +114,7 @@ test("exact match", () => {
 });
 
 test("equal match", () => {
-  const pattern = buildPatternForExtendedMatch(
-    true,
-    "smart-case",
-    false,
-    "^AbC$"
-  );
+  const pattern = buildPatternForExtendedMatch(true, "smart-case", false, "^AbC$");
 
   const match = (str: string, sidxExpected: number, eidxExpected: number) => {
     const textRunes = strToRunes(str);
@@ -168,9 +153,7 @@ Above tests are from junegunn/fzf, but:
 
 test("tab representations are preserved on transformed string", () => {
   const match = (inputStr: string, toMatchStr: string) => {
-    expect(
-      buildPatternForExtendedMatch(false, "smart-case", false, inputStr).str
-    ).toBe(toMatchStr);
+    expect(buildPatternForExtendedMatch(false, "smart-case", false, inputStr).str).toBe(toMatchStr);
   };
 
   match(" AA bb       ", "AA bb");
@@ -178,12 +161,7 @@ test("tab representations are preserved on transformed string", () => {
   match(" AA bb    \\    \\   ", "AA bb    \\    \\ ");
   match(" AA \\  bb \\   ", "AA \\  bb \\ ");
 
-  const pattern = buildPatternForExtendedMatch(
-    false,
-    "smart-case",
-    false,
-    "a\\ b\\ "
-  );
+  const pattern = buildPatternForExtendedMatch(false, "smart-case", false, "a\\ b\\ ");
   const recvText = pattern.termSets[0][0].text;
   expect(recvText[3]).toBe(32);
   expect(recvText[3]).toBe(32);

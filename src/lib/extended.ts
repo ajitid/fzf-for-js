@@ -22,15 +22,7 @@ function iter(
   slab: Slab
 ): [Offset, number, Set<number> | null] {
   for (const part of tokens) {
-    const [res, pos] = algoFn(
-      caseSensitive,
-      normalize,
-      forward,
-      part.text,
-      pattern,
-      true,
-      slab
-    );
+    const [res, pos] = algoFn(caseSensitive, normalize, forward, part.text, pattern, true, slab);
     if (res.start >= 0) {
       // res.start and res.end were typecasted to int32 here
       const sidx = res.start + part.prefixLength;

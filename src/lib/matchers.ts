@@ -1,8 +1,5 @@
 import { slab } from "./slab";
-import {
-  buildPatternForBasicMatch,
-  buildPatternForExtendedMatch,
-} from "./pattern";
+import { buildPatternForBasicMatch, buildPatternForExtendedMatch } from "./pattern";
 import { computeExtendedMatch } from "./extended";
 import type { BaseFinder, SyncFinder, AsyncFinder } from "./finders";
 import { FzfResultItem, Token } from "./types";
@@ -78,12 +75,7 @@ function getExtendedMatchIter<U>(
 ) {
   return (idx: number) => {
     const runes = this.runesList[idx];
-    const match = computeExtendedMatch(
-      runes,
-      pattern,
-      this.algoFn,
-      this.opts.forward
-    );
+    const match = computeExtendedMatch(runes, pattern, this.algoFn, this.opts.forward);
     if (match.offsets.length !== pattern.termSets.length) return;
 
     let sidx = -1,
@@ -109,10 +101,7 @@ function getExtendedMatchIter<U>(
 
 // Sync matchers:
 
-export function basicMatch<U>(
-  this: SyncFinder<ReadonlyArray<U>>,
-  query: string
-) {
+export function basicMatch<U>(this: SyncFinder<ReadonlyArray<U>>, query: string) {
   const { queryRunes, caseSensitive } = buildPatternForBasicMatch(
     query,
     this.opts.casing,
@@ -133,10 +122,7 @@ export function basicMatch<U>(
   return getResultFromScoreMap(scoreMap, this.opts.limit);
 }
 
-export function extendedMatch<U>(
-  this: SyncFinder<ReadonlyArray<U>>,
-  query: string
-) {
+export function extendedMatch<U>(this: SyncFinder<ReadonlyArray<U>>, query: string) {
   const pattern = buildPatternForExtendedMatch(
     Boolean(this.opts.fuzzy),
     this.opts.casing,
@@ -146,10 +132,7 @@ export function extendedMatch<U>(
 
   const scoreMap: Record<number, FzfResultItem<U>[]> = {};
 
-  const iter = getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(
-    scoreMap,
-    pattern
-  );
+  const iter = getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(scoreMap, pattern);
   for (let i = 0, len = this.runesList.length; i < len; ++i) {
     iter(i);
   }
@@ -213,11 +196,7 @@ export function asyncBasicMatch<U>(
   return asyncMatcher(
     token,
     this.runesList.length,
-    getBasicMatchIter.bind(this as BaseFinder<readonly U[]>)(
-      scoreMap,
-      queryRunes,
-      caseSensitive
-    ),
+    getBasicMatchIter.bind(this as BaseFinder<readonly U[]>)(scoreMap, queryRunes, caseSensitive),
     () => getResultFromScoreMap(scoreMap, this.opts.limit)
   );
 }
@@ -239,10 +218,7 @@ export function asyncExtendedMatch<U>(
   return asyncMatcher(
     token,
     this.runesList.length,
-    getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(
-      scoreMap,
-      pattern
-    ),
+    getExtendedMatchIter.bind(this as BaseFinder<readonly U[]>)(scoreMap, pattern),
     () => getResultFromScoreMap(scoreMap, this.opts.limit)
   );
 }

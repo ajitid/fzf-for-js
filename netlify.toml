@@ -2,3 +2,8 @@
   from="/*"
   to="/index.html"
   status=200
+
+# Environment variable to set node version is configured using UI instead.
+# Find it on Site settings > Build & deploy > Environment > Environment variables
+# Commands to run have also been configured using UI.
+

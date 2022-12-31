@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  forwardRef,
-  isValidElement,
-  useContext,
-  useRef,
-} from "react";
+import React, { createContext, forwardRef, isValidElement, useContext, useRef } from "react";
 
 import { CodeBlock } from "../components/code-block";
 import linkIconSrc from "../assets/link.svg";
@@ -23,9 +17,7 @@ const getHeading = (level: number) => {
   const Heading = (props: HeadingProps, ref: React.Ref<HTMLHeadingElement>) => {
     const { lastHeadingsLink } = useContext(HeadingContext);
 
-    let anchor = getAnchor(
-      typeof props.children === "string" ? getAnchor(props.children) : ""
-    );
+    let anchor = getAnchor(typeof props.children === "string" ? getAnchor(props.children) : "");
     if (!anchor) {
       if (isValidElement(props.children)) {
         const elProps = props.children.props;
@@ -49,12 +41,7 @@ const getHeading = (level: number) => {
         ref,
       },
       [
-        <a
-          key="1"
-          href={link}
-          className="heading-link"
-          style={{ textDecoration: "none" }}
-        >
+        <a key="1" href={link} className="heading-link" style={{ textDecoration: "none" }}>
           {props.children}
           <img
             src={linkIconSrc}
@@ -78,18 +65,14 @@ export const mdxComponents = {
     const lastHeadingsLinkRef = useRef<Record<string, string>>({});
 
     return (
-      <HeadingContext.Provider
-        value={{ lastHeadingsLink: lastHeadingsLinkRef.current }}
-      >
+      <HeadingContext.Provider value={{ lastHeadingsLink: lastHeadingsLinkRef.current }}>
         <div className="container mx-auto prose lg:max-w-3xl px-3 sm:px-0">
           <main {...props} />
         </div>
       </HeadingContext.Provider>
     );
   },
-  code: CodeBlock as React.ComponentType<{ children: React.ReactNode }>,
+  pre: CodeBlock,
   // headings
-  ...Object.fromEntries(
-    [2, 3, 4].map((level) => ["h" + level, getHeading(level)])
-  ),
+  ...Object.fromEntries([2, 3, 4].map((level) => ["h" + level, getHeading(level)])),
 };

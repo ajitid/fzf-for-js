@@ -1,4 +1,4 @@
-# FZF for JavaScript (Preview)
+# FZF for JavaScript
 
 [![Tests](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/ajitid/fzf-for-js/actions/workflows/main.yml)
 [![Docs deployment status](https://img.shields.io/netlify/e4324b0d-d5b2-4139-a688-e58f32a5af6b?label=Docs&logo=netlify)](https://app.netlify.com/sites/fzf/deploys)
@@ -23,6 +23,7 @@ npm i fzf
 
 Then you can use it like:
 
+<!-- prettier-ignore -->
 ```js
 import { Fzf } from 'fzf'
 
@@ -48,4 +49,3 @@ There is [a very good read](https://capiche.com/e/consumer-dev-tools-command-pal
 ## Thanks
 
 - Junegunn Choi (author of FZF, [website](https://junegunn.kr/)) – for making his work available and accessible to us. You can [sponsor his project](https://github.com/junegunn/fzf).
-

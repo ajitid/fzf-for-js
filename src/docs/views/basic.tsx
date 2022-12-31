@@ -96,16 +96,13 @@ export function Basic() {
             {entries.map((entry, index) => (
               <li key={index} className="py-1">
                 <HighlightChars str={entry.item} indices={entry.positions} />
-                <span className="text-sm pl-4 italic text-gray-400">
-                  {entry.score}
-                </span>
+                <span className="text-sm pl-4 italic text-gray-400">{entry.score}</span>
               </li>
             ))}
           </ul>
         ) : (
           <div className="text-gray-600 py-1">
-            {choice === "date-fns" ? dateFnDirList.length : wordList.length}{" "}
-            items
+            {choice === "date-fns" ? dateFnDirList.length : wordList.length} items
             {/* can put last selected items here */}
           </div>
         )}

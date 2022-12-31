@@ -26,9 +26,7 @@ if (import.meta.env.PROD) {
   const gitInfo = GitInfo();
   console.log("on commit", gitInfo.commit.hash);
   console.log(
-    '%cFZF\n%cTo use FZF here type, `init()` or `init("' +
-      newestVersion +
-      '" /* version */)`',
+    '%cFZF\n%cTo use FZF here type, `init()` or `init("' + newestVersion + '" /* version */)`',
     "font-size:1.2rem;font-style:italic;font-weight:bold",
     ""
   );
