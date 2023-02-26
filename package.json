@@ -57,7 +57,7 @@
     "@mdx-js/react": "^2.1.1",
     "@mdx-js/rollup": "^2.1.1",
     "@tailwindcss/typography": "^0.5.2",
-    "@types/jest-expect-message": "^1.0.3",
+    "@types/jest": "^29.4.0",
     "@types/mdx": "^2.0.1",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
