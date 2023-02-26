@@ -16,6 +16,7 @@ function loadScript(
 export const expose = (version = "") => {
   version = version ? "@" + version : "";
 
+  console.log("Retrieving FZF...");
   loadScript(
     `https://unpkg.com/fzf${version}/dist/fzf.umd.js`,
     "FZF is now available using `fzf.Fzf`"
