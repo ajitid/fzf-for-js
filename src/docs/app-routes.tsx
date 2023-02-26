@@ -11,7 +11,7 @@ const Loading = () => <div className="mt-3 text-center">Loading...</div>;
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route element={<Docs />} />
+      <Route path="" element={<Docs />} />
       <Route
         path="basic"
         element={
