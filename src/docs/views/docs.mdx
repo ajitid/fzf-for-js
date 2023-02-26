@@ -110,6 +110,7 @@ Let's take the list above with query "pi". The result will be:
 
 To highlight characters "p" and "i" using React for example, it would be:
 
+{/* prettier-ignore */}
 ```js
 const HighlightChars = (props) => {
   const chars = props.str.split("");
@@ -126,9 +127,14 @@ const HighlightChars = (props) => {
 };
 
 // and can be used like so:
-const reactElement = <HighlightChars str={entry.item} indices={entry.positions} />;
-// where `entry` is an item from the result list which is returned from `fzf.find()`
+const reactElement = <HighlightChars
+  str={entry.item.normalize()}
+  indices={entry.positions}
+/>;
 ```
+
+In the last line, `entry` is an item from the result list which is returned from `fzf.find()`.  
+`normalize()` is a built-in function present on strings. This helps you to receive correct highlight indices. If you are passing a selector function, you would write `str={selector(entry.item).normalize()}`.
 
 Find a <Link to="basic">working example</Link> for this and its [sourcecode](https://github.com/ajitid/fzf-for-js/blob/ddf96296e29a61fa634edbac1426c83e51db4378/src/docs/views/basic.tsx#L96-L99).
 
