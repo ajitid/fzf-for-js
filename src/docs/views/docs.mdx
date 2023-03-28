@@ -173,7 +173,7 @@ Now the result will be:
 | Bangalore            | Sangam                              |
 | Sangam               | Bangalore                           |
 
-Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
+Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't move to the top.
 
 #### Implementation detail
 
@@ -185,7 +185,7 @@ To get an idea on how a custom tiebreaker can be implemented, you can look into 
 
 #### Disabling sorter
 
-FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism too:
+FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism as well:
 
 ```js
 const fzf = new Fzf(list, {
