@@ -9,7 +9,7 @@ import pkg from "../../../package.json";
   <div>Docs for v{pkg.version} (<Link to="/docs">Change</Link>) · <Link to="/migrate">Migration Guide</Link></div>
 </div>
 
-[FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries to be as performant as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
+[FZF (stylised as fzf)](https://github.com/junegunn/fzf) is a command line based fuzzy finder built using Golang. A fuzzy finder allows you to type few characters that appear in a string that you are looking for and get that string from a list of strings quickly. FZF for JavaScript ports FZF's algorithm to JavaScript so that it can be used in the browser. However it doesn't tries [to be as performant](https://blog.claude.nl/tech/performance-of-a-go-library-fzf-in-the-browser) as its Golang's counterpart, so while this package can work in Node.JS, you are still better off with Golang version for CLI usage.
 
 _"FZF for JavaScript" will be referred as "FZF" from here on._
 
@@ -173,7 +173,7 @@ Now the result will be:
 | Bangalore            | Sangam                              |
 | Sangam               | Bangalore                           |
 
-Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't moved to the top.
+Note that a tiebreaker is applied only if two items have the same score. That is why Thane, while being the shortest string among the bunch, didn't move to the top.
 
 #### Implementation detail
 
@@ -185,7 +185,7 @@ To get an idea on how a custom tiebreaker can be implemented, you can look into 
 
 #### Disabling sorter
 
-FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism too:
+FZF doesn't uses a tiebreaker by default. But sometimes you don't want the results to get sorted (by score) either. Thankfully we can turn off the sorting mechanism as well:
 
 ```js
 const fzf = new Fzf(list, {
