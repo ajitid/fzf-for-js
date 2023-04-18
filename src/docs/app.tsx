@@ -31,9 +31,7 @@ export function App() {
       <MDXProvider components={mdxComponents}>
         <Router>
           <Routes>
-            <Route path="/">
-              <Navigate to="docs/latest" replace />
-            </Route>
+            <Route path="/" element={<Navigate to="docs/latest" replace />} />
             <Route path="docs/latest/*" element={<AppRoutes />} />
             <Route path="migrate" element={<Migrate />} />
             <Route path="*" element={<div>not found</div>} />
