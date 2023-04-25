@@ -44,6 +44,7 @@
   "module": "./dist/fzf.es.js",
   "exports": {
     ".": {
+      "types": "./dist/types/main.d.ts",
       "import": "./dist/fzf.es.js",
       "require": "./dist/fzf.umd.js"
     }
