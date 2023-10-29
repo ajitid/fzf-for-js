@@ -8,6 +8,7 @@ export default defineConfig({
       formats: ["umd"],
       entry: path.resolve(__dirname, "src/lib/main.ts"),
       name: "fzf",
+      fileName: (format: string) => `fzf.${format}.cjs`,
     },
   },
 });
