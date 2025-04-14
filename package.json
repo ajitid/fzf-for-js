@@ -40,13 +40,13 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/fzf.umd.js",
+  "main": "./dist/fzf.umd.cjs",
   "module": "./dist/fzf.es.js",
   "exports": {
     ".": {
       "types": "./dist/types/main.d.ts",
       "import": "./dist/fzf.es.js",
-      "require": "./dist/fzf.umd.js"
+      "require": "./dist/fzf.umd.cjs"
     }
   },
   "types": "./dist/types/main.d.ts",
