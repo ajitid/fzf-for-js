@@ -22,6 +22,7 @@
   "===== SCRIPTS =====": "",
   "scripts": {
     "dev": "vite -c vite-for-docs.config.ts",
+    "preview": "vite preview",
     "build": "npm run build:modules && npm run build:types",
     "postbuild": "node scripts/postbuild.js",
     "build:modules": "tsc && vite build && vite build -c vite-legacy.config.ts",
