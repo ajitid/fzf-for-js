@@ -1,9 +1,5 @@
 import React, { ReactNode } from "react";
-import Highlight, {
-  defaultProps as prismDefaultProps,
-  Language,
-  PrismTheme,
-} from "prism-react-renderer";
+import { Highlight, Language, PrismTheme } from "prism-react-renderer";
 
 import { theme as lightTheme } from "./customized-night-owl-light";
 
@@ -15,9 +11,10 @@ export const CodeBlock = ({ children, ...rest }: React.HTMLAttributes<HTMLPreEle
   const codeProps = children.props as React.HTMLAttributes<HTMLElement>;
   const lang = String(codeProps.className ?? "").replace(/language-/, "");
 
+  console.log('BOSH: code-block: ', codeProps.style);
+
   return (
     <Highlight
-      {...prismDefaultProps}
       theme={lightTheme as PrismTheme}
       code={codeProps.children?.toString().trim() ?? ""}
       language={lang as Language}
@@ -29,7 +26,7 @@ export const CodeBlock = ({ children, ...rest }: React.HTMLAttributes<HTMLPreEle
               style={{
                 backgroundColor: "#fdfdfd",
               }}
-              className="relative z-10 -mb-3 inline-block font-mono text-sm border text-gray-400 px-3 py-1 rounded leading-none mr-4"
+              className="lang-box relative z-10 -mb-3 inline-block font-mono text-sm border text-gray-400 px-3 py-1 rounded leading-none mr-4"
             >
               {lang.toUpperCase()}
             </div>
@@ -42,13 +39,17 @@ export const CodeBlock = ({ children, ...rest }: React.HTMLAttributes<HTMLPreEle
               marginBottom: 0,
             }}
           >
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line, key: i })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token, key })} />
-                ))}
-              </div>
-            ))}
+            {tokens.map((line, i) => {
+              const { key: lineKey, ...lineProps } = getLineProps({ line, key: i });
+              return (
+                <div key={lineKey as string} {...lineProps}>
+                  {line.map((token, key) => {
+                    const { key: tokenKey, ...tokenProps } = getTokenProps({ token, key });
+                    return <span key={tokenKey as string} {...tokenProps} />;
+                  })}
+                </div>
+              );
+            })}
           </pre>
         </div>
       )}
