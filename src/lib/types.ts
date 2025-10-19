@@ -152,3 +152,5 @@ export type AsyncOptions<U> = BaseOptions<U> & {
     token: Token
   ) => Promise<FzfResultItem<U>[]>;
 };
+
+export type { SyncOptionsTuple } from "./finders";
