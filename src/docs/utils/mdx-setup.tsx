@@ -21,6 +21,7 @@ const getHeading = (level: number) => {
     if (!anchor) {
       if (isValidElement(props.children)) {
         const elProps = props.children.props;
+        // @ts-expect-error children exists on elProps
         const children = elProps["children"];
         if (typeof children === "string") {
           anchor = getAnchor(children);
