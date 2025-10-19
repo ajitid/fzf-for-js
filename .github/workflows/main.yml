@@ -10,22 +10,21 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 16
+          - 24
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
         run: |
-          npm install
-          npx patch-package
+          npm ci
 
       - name: Run tests
         run: npm run test:cov
