@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { Highlight, Language, PrismTheme } from "prism-react-renderer";
 
 import { theme as lightTheme } from "./customized-night-owl-light";
