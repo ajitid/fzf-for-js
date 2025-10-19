@@ -7,7 +7,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { MDXProvider } from "@mdx-js/react";
-// @ts-ignore missing types
 import preval from "preval.macro";
 
 import "./app.css";
