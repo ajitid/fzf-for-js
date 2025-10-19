@@ -1,3 +1,4 @@
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import macrosPlugin from "vite-plugin-babel-macros";
@@ -20,6 +21,7 @@ export default defineConfig(async () => {
         remarkPlugins: [remarkGfm],
       }),
       macrosPlugin(),
+      tailwindcss(),
     ],
     define: {
       // this is required for macrosPlugin to work
